@@ -1,0 +1,14 @@
+.vscode
+
+LLaVA-NeXT/
+
+datasets/
+
+__pycache__/
+
+output/
+
+*.out
+*.err
+
+*.sh
