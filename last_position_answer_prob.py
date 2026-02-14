@@ -83,19 +83,36 @@ def cache_hiddenstate(data_loader, questions, model, tokenizer, dataset_dict, mo
     # Run attention knockouts
     layers_to_cache = list(range(model.config.num_hidden_layers + 1))
     hs_cache_first_answer_gen_all = {}
-    for (input_ids, image_tensor, original_image_sizes, prompts, mask_tensor), line in tqdm(zip(data_loader, questions),total=len(questions)):
+    # for (input_ids, image_tensor, original_image_sizes, prompts, mask_tensor), line in tqdm(zip(data_loader, questions),total=len(questions)):
+    #! video modality 받을 수 있도록
+    for (input_ids, image_tensor, original_image_sizes, prompts, mask_tensor, modality), line in tqdm(zip(data_loader, questions),total=len(questions)):
 
         question_id = line["q_id"]
-        img_id=line["img_id"]
+
+        #! 기존 image만 받음
+        # img_id=line["img_id"]
+
+        #! video도 받을 수 있도록 수정
+        if "video" in line and line["video"] != "":
+            img_id = str(line["video"])
+        else:
+            img_id = str(line["img_id"])
 
 
         input_ids = input_ids.to(device='cuda')
         image_tensor = [img_t.to(device='cuda') for img_t in image_tensor]
 
+        # LLaVA v1.5/v1.6은 항상 "image"로 처리 (InformationFlow.py 참고)
+        if "v1.6" in model_name.lower() or "v1.5" in model_name.lower():
+            effective_modality = "image"
+        else:
+            effective_modality = modality
+
         inps = {
             "inputs": input_ids,
             "images": image_tensor,
             "image_sizes": original_image_sizes,
+            "modalities": [effective_modality], 
             "do_sample": True if args.temperature > 0 else False,
             "temperature": args.temperature,
             "top_p": args.top_p,
@@ -127,15 +144,23 @@ def cache_hiddenstate(data_loader, questions, model, tokenizer, dataset_dict, mo
 # Information flow analysis
 def main(args):
 
+    cache_dir = os.environ.get("HF_HOME", None)
 
     # Model
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
-    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
-                                                                          args.model_base,
-                                                                          model_name,
-                                                                          device_map="auto",
-                                                                          attn_implementation=None)
+    # tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
+    #                                                                       args.model_base,
+    #                                                                       model_name,
+    #                                                                       device_map="auto",
+    #                                                                       attn_implementation=None)
+    
+    #! cache dir 주기 위해 수정
+    tokenizer, model, image_processor, context_len = load_pretrained_model(
+        model_path, args.model_base, model_name,
+        device_map="auto", attn_implementation=None, cache_dir=cache_dir
+    )
+
     model.eval()
     model.tie_weights()
 
@@ -146,7 +171,12 @@ def main(args):
     df = pd.read_csv(args.refined_dataset, dtype={"question_id":str}).fillna('')
     dataset_dict = df.set_index('question_id').T.to_dict('dict')
     questions = [ {**detail, "q_id":qu_id} for qu_id, detail in dataset_dict.items()]
-    data_loader = create_data_loader(questions, args.image_folder,  args.batch_size, args.num_workers, tokenizer,  image_processor, model.config, task_name, args.conv_mode)
+    # data_loader = create_data_loader(questions, args.image_folder,  args.batch_size, args.num_workers, tokenizer,  image_processor, model.config, task_name, args.conv_mode)
+    #! video load 가능하도록 수정
+    data_loader = create_data_loader(questions, args.image_folder, args.batch_size, args.num_workers,
+                                  tokenizer, image_processor, model.config, task_name, args.conv_mode,
+                                  video_folder=args.video_folder, video_fps=args.video_fps,
+                                  frames_upbound=args.frames_upbound, force_sample=args.force_sample)
 
 
 
@@ -286,6 +316,12 @@ if __name__ == "__main__":
 
     parser.add_argument("--only_read_cache",action='store_true', default=False)
     parser.add_argument("--only_cache",action='store_true', default=False)
+
+    #! video 관련 인자 추가
+    parser.add_argument("--video-folder", type=str, default="")
+    parser.add_argument("--video_fps", type=int, default=1)
+    parser.add_argument("--frames_upbound", type=int, default=32)
+    parser.add_argument("--force_sample", action="store_true", default=False)
 
 
 
