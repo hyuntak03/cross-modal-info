@@ -204,7 +204,14 @@ def main(args):
 
 
         question_id = line["q_id"]
-        img_id=line["img_id"]
+        #! 기존 image만 받음
+        # img_id=line["img_id"]
+
+        #! video도 받을 수 있도록 수정
+        if "video" in line and line["video"] != "":
+            img_id = str(line["video"])
+        else:
+            img_id = str(line["img_id"])
 
         if question_id not in hs_cache_first_answer_gen_all: continue
 
