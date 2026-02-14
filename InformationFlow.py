@@ -9,6 +9,9 @@ import numpy as np
 import pandas as pd
 import torch
 from tqdm import tqdm
+
+import torch.multiprocessing as mp
+
 torch.set_grad_enabled(False)
 tqdm.pandas()
 
@@ -449,9 +452,11 @@ def blockdesc2range_patches(des, input_ids, inputs_embeds_shape, central_object_
 
 
 # Information flow analysis
-def InforFlowAna(args):
+# def InforFlowAna(args):
+#! 데이터 병렬
+def InforFlowAna(rank, world_size, args):
 
-
+    torch.cuda.set_device(rank)
     # Model
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
@@ -460,9 +465,16 @@ def InforFlowAna(args):
 
     # tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,args.model_base,model_name,device_map="auto",attn_implementation=None, cache_dir=cache_dir)
 
+    #! 단일 gpu
+    # tokenizer, model, image_processor, context_len = load_pretrained_model(
+    #     model_path, args.model_base, model_name,
+    #     device_map="auto", attn_implementation=None, cache_dir=cache_dir
+    # )
+
+    #! multi-gpu (데이터 병렬)
     tokenizer, model, image_processor, context_len = load_pretrained_model(
         model_path, args.model_base, model_name,
-        device_map="auto", attn_implementation=None, cache_dir=cache_dir
+        device_map={"": rank}, attn_implementation=None, cache_dir=cache_dir
     )
 
     model.prepare_image_patch_bbx=MethodType(prepare_image_patch_bbx, model)
@@ -477,7 +489,11 @@ def InforFlowAna(args):
     task_name = args.refined_dataset.split("/")[-1].split(".csv")[0].split("_")[-1]
     df = pd.read_csv(args.refined_dataset, dtype={"question_id":str}).fillna('')
     dataset_dict = df.set_index('question_id').T.to_dict('dict')
-    questions = [ {**detail, "q_id":qu_id} for qu_id, detail in dataset_dict.items()]
+
+    all_questions = [ {**detail, "q_id":qu_id} for qu_id, detail in dataset_dict.items()]
+
+    #! 데이터 병렬을 위해 데이터 슬라이싱
+    questions = all_questions[rank::world_size]
 
     # data_loader = create_data_loader(questions, args.image_folder,  args.batch_size, args.num_workers, tokenizer,  image_processor, model.config, task_name, args.conv_mode)
     data_loader = create_data_loader(questions, args.image_folder, args.batch_size, args.num_workers,
@@ -607,6 +623,14 @@ def InforFlowAna(args):
     if args.noHD_noPad:
         save_name=save_name+"_noHD_noPad"
     tmp = pd.DataFrame.from_records(results)
+
+    #! multi-gpu: 각 rank별 임시 저장만 하고 return (plot은 merge 후에)
+    if world_size > 1:
+        os.makedirs("/tmp/infoflow_parts", exist_ok=True)
+        tmp.to_csv(f'/tmp/infoflow_parts/rank{rank}.csv', index=False)
+        print(f"[GPU {rank}] Saved {len(tmp)} results to /tmp/infoflow_parts/rank{rank}.csv")
+        return
+
     model_name = model_name.replace('-', '_').replace('.', '_')
     os.makedirs(f"output/information_flow/{model_name}/{task_name}/val/{save_name}", exist_ok=True)
     
@@ -655,6 +679,9 @@ if __name__ == "__main__":
     parser.add_argument("--frames_upbound", type=int, default=32)
     parser.add_argument("--force_sample", action="store_true", default=False)
 
+    #! gpu 수 인자 추가
+    parser.add_argument("--num-gpus", type=int, default=1)
+
     args = parser.parse_args()
 
     block_descs_split = args.block_description.split("->")
@@ -665,6 +692,54 @@ if __name__ == "__main__":
     print(args)
     print("------------------------------------------")
 
-    InforFlowAna(args)
+    # InforFlowAna(args)
+
+    if args.num_gpus > 1:
+        mp.spawn(InforFlowAna, args=(args.num_gpus, args), 
+                 nprocs=args.num_gpus, join=True)
+        
+        #! merge all rank results
+        dfs = [pd.read_csv(f'/tmp/infoflow_parts/rank{i}.csv') for i in range(args.num_gpus)]
+        merged = pd.concat(dfs, ignore_index=True)
+        
+        #! 저장 경로 구성 (InforFlowAna 내부와 동일하게)
+        model_name_clean = get_model_name_from_path(os.path.expanduser(args.model_path))
+        task_name = args.refined_dataset.split("/")[-1].split(".csv")[0].split("_")[-1]
+        
+        #! block_descs에서 save_name 구성
+        save_name = args.block_description.replace(" ", "_").replace("->", "___")
+        if args.noHD_noPad:
+            save_name = save_name + "_noHD_noPad"
+        
+        model_name_clean = model_name_clean.replace('-', '_').replace('.', '_')
+        out_dir = f"output/information_flow/{model_name_clean}/{task_name}/val/{save_name}"
+        os.makedirs(out_dir, exist_ok=True)
+        
+        csv_name = f'{args.refined_dataset.split("/")[-1].split(".csv")[0]}_window{args.window}_{save_name}'
+        merged.to_csv(f'{out_dir}/{csv_name}.csv', index=False)
+        print(f"Merged {len(merged)} results -> {out_dir}/{csv_name}.csv")
+        
+        #! plot 생성
+        base_path = f'{out_dir}/{csv_name}'
+        
+        # 전체 layer 수는 merged 데이터에서 추론
+        num_layers = merged["layer"].max() + 1
+        
+        tmp_correct = merged[merged["is_correct"] == True]
+        if len(tmp_correct) > 0:
+            generate_plot(tmp_correct, f'{base_path}_first_correct.pdf', 
+                         x="layer", y="relative diff first", hue="block_desc", layers=num_layers)
+        
+        tmp_incorrect = merged[merged["is_correct"] == False]
+        if len(tmp_incorrect) > 0:
+            generate_plot(tmp_incorrect, f'{base_path}_first_incorrect.pdf', 
+                         x="layer", y="relative diff first", hue="block_desc", layers=num_layers)
+        
+        #! 임시 파일 정리
+        import shutil
+        shutil.rmtree('/tmp/infoflow_parts', ignore_errors=True)
+        
+    else:
+        InforFlowAna(0, 1, args)  #! single-gpu: rank=0, world_size=1
 
 
