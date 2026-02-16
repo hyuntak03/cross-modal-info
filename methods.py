@@ -41,11 +41,11 @@ def set_block_attn_add_hooks_llava(model, values_per_layer, coef_value=0, only_k
         hooks.append(model.model.layers[layer].self_attn.o_proj.register_forward_hook(change_values(values, coef_value, only_knockout_question, question_range)))
     return hooks
 
-def set_block_attn_hooks_llava(model, from_to_index_per_layer, opposite=False, block_desc=None):
+def set_block_attn_hooks_llava(model, from_to_index_per_layer, opposite=False, block_desc=None, last_token_idx=None):
     """
     Only works on llava
     """
-    def wrap_attn_forward(forward_fn, model_, from_to_index_, opposite_, block_desc_):
+    def wrap_attn_forward(forward_fn, model_, from_to_index_, opposite_, block_desc_, last_token_idx_):
         @functools.wraps(forward_fn)
         def wrapper_fn(*args, **kwargs):
 
@@ -64,11 +64,21 @@ def set_block_attn_hooks_llava(model, from_to_index_per_layer, opposite=False, b
             q_length = kwargs["hidden_states"][0].size(0)
 
             if q_length==1:
-                if block_desc_.split("->")[-1]=="Last":
-                    #! (query, key) 구조니까, t = key 못 보게 하는거임, 즉 last 생성되는 토큰들이 설정한 key랑 attend 못하게 하는거임
-                    from_to_index=[(0, t) for _, t in from_to_index_]
+                #! decode 단계: ->Last pair만 적용
+                #! from_to_index_는 (target_row, source_col) 형태
+                #! target이 last_token_idx인 pair만 decode에서 새 생성 토큰(row=0)에 적용
+                if last_token_idx_ is not None:
+                    from_to_index = [(0, t) for s, t in from_to_index_ if s == last_token_idx_]
                 else:
-                    from_to_index = []
+                    #! fallback: last_token_idx 미제공 시 기존 동작 (하위호환)
+                    has_last_target = any(
+                        bd.strip().split("->")[-1].strip() == "Last"
+                        for bd in block_desc_.split(",")
+                    )
+                    if has_last_target:
+                        from_to_index=[(0, t) for _, t in from_to_index_]
+                    else:
+                        from_to_index = []
 
             else:
                 from_to_index=from_to_index_
@@ -110,7 +120,7 @@ def set_block_attn_hooks_llava(model, from_to_index_per_layer, opposite=False, b
     for i in from_to_index_per_layer.keys():
         hook = model.model.layers[i].self_attn.forward
         model.model.layers[i].self_attn.forward = wrap_attn_forward(model.model.layers[i].self_attn.forward,
-                                                                model, from_to_index_per_layer[i], opposite, block_desc)
+                                                                model, from_to_index_per_layer[i], opposite, block_desc, last_token_idx)
         hooks.append((i, hook))
 
     return hooks
@@ -262,25 +272,25 @@ def trace_with_attn_block_llava(
         model,
         inp,
         from_to_index_per_layer,  # A list of (source index, target index) to block
-        first_answer_token_id,
         block_desc,
-        model_name
+        model_name,
+        last_token_idx=None
 ):
     with torch.inference_mode():
         # set hooks
-        block_attn_hooks = set_block_attn_hooks_llava(model, from_to_index_per_layer, block_desc=block_desc)
+        block_attn_hooks = set_block_attn_hooks_llava(model, from_to_index_per_layer, block_desc=block_desc, last_token_idx=last_token_idx)
 
         # get prediction
         output_details = model.generate(**inp)
-        answer_token_id = output_details['sequences']  # tensor([[   198,   9619, 128009]], device='cuda:0')  ['\nFull<|eot_id|>']
 
         logits_first_answer_token = output_details['scores'][0]
         # remove hooks
         remove_wrapper_llava(model, block_attn_hooks)
 
-    [base_score_first] = torch.softmax(logits_first_answer_token, dim=-1)[0][first_answer_token_id]  # (1,1)
+    #! full softmax probs 반환 → caller가 원하는 token들을 indexing
+    probs = torch.softmax(logits_first_answer_token, dim=-1)[0]
 
-    return base_score_first
+    return probs
 
 
 

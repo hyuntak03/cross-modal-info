@@ -281,38 +281,24 @@ def run_original(model, inps, tokenizer, model_name, answer, mask_tensor=None, a
     answer_token_id = output_details['sequences']
     generated_first_id = answer_token_id[:, 0]
     decoded_generated_first_id = tokenizer.decode(generated_first_id.item())
-
-    #! 정답의 첫 토큰 ID (생성 컨텍스트에 맞게 space prefix)
+    #! 정답의 첫 토큰 ID
     gt_token_ids = tokenizer.encode(answer, add_special_tokens=False)
     gt_first_token_id = gt_token_ids[0]
-
-
+    gt_first_token_id_tensor = torch.tensor([gt_first_token_id], device=generated_first_id.device)
+    logits_first_answer_token = output_details['scores'][0]
+    probs = torch.softmax(logits_first_answer_token, dim=-1)[0]
+    #! GT 토큰과 예측 토큰 각각의 base score
+    gt_base_score = probs[gt_first_token_id_tensor].item()
+    predicted_base_score = probs[generated_first_id].item()
     if decoded_generated_first_id.strip().lower() == answer.strip().lower():
         is_correct_bool = True
-        first_answer_token_id = generated_first_id
     else:
         is_correct_bool = False
-        first_answer_token_id = torch.tensor([gt_first_token_id], 
-                                            device=generated_first_id.device)
-
-    # first_answer_token_id = answer_token_id[:, 0]
-    # logits_first_answer_token = output_details['scores'][0]
-
-    # [base_score_first] = torch.softmax(logits_first_answer_token, dim=-1)[0][first_answer_token_id]  # (1,1)
-    # base_score_first = base_score_first.item()
-
-
-    logits_first_answer_token = output_details['scores'][0]
-
-    [base_score_first] = torch.softmax(logits_first_answer_token, dim=-1)[0][first_answer_token_id]
-    base_score_first = base_score_first.item()
-
     predicted_answer = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip().lower()
-
     if args.certain_part_image:
-        return base_score_first, predicted_answer, first_answer_token_id, inputs_embeds_shape, is_correct_bool, objects_indices, pad_indices, original_patch_indices,hd_patch_indice, objects_indices_in_hd, patched_mask
+        return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool, objects_indices, pad_indices, original_patch_indices, hd_patch_indice, objects_indices_in_hd, patched_mask
     else:
-        return base_score_first, predicted_answer, first_answer_token_id, inputs_embeds_shape, is_correct_bool
+        return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool
 
 
 
@@ -540,13 +526,13 @@ def InforFlowAna(args):
         question = dataset_dict[question_id]["question"]
         answer = dataset_dict[question_id]["answer"]
 
-        #! run_original 돌리면, 얘가 대답한 answer token index가 나옴 (vocab 기준)
+        #! run_original: GT 토큰과 예측 토큰 각각의 base score 반환
         if args.certain_part_image:
-            base_score_first, predicted_answer, first_answer_token_id, inputs_embeds_shape, is_correct_bool, central_object_patch_indices, pad_patch_indices,original_patch_indices,hd_patch_indice,  objects_indices_in_hd, patched_mask = run_original(model, inps, tokenizer, model_name, answer, mask_tensor, args=args)
+            gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id, predicted_first_token_id, inputs_embeds_shape, is_correct_bool, central_object_patch_indices, pad_patch_indices, original_patch_indices, hd_patch_indice, objects_indices_in_hd, patched_mask = run_original(model, inps, tokenizer, model_name, answer, mask_tensor, args=args)
         else:
-            # base_score_first, predicted_answer, first_answer_token_id, inputs_embeds_shape = run_original(model, inps, tokenizer, model_name, args=args)
-            base_score_first, predicted_answer, first_answer_token_id, inputs_embeds_shape, is_correct_bool = run_original(model, inps, tokenizer, model_name, answer, args=args)
-
+            gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id, predicted_first_token_id, inputs_embeds_shape, is_correct_bool = run_original(model, inps, tokenizer, model_name, answer, args=args)
+        
+        
         if is_correct_bool == False:
             is_correct=False
         else:
@@ -554,19 +540,29 @@ def InforFlowAna(args):
             index += 1
             print("Finish samples:", index)
 
-
         #get range
-        block_descs_split = args.block_description.split("->")
-        if args.certain_part_image:
-            range1 = blockdesc2range_patches(block_descs_split[0], input_ids, inputs_embeds_shape,central_object_patch_indices, pad_patch_indices, hd_patch_indice,objects_indices_in_hd, original_patch_indices)
-        else:
-            range1 = blockdesc2range(block_descs_split[0], dataset_dict, question_id, input_ids, inputs_embeds_shape,tokenizer, model_name)
-        range2 = blockdesc2range(block_descs_split[1], dataset_dict, question_id, input_ids, inputs_embeds_shape,tokenizer, model_name)
-        block_descs = [([range1, range2], args.block_description)]
+        #! 콤마로 구분된 여러 block_description 지원
+        #! e.g. "Image->Question,Image->Last"
+        block_desc_pairs = [bd.strip() for bd in args.block_description.split(",")]
+        
+        all_temp2 = []
+        for bd_pair in block_desc_pairs:
+            bd_split = bd_pair.split("->")
+            if args.certain_part_image:
+                r1 = blockdesc2range_patches(bd_split[0], input_ids, inputs_embeds_shape, central_object_patch_indices, pad_patch_indices, hd_patch_indice, objects_indices_in_hd, original_patch_indices)
+            else:
+                r1 = blockdesc2range(bd_split[0], dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name)
+            r2 = blockdesc2range(bd_split[1], dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name)
+            all_temp2.extend([(stok1, stok0) for stok0 in r1 for stok1 in r2])
+        
+        block_descs = [(all_temp2, args.block_description)]
 
-        for block_ids, block_desc in block_descs:
+        #! decode 단계에서 ->Last pair만 필터링하기 위해 last_token_idx 계산
+        image_dim = inputs_embeds_shape[1] - (input_ids.shape[-1] - 1)
+        ntoks = input_ids.shape[1] + image_dim - 1
+        last_token_idx = ntoks - 1
 
-            temp2 = [(stok1, stok0) for stok0 in block_ids[0] for stok1 in block_ids[1]]
+        for temp2, block_desc in block_descs:
 
             if args.block_all_layers:
                 block_config = {
@@ -575,13 +571,16 @@ def InforFlowAna(args):
                 }
                 inps["max_new_tokens"] = 1
 
-                new_score_first = trace_with_attn_block_llava(
-                    model, inps, block_config, first_answer_token_id, block_desc, model_name
+                #! full probs 반환 → GT/predicted 둘 다 indexing
+                new_probs = trace_with_attn_block_llava(
+                    model, inps, block_config, block_desc, model_name, last_token_idx=last_token_idx
                 )
 
-                new_score_first = new_score_first.cpu().item()
+                new_score_gt = new_probs[gt_first_token_id].cpu().item()
+                new_score_predicted = new_probs[predicted_first_token_id].cpu().item()
 
-                re={
+                #! GT answer tracing (항상 저장)
+                re_gt = {
                     "question_id": question_id,
                     "image": img_id,
                     "goden answer": answer,
@@ -590,11 +589,30 @@ def InforFlowAna(args):
                     "question": question,
                     "block_desc": block_desc,
                     "layer": "all",
-                    "base_score_first": base_score_first,
-                    "new_score_first": new_score_first,
-                    "relative diff first": (new_score_first - base_score_first) * 100.0 / base_score_first,
+                    "trace_target": "gt_answer",
+                    "base_score_first": gt_base_score,
+                    "new_score_first": new_score_gt,
+                    "relative diff first": (new_score_gt - gt_base_score) * 100.0 / gt_base_score if gt_base_score != 0 else 0.0,
                 }
-                results.append(re)
+                results.append(re_gt)
+
+                #! predicted answer tracing (오답일 때만 별도 저장)
+                if not is_correct:
+                    re_pred = {
+                        "question_id": question_id,
+                        "image": img_id,
+                        "goden answer": answer,
+                        "predicted answer": predicted_answer,
+                        "is_correct": is_correct,
+                        "question": question,
+                        "block_desc": block_desc,
+                        "layer": "all",
+                        "trace_target": "predicted_answer",
+                        "base_score_first": predicted_base_score,
+                        "new_score_first": new_score_predicted,
+                        "relative diff first": (new_score_predicted - predicted_base_score) * 100.0 / predicted_base_score if predicted_base_score != 0 else 0.0,
+                    }
+                    results.append(re_pred)
             else:
                 #! 기존: layer별 sliding window knockout
                 for layer in range(model.config.num_hidden_layers):
@@ -604,17 +622,20 @@ def InforFlowAna(args):
                         )
                     ]
                     block_config = {
-                        l:copy.deepcopy(temp2)
+                        l: copy.deepcopy(temp2)
                         for l in layerlist
                     }
 
                     inps["max_new_tokens"] = 1
-                    new_score_first = trace_with_attn_block_llava(
-                        model, inps, block_config, first_answer_token_id, block_desc, model_name
+                    new_probs = trace_with_attn_block_llava(
+                        model, inps, block_config, block_desc, model_name, last_token_idx=last_token_idx
                     )
-                    new_score_first = new_score_first.cpu().item()
 
-                    re={
+                    new_score_gt = new_probs[gt_first_token_id].cpu().item()
+                    new_score_predicted = new_probs[predicted_first_token_id].cpu().item()
+
+                    #! GT answer tracing
+                    re_gt = {
                         "question_id": question_id,
                         "image": img_id,
                         "goden answer": answer,
@@ -623,11 +644,30 @@ def InforFlowAna(args):
                         "question": question,
                         "block_desc": block_desc,
                         "layer": layer,
-                        "base_score_first": base_score_first,
-                        "new_score_first": new_score_first,
-                        "relative diff first": (new_score_first - base_score_first) * 100.0 / base_score_first,
+                        "trace_target": "gt_answer",
+                        "base_score_first": gt_base_score,
+                        "new_score_first": new_score_gt,
+                        "relative diff first": (new_score_gt - gt_base_score) * 100.0 / gt_base_score if gt_base_score != 0 else 0.0,
                     }
-                    results.append(re)
+                    results.append(re_gt)
+
+                    #! predicted answer tracing (오답일 때만)
+                    if not is_correct:
+                        re_pred = {
+                            "question_id": question_id,
+                            "image": img_id,
+                            "goden answer": answer,
+                            "predicted answer": predicted_answer,
+                            "is_correct": is_correct,
+                            "question": question,
+                            "block_desc": block_desc,
+                            "layer": layer,
+                            "trace_target": "predicted_answer",
+                            "base_score_first": predicted_base_score,
+                            "new_score_first": new_score_predicted,
+                            "relative diff first": (new_score_predicted - predicted_base_score) * 100.0 / predicted_base_score if predicted_base_score != 0 else 0.0,
+                        }
+                        results.append(re_pred)
 
 
     save_name = "_".join([des[1].replace(" ", "_").replace("->", "___") for des in block_descs])
@@ -649,10 +689,35 @@ def InforFlowAna(args):
     # generate_plot(tmp, f'{base_path}_first_all.pdf', x="layer", y="relative diff first", hue="block_desc", layers=model.config.num_hidden_layers)
 
     if args.block_all_layers:
-        #! block_all_layers 모드: layer별 plot 대신 CSV만 저장 (layer="all"이므로 lineplot 불가)
-        print(f"[INFO] block_all_layers mode: results saved to CSV. No layer-wise plot generated.", flush=True)
+        #! block_all_layers 모드: answer class별 bar plot 생성
+        print(f"[INFO] block_all_layers mode: generating summary bar plots.", flush=True)
         print(f"[INFO] Correct samples: {len(tmp[tmp['is_correct']==True]['question_id'].unique())}, "
               f"Incorrect samples: {len(tmp[tmp['is_correct']==False]['question_id'].unique())}", flush=True)
+
+        #! bar plot은 trace_target별로 분리해서 그려야 함 (gt_answer / predicted_answer 혼합 방지)
+        tmp_gt = tmp[tmp["trace_target"] == "gt_answer"]
+        tmp_pred = tmp[tmp["trace_target"] == "predicted_answer"]
+
+        #! 전체 (gt answer 기준)
+        generate_plot(tmp_gt, f'{base_path}_first_all.pdf',
+                      y="relative diff first", block_all_layers=True, block_description=args.block_description)
+
+        #! 정답만 (gt answer만 존재)
+        tmp_correct = tmp_gt[tmp_gt["is_correct"] == True]
+        if len(tmp_correct) > 0:
+            generate_plot(tmp_correct, f'{base_path}_first_correct.pdf',
+                          y="relative diff first", block_all_layers=True, block_description=args.block_description)
+
+        #! 오답만 — gt answer tracing
+        tmp_incorrect_gt = tmp_gt[tmp_gt["is_correct"] == False]
+        if len(tmp_incorrect_gt) > 0:
+            generate_plot(tmp_incorrect_gt, f'{base_path}_first_incorrect_gt.pdf',
+                          y="relative diff first", block_all_layers=True, block_description=args.block_description)
+
+        #! 오답만 — predicted answer tracing
+        if len(tmp_pred) > 0:
+            generate_plot(tmp_pred, f'{base_path}_first_incorrect_predicted.pdf',
+                          y="relative diff first", block_all_layers=True, block_description=args.block_description)
     else:
         #! 기존: layer별 plot 생성
         #! 정답만 (knockout 전 기준)
@@ -697,9 +762,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    block_descs_split = args.block_description.split("->")
-    if "Image " in block_descs_split[0]:
-        args.certain_part_image=True
+    #! 콤마로 구분된 여러 block_description에서 Image patch 관련 여부 감지
+    for bd_pair in args.block_description.split(","):
+        bd_split = bd_pair.strip().split("->")
+        if "Image " in bd_split[0]:
+            args.certain_part_image = True
+            break
 
     print("-------------------args-------------------")
     print(args)

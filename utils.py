@@ -139,7 +139,7 @@ def set_requires_grad(requires_grad, *models):
 
 
 
-def generate_plot(data, save_file,x="layer",y="score_all_objects",hue=None, layers=0):
+def generate_plot(data, save_file, x="layer", y="score_all_objects", hue=None, layers=0, block_all_layers=False, block_description=None):
 
     sns.set(context="notebook",
             rc={"font.size": 14,
@@ -148,21 +148,56 @@ def generate_plot(data, save_file,x="layer",y="score_all_objects",hue=None, laye
                 "xtick.labelsize": 14.0,
                 "ytick.labelsize": 14.0,
                 "legend.fontsize": 10.0})
-    palette_ = sns.color_palette("Set1") #9 colors
+    palette_ = sns.color_palette("Set1")  # 9 colors
     palette = palette_[2:5] + palette_[5:6] + palette_[7:] + palette_[0:2] + palette_[6:7]
     sns.set_theme(style='whitegrid')
-    plt.figure(figsize=(4, 4))
-    ax = sns.lineplot(data, x=x, y=y,
-                      hue=hue,
-                      style=hue,
-                      dashes=True,
-                      palette=palette, linewidth=1)
-    ax.set_xlabel("layer")
-    ax.set_ylabel("% change in prediction probability")
-    ax.set_xlim(0, layers+0.5)
-    plt.subplots_adjust(left=0.2, bottom=0.2)
-    plt.legend(title='blocked positions',fontsize=8,handlelength=2, handletextpad=0.1)
-    plt.savefig(save_file)
+
+    if block_all_layers:
+        #! block_all_layers 모드: answer class별 bar plot
+        title_suffix = f"\n{block_description}" if block_description else ""
+
+        class_means = data.groupby("goden answer")[y].mean().sort_values()
+        fig, ax = plt.subplots(figsize=(6, 4))
+        colors = ['#e74c3c' if v < 0 else '#2ecc71' for v in class_means.values]
+        class_means.plot(kind='barh', ax=ax, color=colors, edgecolor='black', linewidth=0.5)
+        ax.set_xlabel("% change in prediction probability")
+        ax.set_ylabel("Answer class")
+        ax.set_title(f"Attention Knockout Effect (all layers){title_suffix}")
+        ax.axvline(x=0, color='black', linewidth=0.8, linestyle='--')
+        for i, (val, name) in enumerate(zip(class_means.values, class_means.index)):
+            offset = 0.3 if val >= 0 else -0.3
+            ax.text(val + offset, i, f"{val:.1f}%",
+                    va='center', ha='left' if val >= 0 else 'right', fontsize=9)
+        plt.tight_layout()
+        plt.savefig(save_file)
+        plt.close()
+    else:
+        #! 기존: layer별 lineplot
+        #! trace_target 컬럼이 있으면 실선(gt)/점선(predicted) 구분
+        has_trace_target = "trace_target" in data.columns and data["trace_target"].nunique() > 1
+
+        plt.figure(figsize=(4, 4))
+        if has_trace_target:
+            ax = sns.lineplot(data, x=x, y=y,
+                              hue=hue,
+                              style="trace_target",
+                              style_order=["gt_answer", "predicted_answer"],
+                              dashes={"gt_answer": "", "predicted_answer": (4, 2)},
+                              palette=palette, linewidth=1)
+            plt.legend(title='blocked / trace target', fontsize=7, handlelength=2, handletextpad=0.1)
+        else:
+            ax = sns.lineplot(data, x=x, y=y,
+                              hue=hue,
+                              style=hue,
+                              dashes=True,
+                              palette=palette, linewidth=1)
+            plt.legend(title='blocked positions', fontsize=8, handlelength=2, handletextpad=0.1)
+        ax.set_xlabel("layer")
+        ax.set_ylabel("% change in prediction probability")
+        ax.set_xlim(0, layers + 0.5)
+        plt.subplots_adjust(left=0.2, bottom=0.2)
+        plt.savefig(save_file)
+        plt.close()
 
 
 def create_mask_with_bbox(image, bboxes):
