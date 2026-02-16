@@ -568,22 +568,17 @@ def InforFlowAna(args):
 
             temp2 = [(stok1, stok0) for stok0 in block_ids[0] for stok1 in block_ids[1]]
 
-            for layer in range(model.config.num_hidden_layers):
-                layerlist = [
-                    l for l in range(
-                        max(0, layer - args.window // 2), min(model.config.num_hidden_layers, layer - (-args.window // 2))
-                    )
-                ]
+            if args.block_all_layers:
                 block_config = {
-                    l:copy.deepcopy(temp2)
-                    for l in layerlist
+                    l: copy.deepcopy(temp2)
+                    for l in range(model.config.num_hidden_layers)
                 }
-
                 inps["max_new_tokens"] = 1
-                #! 그래서 여기서 token_id 인자 넘겨주게 됨 (만약 틀린 샘플에 대해선 그냥 로직 바꾸면 될 듯?)
+
                 new_score_first = trace_with_attn_block_llava(
                     model, inps, block_config, first_answer_token_id, block_desc, model_name
                 )
+
                 new_score_first = new_score_first.cpu().item()
 
                 re={
@@ -594,18 +589,54 @@ def InforFlowAna(args):
                     "is_correct": is_correct,
                     "question": question,
                     "block_desc": block_desc,
-                    "layer": layer,
+                    "layer": "all",
                     "base_score_first": base_score_first,
                     "new_score_first": new_score_first,
                     "relative diff first": (new_score_first - base_score_first) * 100.0 / base_score_first,
                 }
                 results.append(re)
+            else:
+                #! 기존: layer별 sliding window knockout
+                for layer in range(model.config.num_hidden_layers):
+                    layerlist = [
+                        l for l in range(
+                            max(0, layer - args.window // 2), min(model.config.num_hidden_layers, layer - (-args.window // 2))
+                        )
+                    ]
+                    block_config = {
+                        l:copy.deepcopy(temp2)
+                        for l in layerlist
+                    }
+
+                    inps["max_new_tokens"] = 1
+                    new_score_first = trace_with_attn_block_llava(
+                        model, inps, block_config, first_answer_token_id, block_desc, model_name
+                    )
+                    new_score_first = new_score_first.cpu().item()
+
+                    re={
+                        "question_id": question_id,
+                        "image": img_id,
+                        "goden answer": answer,
+                        "predicted answer": predicted_answer,
+                        "is_correct": is_correct,
+                        "question": question,
+                        "block_desc": block_desc,
+                        "layer": layer,
+                        "base_score_first": base_score_first,
+                        "new_score_first": new_score_first,
+                        "relative diff first": (new_score_first - base_score_first) * 100.0 / base_score_first,
+                    }
+                    results.append(re)
 
 
     save_name = "_".join([des[1].replace(" ", "_").replace("->", "___") for des in block_descs])
     
     if args.noHD_noPad:
         save_name=save_name+"_noHD_noPad"
+    if args.block_all_layers:
+        save_name=save_name+"_block_all_layers"
+
     tmp = pd.DataFrame.from_records(results)
     model_name = model_name.replace('-', '_').replace('.', '_')
     os.makedirs(f"output/information_flow/{model_name}/{task_name}/val/{save_name}", exist_ok=True)
@@ -617,16 +648,22 @@ def InforFlowAna(args):
     # 전체
     # generate_plot(tmp, f'{base_path}_first_all.pdf', x="layer", y="relative diff first", hue="block_desc", layers=model.config.num_hidden_layers)
 
-    #! 정답만 (knockout 전 기준)
-    tmp_correct = tmp[tmp["is_correct"] == True]
-    if len(tmp_correct) > 0:
-        generate_plot(tmp_correct, f'{base_path}_first_correct.pdf', x="layer", y="relative diff first", hue="block_desc", layers=model.config.num_hidden_layers)
+    if args.block_all_layers:
+        #! block_all_layers 모드: layer별 plot 대신 CSV만 저장 (layer="all"이므로 lineplot 불가)
+        print(f"[INFO] block_all_layers mode: results saved to CSV. No layer-wise plot generated.", flush=True)
+        print(f"[INFO] Correct samples: {len(tmp[tmp['is_correct']==True]['question_id'].unique())}, "
+              f"Incorrect samples: {len(tmp[tmp['is_correct']==False]['question_id'].unique())}", flush=True)
+    else:
+        #! 기존: layer별 plot 생성
+        #! 정답만 (knockout 전 기준)
+        tmp_correct = tmp[tmp["is_correct"] == True]
+        if len(tmp_correct) > 0:
+            generate_plot(tmp_correct, f'{base_path}_first_correct.pdf', x="layer", y="relative diff first", hue="block_desc", layers=model.config.num_hidden_layers)
 
-    #! 오답만 (knockout 전 기준)
-    tmp_incorrect = tmp[tmp["is_correct"] == False]
-    if len(tmp_incorrect) > 0:
-        generate_plot(tmp_incorrect, f'{base_path}_first_incorrect.pdf', x="layer", y="relative diff first", hue="block_desc", layers=model.config.num_hidden_layers)
-
+        #! 오답만 (knockout 전 기준)
+        tmp_incorrect = tmp[tmp["is_correct"] == False]
+        if len(tmp_incorrect) > 0:
+            generate_plot(tmp_incorrect, f'{base_path}_first_incorrect.pdf', x="layer", y="relative diff first", hue="block_desc", layers=model.config.num_hidden_layers)
 
 
 if __name__ == "__main__":
@@ -654,6 +691,9 @@ if __name__ == "__main__":
     parser.add_argument("--video_fps", type=int, default=1)
     parser.add_argument("--frames_upbound", type=int, default=32)
     parser.add_argument("--force_sample", action="store_true", default=False)
+
+    #! 모든 layer에서 Attention Knock Out 적용
+    parser.add_argument('--block_all_layers', default=False, action="store_true", help="Block attention across all layers at once")
 
     args = parser.parse_args()
 
