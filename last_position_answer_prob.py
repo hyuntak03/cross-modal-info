@@ -28,7 +28,13 @@ from llava.mm_utils import tokenizer_image_token, process_images, get_model_name
 
 
 def generate_plot_attrscore(data, save_file, x="layer", ys="", layer_num=0):
-    hex_colors = ["#f20089", "#5c95ff", "#ffa9a3", "#b9e6ff" ]
+    
+    #! measures 개수에 맞게 palette 동적 생성
+    if len(ys) <= 4:
+        hex_colors = ["#f20089", "#5c95ff", "#ffa9a3", "#b9e6ff"]
+    else:
+        hex_colors = sns.color_palette("husl", len(ys)).as_hex()
+
     palette = sns.color_palette(hex_colors)
 
     sns.set(context="notebook")
@@ -54,6 +60,7 @@ def generate_plot_attrscore(data, save_file, x="layer", ys="", layer_num=0):
     plt.legend(fontsize=6,handlelength=1)
 
     plt.savefig(save_file)
+    plt.close()
 
 
 
@@ -131,10 +138,16 @@ def cache_hiddenstate(data_loader, questions, model, tokenizer, dataset_dict, mo
 
         hs_cache_first_answer_gen, predicted_answer = run_original(model, inps,tokenizer,model_name)
 
-        if answer != predicted_answer:
-            continue
+        #! 정답인지, 오답인지 확인
+        is_correct = (answer == predicted_answer)
 
         hs_cache_first_answer_gen_all[question_id]={}
+        
+        #! is_correct & predicted answer 넣어서 파일 저장하기.
+        hs_cache_first_answer_gen_all[question_id]["is_correct"] = is_correct
+        hs_cache_first_answer_gen_all[question_id]["predicted_answer"] = predicted_answer
+
+        #! 그냥 question_id, img_id 별로 layer별 last token hiddenstate 저장하는 거임
         for layer in layers_to_cache:
             hs_cache_first_answer_gen_all[question_id][(question_id, img_id, layer)]=hs_cache_first_answer_gen[layer]
 
@@ -167,7 +180,14 @@ def main(args):
 
     #dataset
     #predict correct and filter
-    task_name = args.refined_dataset.split("/")[-1].split(".csv")[0].split("_")[-1]
+
+    #! option argument로 MCQ 또는 일반론적으로 분기 처리
+    if args.option == "MCQ":
+        task_name = "MCQ"
+    else:
+        task_name = args.refined_dataset.split("/")[-1].split(".csv")[0].split("_")[-1]
+
+    # task_name = args.refined_dataset.split("/")[-1].split(".csv")[0].split("_")[-1]
     df = pd.read_csv(args.refined_dataset, dtype={"question_id":str}).fillna('')
     dataset_dict = df.set_index('question_id').T.to_dict('dict')
     questions = [ {**detail, "q_id":qu_id} for qu_id, detail in dataset_dict.items()]
@@ -185,7 +205,7 @@ def main(args):
         cache_path=f"output/temp/last_position_answer_probs/{model_name}/{task_name}/val/{file_name}.npy"
         print(f"read files form here: {cache_path}", flush=True)
         hs_cache_first_answer_gen_all = np.load(cache_path, allow_pickle=True).tolist()
-    else:
+    else :
         #cashe hidden state
         hs_cache_first_answer_gen_all = cache_hiddenstate(data_loader, questions, model, tokenizer, dataset_dict, model_name)
         if args.only_cache:
@@ -199,6 +219,8 @@ def main(args):
 
 
     records = []
+    
+    #! lm_head weight 불러오기
     E = model.get_output_embeddings().weight.to(torch.float32).cpu().detach()
     for line in tqdm(questions,total=len(questions)):
 
@@ -215,9 +237,15 @@ def main(args):
 
         if question_id not in hs_cache_first_answer_gen_all: continue
 
+        #! 정답/오답 여부와 모델 예측 답변 가져오기
+        is_correct = hs_cache_first_answer_gen_all[question_id]["is_correct"]
+        predicted_answer = hs_cache_first_answer_gen_all[question_id]["predicted_answer"]
+
         question = dataset_dict[question_id]["question"]
         answer = dataset_dict[question_id]["answer"].lower()
-        if task_name == "ChooseRel" or  task_name == "ChooseAttr" or task_name == "ChooseCat":
+
+        #! MCQ 추가
+        if task_name in ("ChooseRel", "ChooseAttr", "ChooseCat", "MCQ"):
             true_option = dataset_dict[question_id]["true option"]
             false_option = dataset_dict[question_id]["false option"]
 
@@ -231,11 +259,13 @@ def main(args):
             top_k = [(tokenizer.decode([i]), i, scores_first_generated_token[i]) for i in np.argsort(-scores_first_generated_token)[:50]]
             top_k_word, top_k_token, top_k_score = zip(*top_k)
 
-
+            #! is_correct & predicted_answer 추가
             temp_re={
                 "question_id": question_id,
                 "image": img_id,
                 "goden answer": answer,
+                "predicted_answer": predicted_answer,
+                "is_correct": is_correct,
                 "question": question,
                 "layer": layer,
                 "top_k_word":top_k_word,
@@ -259,9 +289,31 @@ def main(args):
                     "Capitalized Answer": true_InitialsUpperCase_score_first*100.0,
                     "Capitalized False Option": false_InitialsUpperCase_score_first*100.0,
                 })
+            elif task_name == "MCQ":
+                true_LowerCase_score_first = scores_first_generated_token[tokenizer.encode(true_option, add_special_tokens=False)[0]]
+                true_option_InitialsUpperCase = true_option.capitalize()
+                true_InitialsUpperCase_score_first = scores_first_generated_token[
+                    tokenizer.encode(true_option_InitialsUpperCase, add_special_tokens=False)[0]]
+                temp_re.update({
+                    "Noncapitalized Answer": true_LowerCase_score_first*100.0,
+                    "Capitalized Answer": true_InitialsUpperCase_score_first*100.0,
+                })
+
+                #! false option 여러 개를 | 구분자로 split하여 각각 처리
+                false_options = [fo.strip() for fo in false_option.split("|")]
+                for fi, fo in enumerate(false_options):
+                    fo_lower_score = scores_first_generated_token[tokenizer.encode(fo, add_special_tokens=False)[0]]
+                    fo_upper = fo.capitalize()
+                    fo_upper_score = scores_first_generated_token[tokenizer.encode(fo_upper, add_special_tokens=False)[0]]
+                    temp_re.update({
+                        f"Noncapitalized False Option {fi}": fo_lower_score * 100.0,
+                        f"Capitalized False Option {fi}": fo_upper_score * 100.0,
+                    })
             else:
+                #! answer 소문자 tracing
                 answer_LowerCase_score_first = scores_first_generated_token[tokenizer.encode(answer, add_special_tokens=False)[0]]
                 answer_InitialsUpperCase = answer.capitalize()
+                #! answer 대문자 tracing
                 answer_InitialsUpperCase_score_first = scores_first_generated_token[tokenizer.encode(answer_InitialsUpperCase, add_special_tokens=False)[0]]
                 temp_re.update({
                     "Noncapitalized Answer": answer_LowerCase_score_first*100.0,
@@ -273,15 +325,20 @@ def main(args):
 
     tmp = pd.DataFrame.from_records(records)
 
+    tmp_correct = tmp[tmp["is_correct"] == True]
+    tmp_incorrect = tmp[tmp["is_correct"] == False]
+
     save_name = ""
     model_name = model_name.replace('-', '_').replace('.', '_')
     os.makedirs(f"output/last_position_answer_probs/{model_name}/{task_name}/val/", exist_ok=True)
-    tmp.to_csv(f'output/last_position_answer_probs/{model_name}/{task_name}/val/{args.refined_dataset.split("/")[-1].split(".csv")[0]}{save_name}.csv', index=False)
+
+    #! 전체/정답/오답 CSV 각각 저장
+    base_name = args.refined_dataset.split("/")[-1].split(".csv")[0]
+    tmp.to_csv(f'output/last_position_answer_probs/{model_name}/{task_name}/val/{base_name}{save_name}_all.csv', index=False)
+    tmp_correct.to_csv(f'output/last_position_answer_probs/{model_name}/{task_name}/val/{base_name}{save_name}_correct.csv', index=False)
+    tmp_incorrect.to_csv(f'output/last_position_answer_probs/{model_name}/{task_name}/val/{base_name}{save_name}_incorrect.csv', index=False)
 
     # Plot the results
-    save_name += "_" + model_name
-    save_path=f'output/last_position_answer_probs/{model_name}/{task_name}/val/{args.refined_dataset.split("/")[-1].split(".csv")[0]}{save_name}_first.pdf'
-
     if task_name == "ChooseRel" or task_name == "ChooseAttr" or task_name == "ChooseCat":
         measures = [
             "Noncapitalized Answer",
@@ -289,13 +346,31 @@ def main(args):
             "Noncapitalized False Option",
             "Capitalized False Option"
         ]
+    elif task_name == "MCQ":
+        measures = [
+            "Noncapitalized Answer",
+            "Capitalized Answer",
+        ]
+        #! false option 컬럼들을 동적으로 추가
+        false_cols = [c for c in tmp.columns if c.startswith("Noncapitalized False Option") or c.startswith("Capitalized False Option")]
+        measures.extend(sorted(false_cols))
+    
     else:
         measures = [
             "Noncapitalized Answer",
             "Capitalized Answer",
         ]
 
-    generate_plot_attrscore(tmp, save_path, x="layer", ys=measures, layer_num=model.config.num_hidden_layers)
+    save_name += "_" + model_name
+
+    #! 정답/오답 plot 각각 생성
+    for label, df_sub in [("correct", tmp_correct), ("incorrect", tmp_incorrect), ("all", tmp)]:
+        if len(df_sub) == 0:
+            print(f"[WARN] No {label} samples, skipping plot.", flush=True)
+            continue
+        save_path = f'output/last_position_answer_probs/{model_name}/{task_name}/val/{base_name}{save_name}_{label}_first.pdf'
+        generate_plot_attrscore(df_sub, save_path, x="layer", ys=measures, layer_num=model.config.num_hidden_layers)
+
 
 
 
@@ -330,7 +405,8 @@ if __name__ == "__main__":
     parser.add_argument("--frames_upbound", type=int, default=32)
     parser.add_argument("--force_sample", action="store_true", default=False)
 
-
+    #! MCQ option 인자 추가
+    parser.add_argument("--option", type=str, default="standard")
 
     args = parser.parse_args()
 
