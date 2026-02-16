@@ -139,7 +139,7 @@ def cache_hiddenstate(data_loader, questions, model, tokenizer, dataset_dict, mo
         hs_cache_first_answer_gen, predicted_answer = run_original(model, inps,tokenizer,model_name)
 
         #! 정답인지, 오답인지 확인
-        is_correct = (answer == predicted_answer)
+        is_correct = (answer.lower() == predicted_answer)
 
         hs_cache_first_answer_gen_all[question_id]={}
         
@@ -245,8 +245,11 @@ def main(args):
         answer = dataset_dict[question_id]["answer"].lower()
 
         #! MCQ 추가
-        if task_name in ("ChooseRel", "ChooseAttr", "ChooseCat", "MCQ"):
+        if task_name in ("ChooseRel", "ChooseAttr", "ChooseCat"):
             true_option = dataset_dict[question_id]["true option"]
+            false_option = dataset_dict[question_id]["false option"]
+        elif task_name in ("MCQ"):
+            true_option = answer
             false_option = dataset_dict[question_id]["false option"]
 
 
