@@ -29,35 +29,49 @@ from llava.mm_utils import tokenizer_image_token, process_images, get_model_name
 
 def generate_plot_attrscore(data, save_file, x="layer", ys="", layer_num=0):
     
-    #! measures 개수에 맞게 palette 동적 생성
-    if len(ys) <= 4:
-        hex_colors = ["#f20089", "#5c95ff", "#ffa9a3", "#b9e6ff"]
-    else:
-        hex_colors = sns.color_palette("husl", len(ys)).as_hex()
+    #! Noncapitalized/Capitalized 쌍이면 같은 색 + 실선/점선으로 구분
+    #! "[옵션명]" 패턴이 있으면 옵션별 색 매핑
+    import re
 
-    palette = sns.color_palette(hex_colors)
+    # 옵션 텍스트 추출하여 고유 옵션 수 파악
+    option_names = []
+    for y in ys:
+        m = re.search(r'\[(.+?)\]', y)
+        if m:
+            option_names.append(m.group(1).lower())
+        else:
+            option_names.append(y)
+    unique_options = list(dict.fromkeys(option_names))  # 순서 유지 중복 제거
+
+    #! 옵션 수 기준으로 색상 할당 (구분 잘 되는 tab10 사용)
+    if len(unique_options) <= 4:
+        base_colors = ["#f20089", "#5c95ff", "#2db84b", "#ff8c1a"]
+    else:
+        base_colors = sns.color_palette("tab10", len(unique_options)).as_hex()
+    
+    option_color_map = {opt: base_colors[i] for i, opt in enumerate(unique_options)}
 
     sns.set(context="notebook")
     sns.set_theme(style='whitegrid')
-    plt.figure(figsize=(4, 4))
+    plt.figure(figsize=(5, 4))
 
-    ax = sns.lineplot(data, x=x, y=ys[0],
-                      label=ys[0],color=palette[0],
-                      dashes=False,
-                      linewidth=3)
+    for ind, y in enumerate(ys):
+        opt_key = option_names[ind]
+        color = option_color_map[opt_key]
+        #! Capitalized → 점선, Noncapitalized → 실선
+        is_cap = y.startswith("Capitalized")
+        linestyle = "--" if is_cap else "-"
 
-    for ind, y in enumerate(ys[1:]):
-        sns.lineplot(data, x=x, y=y,
-                     label=y,color=palette[ind+1],
-                     dashes=False,
-                     linewidth=3)
-
+        ax = sns.lineplot(data, x=x, y=y,
+                          label=y, color=color,
+                          linestyle=linestyle,
+                          linewidth=2)
 
     ax.set_xlabel("Layer")
     ax.set_ylabel("Probability (%)")
     ax.set_xlim(0, layer_num + 0.5)
     plt.subplots_adjust(left=0.2, bottom=0.2)
-    plt.legend(fontsize=6,handlelength=1)
+    plt.legend(fontsize=5, handlelength=2)
 
     plt.savefig(save_file)
     plt.close()
@@ -250,7 +264,7 @@ def main(args):
             false_option = dataset_dict[question_id]["false option"]
         elif task_name in ("MCQ"):
             true_option = answer
-            false_option = dataset_dict[question_id]["false option"]
+            false_option = dataset_dict[question_id]["false option"].lower()
 
 
         hs_cache_first_answer_gen_question=hs_cache_first_answer_gen_all[question_id]
@@ -293,24 +307,24 @@ def main(args):
                     "Capitalized False Option": false_InitialsUpperCase_score_first*100.0,
                 })
             elif task_name == "MCQ":
+                #! 실제 옵션 텍스트를 컬럼명에 포함 (어떤 옵션인지 식별 가능)
                 true_LowerCase_score_first = scores_first_generated_token[tokenizer.encode(true_option, add_special_tokens=False)[0]]
-                true_option_InitialsUpperCase = true_option.capitalize()
-                true_InitialsUpperCase_score_first = scores_first_generated_token[
-                    tokenizer.encode(true_option_InitialsUpperCase, add_special_tokens=False)[0]]
+                true_option_upper = true_option.capitalize()
+                true_UpperCase_score_first = scores_first_generated_token[
+                    tokenizer.encode(true_option_upper, add_special_tokens=False)[0]]
                 temp_re.update({
-                    "Noncapitalized Answer": true_LowerCase_score_first*100.0,
-                    "Capitalized Answer": true_InitialsUpperCase_score_first*100.0,
+                    f"Noncapitalized [{true_option}]": true_LowerCase_score_first * 100.0,
+                    f"Capitalized [{true_option_upper}]": true_UpperCase_score_first * 100.0,
                 })
 
-                #! false option 여러 개를 | 구분자로 split하여 각각 처리
                 false_options = [fo.strip() for fo in false_option.split("|")]
-                for fi, fo in enumerate(false_options):
+                for fo in false_options:
                     fo_lower_score = scores_first_generated_token[tokenizer.encode(fo, add_special_tokens=False)[0]]
                     fo_upper = fo.capitalize()
                     fo_upper_score = scores_first_generated_token[tokenizer.encode(fo_upper, add_special_tokens=False)[0]]
                     temp_re.update({
-                        f"Noncapitalized False Option {fi}": fo_lower_score * 100.0,
-                        f"Capitalized False Option {fi}": fo_upper_score * 100.0,
+                        f"Noncapitalized [{fo}]": fo_lower_score * 100.0,
+                        f"Capitalized [{fo_upper}]": fo_upper_score * 100.0,
                     })
             else:
                 #! answer 소문자 tracing
@@ -350,14 +364,23 @@ def main(args):
             "Capitalized False Option"
         ]
     elif task_name == "MCQ":
-        measures = [
-            "Noncapitalized Answer",
-            "Capitalized Answer",
-        ]
-        #! false option 컬럼들을 동적으로 추가
-        false_cols = [c for c in tmp.columns if c.startswith("Noncapitalized False Option") or c.startswith("Capitalized False Option")]
-        measures.extend(sorted(false_cols))
-    
+        #! 전체 옵션 텍스트를 수집하여 measures 구성
+        all_options = set()
+        for line in questions:
+            qid = line["q_id"]
+            if qid not in dataset_dict:
+                continue
+            ans = dataset_dict[qid]["answer"].lower()
+            all_options.add(ans)
+            if dataset_dict[qid].get("false option", ""):
+                for fo in dataset_dict[qid]["false option"].split("|"):
+                    fo = fo.strip()
+                    if fo:
+                        all_options.add(fo)
+        measures = []
+        for opt in sorted(all_options):
+            measures.append(f"Noncapitalized [{opt}]")
+            measures.append(f"Capitalized [{opt.capitalize()}]")
     else:
         measures = [
             "Noncapitalized Answer",
@@ -371,8 +394,18 @@ def main(args):
         if len(df_sub) == 0:
             print(f"[WARN] No {label} samples, skipping plot.", flush=True)
             continue
-        save_path = f'output/last_position_answer_probs/{model_name}/{task_name}/val/{base_name}{save_name}_{label}_first.pdf'
-        generate_plot_attrscore(df_sub, save_path, x="layer", ys=measures, layer_num=model.config.num_hidden_layers)
+
+        if task_name == "MCQ":
+            #! MCQ: answer 클래스별 폴더 생성 후 correct/incorrect 저장
+            for answer_class, df_class in df_sub.groupby("goden answer"):
+                safe_class_name = answer_class.replace("/", "_").replace(" ", "_")
+                class_dir = f'output/last_position_answer_probs/{model_name}/{task_name}/val/{safe_class_name}'
+                os.makedirs(class_dir, exist_ok=True)
+                save_path = f'{class_dir}/{base_name}{save_name}_{label}_first.pdf'
+                generate_plot_attrscore(df_class, save_path, x="layer", ys=measures, layer_num=model.config.num_hidden_layers)
+        else:
+            save_path = f'output/last_position_answer_probs/{model_name}/{task_name}/val/{base_name}{save_name}_{label}_first.pdf'
+            generate_plot_attrscore(df_sub, save_path, x="layer", ys=measures, layer_num=model.config.num_hidden_layers)
 
 
 
