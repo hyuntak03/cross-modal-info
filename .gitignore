@@ -8,6 +8,10 @@ __pycache__/
 
 output/
 
+make_csv.py
+
+2D_direction_video_symmetry_4class_1combo_val.csv
+
 *.out
 *.err
 
