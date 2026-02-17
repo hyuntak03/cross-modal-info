@@ -282,6 +282,8 @@ def run_original(model, inps, tokenizer, model_name, answer, mask_tensor=None, a
     generated_first_id = answer_token_id[:, 0]
     decoded_generated_first_id = tokenizer.decode(generated_first_id.item())
     #! 정답의 첫 토큰 ID
+    #! csv 파일 기준 answer를 captalized해서 동일하게 맞추기
+    answer = answer.capitalize()
     gt_token_ids = tokenizer.encode(answer, add_special_tokens=False)
     gt_first_token_id = gt_token_ids[0]
     gt_first_token_id_tensor = torch.tensor([gt_first_token_id], device=generated_first_id.device)
@@ -296,13 +298,15 @@ def run_original(model, inps, tokenizer, model_name, answer, mask_tensor=None, a
         is_correct_bool = False
     predicted_answer = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip().lower()
     if args.certain_part_image:
+        #! gt_first_token_id_tensor 기준으로 앞으로 정답이 모두 tracing 됨
+        #! Left는 19941임
         return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool, objects_indices, pad_indices, original_patch_indices, hd_patch_indice, objects_indices_in_hd, patched_mask
     else:
         return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool
 
 
 
-def blockdesc2range(des, dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name):
+def blockdesc2range(des, dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name, args=None):
     if des=="Last":
         image_dim = inputs_embeds_shape[1] - (input_ids.shape[-1] - 1)
         ntoks = input_ids.shape[1] + image_dim - 1
@@ -366,6 +370,35 @@ def blockdesc2range(des, dataset_dict, question_id, input_ids, inputs_embeds_sha
         central_object_range = [x for x in range(central_object_range[0] + len(input_ids_noim[0]) + 1 + image_dim - 1,
                                                  central_object_range[1] + len(input_ids_noim[0]) + 1 + image_dim - 1)]
         return central_object_range
+
+    if des=="Instruction":
+        #! "Answer the question using a single word or phrase. ASSISTANT:" 구간
+        #! = Question 끝 ~ Last 사이의 모든 토큰
+        question = dataset_dict[question_id]["question"]
+        image_dim = inputs_embeds_shape[1] - (input_ids.shape[-1] - 1)
+        image_token_indices = [-1] + torch.where(input_ids[0] == IMAGE_TOKEN_INDEX)[0].tolist() + [input_ids[0].shape[0]]
+        input_ids_noim = []
+        for i in range(len(image_token_indices) - 1):
+            input_ids_noim.append(input_ids[0][image_token_indices[i] + 1:image_token_indices[i + 1]])
+        question_range = find_token_range(tokenizer, input_ids_noim[1], question, model_name)
+        question_end = question_range[1] + len(input_ids_noim[0]) + 1 + image_dim - 1
+        ntoks = input_ids.shape[1] + image_dim - 1
+        last_token_idx = ntoks - 1
+
+        if args.block_ASSIST:
+            #! question 끝부터 Last 직전까지 (ASSISTANT 포함, \n 포함 — 간접 경로 완전 차단)
+            instruction_range = list(range(question_end, last_token_idx))
+        else:
+            #! question 끝부터 Last 직전까지 (ASSISTANT 토큰 제외) (기본값)
+            assistant_str = "ASSISTANT"
+            assistant_range_rel = find_token_range(tokenizer, input_ids_noim[1], assistant_str, model_name)
+            assistant_start = assistant_range_rel[0] + len(input_ids_noim[0]) + 1 + image_dim - 1
+            assistant_end = assistant_range_rel[1] + len(input_ids_noim[0]) + 1 + image_dim - 1
+            assistant_set = set(range(assistant_start, assistant_end))
+            instruction_range = [x for x in range(question_end, last_token_idx) if x not in assistant_set]
+
+        return instruction_range
+
     if des=="Question without Options":
         true_option = dataset_dict[question_id]["true option"]
         false_option = dataset_dict[question_id]["false option"]
@@ -551,8 +584,8 @@ def InforFlowAna(args):
             if args.certain_part_image:
                 r1 = blockdesc2range_patches(bd_split[0], input_ids, inputs_embeds_shape, central_object_patch_indices, pad_patch_indices, hd_patch_indice, objects_indices_in_hd, original_patch_indices)
             else:
-                r1 = blockdesc2range(bd_split[0], dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name)
-            r2 = blockdesc2range(bd_split[1], dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name)
+                r1 = blockdesc2range(bd_split[0], dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name, args=args)
+            r2 = blockdesc2range(bd_split[1], dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name, args=args)
             all_temp2.extend([(stok1, stok0) for stok0 in r1 for stok1 in r2])
         
         block_descs = [(all_temp2, args.block_description)]
@@ -572,8 +605,8 @@ def InforFlowAna(args):
                 inps["max_new_tokens"] = 1
 
                 #! full probs 반환 → GT/predicted 둘 다 indexing
-                new_probs = trace_with_attn_block_llava(
-                    model, inps, block_config, block_desc, model_name, last_token_idx=last_token_idx
+                new_probs, knocked_predicted_answer = trace_with_attn_block_llava(
+                    model, inps, block_config, block_desc, model_name, tokenizer=tokenizer, last_token_idx=last_token_idx
                 )
 
                 new_score_gt = new_probs[gt_first_token_id].cpu().item()
@@ -584,7 +617,8 @@ def InforFlowAna(args):
                     "question_id": question_id,
                     "image": img_id,
                     "goden answer": answer,
-                    "predicted answer": predicted_answer,
+                    "origin_predicted_answer": predicted_answer,
+                    "knocked_predicted_answer": knocked_predicted_answer,
                     "is_correct": is_correct,
                     "question": question,
                     "block_desc": block_desc,
@@ -602,7 +636,8 @@ def InforFlowAna(args):
                         "question_id": question_id,
                         "image": img_id,
                         "goden answer": answer,
-                        "predicted answer": predicted_answer,
+                        "origin_predicted_answer": predicted_answer,
+                        "knocked_predicted_answer": knocked_predicted_answer,
                         "is_correct": is_correct,
                         "question": question,
                         "block_desc": block_desc,
@@ -627,8 +662,8 @@ def InforFlowAna(args):
                     }
 
                     inps["max_new_tokens"] = 1
-                    new_probs = trace_with_attn_block_llava(
-                        model, inps, block_config, block_desc, model_name, last_token_idx=last_token_idx
+                    new_probs, knocked_predicted_answer = trace_with_attn_block_llava(
+                        model, inps, block_config, block_desc, model_name, tokenizer=tokenizer, last_token_idx=last_token_idx
                     )
 
                     new_score_gt = new_probs[gt_first_token_id].cpu().item()
@@ -639,7 +674,8 @@ def InforFlowAna(args):
                         "question_id": question_id,
                         "image": img_id,
                         "goden answer": answer,
-                        "predicted answer": predicted_answer,
+                        "origin_predicted_answer": predicted_answer,
+                        "knocked_predicted_answer": knocked_predicted_answer,
                         "is_correct": is_correct,
                         "question": question,
                         "block_desc": block_desc,
@@ -657,7 +693,8 @@ def InforFlowAna(args):
                             "question_id": question_id,
                             "image": img_id,
                             "goden answer": answer,
-                            "predicted answer": predicted_answer,
+                            "origin_predicted_answer": predicted_answer,
+                            "knocked_predicted_answer": knocked_predicted_answer,
                             "is_correct": is_correct,
                             "question": question,
                             "block_desc": block_desc,
@@ -759,6 +796,9 @@ if __name__ == "__main__":
 
     #! 모든 layer에서 Attention Knock Out 적용
     parser.add_argument('--block_all_layers', default=False, action="store_true", help="Block attention across all layers at once")
+
+    #! Instruction에 Assistant도 포함시킬지 argument로 받음
+    parser.add_argument('--block_ASSIST', default=False, action="store_true", help="Also block ASSISTANT tokens in Instruction range")
 
     args = parser.parse_args()
 

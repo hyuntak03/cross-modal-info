@@ -271,26 +271,25 @@ def remove_wrapper_llava(model, hooks):
 def trace_with_attn_block_llava(
         model,
         inp,
-        from_to_index_per_layer,  # A list of (source index, target index) to block
+        from_to_index_per_layer,
         block_desc,
         model_name,
+        tokenizer=None,
         last_token_idx=None
 ):
     with torch.inference_mode():
-        # set hooks
         block_attn_hooks = set_block_attn_hooks_llava(model, from_to_index_per_layer, block_desc=block_desc, last_token_idx=last_token_idx)
-
-        # get prediction
         output_details = model.generate(**inp)
-
         logits_first_answer_token = output_details['scores'][0]
-        # remove hooks
         remove_wrapper_llava(model, block_attn_hooks)
 
-    #! full softmax probs 반환 → caller가 원하는 token들을 indexing
     probs = torch.softmax(logits_first_answer_token, dim=-1)[0]
 
-    return probs
+    #! knockout 후 예측 토큰 디코딩
+    knocked_first_token_id = probs.argmax().item()
+    knocked_predicted_answer = tokenizer.decode(knocked_first_token_id).strip().lower() if tokenizer else None
+
+    return probs, knocked_predicted_answer
 
 
 

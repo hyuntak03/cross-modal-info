@@ -167,7 +167,7 @@ def generate_plot(data, save_file, x="layer", y="score_all_objects", hue=None, l
         for i, (val, name) in enumerate(zip(class_means.values, class_means.index)):
             offset = 0.3 if val >= 0 else -0.3
             ax.text(val + offset, i, f"{val:.1f}%",
-                    va='center', ha='left' if val >= 0 else 'right', fontsize=9)
+                    va='center', ha='left' if val >= 0 else 'right', fontsize=5)
         plt.tight_layout()
         plt.savefig(save_file)
         plt.close()
@@ -178,20 +178,22 @@ def generate_plot(data, save_file, x="layer", y="score_all_objects", hue=None, l
 
         plt.figure(figsize=(4, 4))
         if has_trace_target:
+            trace_palette = {"gt_answer": "#2ecc71", "predicted_answer": "#e74c3c"}
             ax = sns.lineplot(data, x=x, y=y,
-                              hue=hue,
+                              hue="trace_target",
+                              hue_order=["gt_answer", "predicted_answer"],
                               style="trace_target",
                               style_order=["gt_answer", "predicted_answer"],
                               dashes={"gt_answer": "", "predicted_answer": (4, 2)},
-                              palette=palette, linewidth=1)
-            plt.legend(title='blocked / trace target', fontsize=7, handlelength=2, handletextpad=0.1)
+                              palette=trace_palette, linewidth=1)
+            plt.legend(title='trace target', fontsize=4, handlelength=2, handletextpad=0.1)
         else:
             ax = sns.lineplot(data, x=x, y=y,
                               hue=hue,
                               style=hue,
                               dashes=True,
                               palette=palette, linewidth=1)
-            plt.legend(title='blocked positions', fontsize=8, handlelength=2, handletextpad=0.1)
+            plt.legend(title='blocked positions', fontsize=4, handlelength=2, handletextpad=0.1)
         ax.set_xlabel("layer")
         ax.set_ylabel("% change in prediction probability")
         ax.set_xlim(0, layers + 0.5)
