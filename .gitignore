@@ -16,3 +16,15 @@ make_csv.py
 *.err
 
 *.sh
+
+par2json.py
+
+make_csv_actqa.py
+
+*.json
+
+*.csv
+
+out_files/
+
+sh_files/
