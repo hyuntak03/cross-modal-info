@@ -61,7 +61,7 @@ class CustomDataset(Dataset):
         if self.model_name == "llama3-llava-next-8b" or self.model_name == "llava-v1.6-vicuna-7b" or self.model_name == "llava-v1.5-7b" or self.model_name == "llava-v1.5-13b":
             self.image_processor_mask.do_normalize=False
             self.image_processor_mask.do_rescale=False
-        elif self.model_name == "llava-next-qwen-32b":
+        elif self.model_name == "llava-next-qwen-32b" or "onevision" in self.model_name.lower() or "qwen" in self.model_name.lower():
             self.image_processor_mask.image_mean = (0, 0, 0)
             self.image_processor_mask.image_std = (1, 1, 1)
             self.image_processor_mask.rescale_factor = 1
@@ -210,8 +210,8 @@ def find_token_range(tokenizer, token_array, substring, model_name):
   
   if model_name in ("llava-v1.6-vicuna-7b", "llava-v1.5-7b", "llava-v1.5-13b", "LLaVA-NeXT-Video-7B"):
       whole_string = "".join(toks).replace("▁", " ")
-  elif model_name in ("llama3-llava-next-8b", "llava-next-qwen-32b"):
-      whole_string = "".join(toks).replace("Ġ"," ").replace("Ċ","\n")
+  elif model_name in ("llama3-llava-next-8b", "llava-next-qwen-32b", "llava-onevision-qwen2-7b-si") or "onevision" in model_name.lower() or "qwen2" in model_name.lower():
+    whole_string = "".join(toks).replace("Ġ"," ").replace("Ċ","\n")
 
   char_loc = whole_string.index(substring)
   loc = 0
@@ -390,7 +390,11 @@ def blockdesc2range(des, dataset_dict, question_id, input_ids, inputs_embeds_sha
             instruction_range = list(range(question_end, last_token_idx))
         else:
             #! question 끝부터 Last 직전까지 (ASSISTANT 토큰 제외) (기본값)
-            assistant_str = "ASSISTANT"
+            if "qwen" in model_name.lower() or "onevision" in model_name.lower():
+                assistant_str = "assistant"  # ChatML format
+            else:
+                assistant_str = "ASSISTANT"  # Vicuna format
+            
             assistant_range_rel = find_token_range(tokenizer, input_ids_noim[1], assistant_str, model_name)
             assistant_start = assistant_range_rel[0] + len(input_ids_noim[0]) + 1 + image_dim - 1
             assistant_end = assistant_range_rel[1] + len(input_ids_noim[0]) + 1 + image_dim - 1
