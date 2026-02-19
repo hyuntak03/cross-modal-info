@@ -107,7 +107,10 @@ def main():
 
     for subdir in subdirs:
         subdir_path = os.path.join(result_dir, subdir)
-        csv_files = glob.glob(os.path.join(subdir_path, "*.csv"))
+        csv_files = [
+            f for f in glob.glob(os.path.join(subdir_path, "*.csv"))
+            if not os.path.basename(f).startswith("layer_accuracy_") and not os.path.basename(f).startswith("summary_")
+        ]
 
         if not csv_files:
             print(f"[SKIP] No CSV in {subdir}")

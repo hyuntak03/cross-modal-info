@@ -1,25 +1,20 @@
+## .vscode
 .vscode
 
-LLaVA-NeXT/
-
+# datasets * pycache
 datasets/
 
 __pycache__/
 
+
+# 실험 결과 폴더
 output/
 
-make_csv.py
-
-2D_direction_video_symmetry_4class_1combo_val.csv
-
+# log file
 *.out
 *.err
-
+# shell script
 *.sh
-
-par2json.py
-
-make_csv_actqa.py
 
 *.json
 
@@ -28,3 +23,5 @@ make_csv_actqa.py
 out_files/
 
 sh_files/
+
+make_csv/
