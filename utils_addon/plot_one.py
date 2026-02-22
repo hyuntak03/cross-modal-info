@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # BASE_DIR = "/data/hyuntak/project/2026/vlm_direction/cross-modal-information-flow-in-MLLM/output/information_flow/LLaVA_NeXT_Video_7B/100/val"
-BASE_DIR = "../output/information_flow/llava_v1_6_vicuna_7b/position/val"
+BASE_DIR = "../output/information_flow/LLaVA_NeXT_Video_7B/shape/val"
 
 folders = [
     "Image___Last",
