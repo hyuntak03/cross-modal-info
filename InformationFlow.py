@@ -599,6 +599,21 @@ def InforFlowAna(args):
         ntoks = input_ids.shape[1] + image_dim - 1
         last_token_idx = ntoks - 1
 
+        #! inference_only 모드: knockout 없이 정확도만 측정
+        if args.inference_only:
+            re = {
+                "question_id": question_id,
+                "image": img_id,
+                "goden answer": answer,
+                "predicted_answer": predicted_answer,
+                "is_correct": is_correct,
+                "question": question,
+                "gt_base_score": gt_base_score,
+                "predicted_base_score": predicted_base_score,
+            }
+            results.append(re)
+            continue
+
         for temp2, block_desc in block_descs:
 
             if args.block_all_layers:
@@ -711,6 +726,21 @@ def InforFlowAna(args):
                         results.append(re_pred)
 
 
+    if args.inference_only:
+        tmp = pd.DataFrame.from_records(results)
+        model_name_safe = model_name.replace('-', '_').replace('.', '_')
+        dataset_name = args.refined_dataset.split("/")[-1].split(".csv")[0]
+        os.makedirs(f"output/inference_only/{model_name_safe}", exist_ok=True)
+        out_path = f"output/inference_only/{model_name_safe}/{dataset_name}_inference.csv"
+        tmp.to_csv(out_path, index=False)
+
+        acc = tmp["is_correct"].sum() / len(tmp) * 100
+        print(f"\n{'='*50}")
+        print(f"  Accuracy: {acc:.2f}% ({tmp['is_correct'].sum()}/{len(tmp)})")
+        print(f"  Saved: {out_path}")
+        print(f"{'='*50}")
+        return
+
     save_name = "_".join([des[1].replace(" ", "_").replace("->", "___") for des in block_descs])
     
     if args.noHD_noPad:
@@ -803,6 +833,9 @@ if __name__ == "__main__":
 
     #! Instruction에 Assistant도 포함시킬지 argument로 받음
     parser.add_argument('--block_ASSIST', default=False, action="store_true", help="Also block ASSISTANT tokens in Instruction range")
+
+    #! Inference Only
+    parser.add_argument('--inference_only', default=False, action="store_true", help="Run inference only without knockout, just measure accuracy")
 
     args = parser.parse_args()
 

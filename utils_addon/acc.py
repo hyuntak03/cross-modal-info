@@ -80,7 +80,7 @@ def process_folder(folder_path):
     plt.close()
     print(f"  Plot: {out_pdf}")
 
-BASE_DIR = "./output/information_flow/LLaVA_NeXT_Video_7B/100/val"
+BASE_DIR = "../output/information_flow/llava_v1_6_vicuna_7b/position/val"
 
 def main():
     if len(sys.argv) < 2:
@@ -134,3 +134,4 @@ if __name__ == "__main__":
     main()
 
 # python acc.py ./output/information_flow/LLaVA_NeXT_Video_7B/direction/val
+# ./output/information_flow/llava_v1_6_vicuna_7b/position/val
