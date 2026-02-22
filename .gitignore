@@ -25,3 +25,6 @@ out_files/
 sh_files/
 
 make_csv/
+
+# utils_addon 폴더 제외
+utils_addon/
