@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # BASE_DIR = "/data/hyuntak/project/2026/vlm_direction/cross-modal-information-flow-in-MLLM/output/information_flow/LLaVA_NeXT_Video_7B/100/val"
-BASE_DIR = "../output/information_flow/LLaVA_NeXT_Video_7B/shape/val"
+BASE_DIR = "../output/information_flow/LLaVA_NeXT_Video_7B/existence/val"
+
+
 
 folders = [
     "Image___Last",
@@ -15,8 +17,8 @@ folders = [
 ]
 
 labels = [
-    "Image → Last",
-    "Image → Question",
+    "Video → Last",
+    "Video → Question",
     "Question → Last",
     "Last → Last",
 ]
@@ -51,7 +53,7 @@ sns.set(context="notebook",
             "axes.labelsize": 14,
             "xtick.labelsize": 12,
             "ytick.labelsize": 12,
-            "legend.fontsize": 10})
+            "legend.fontsize": 12})
 sns.set_theme(style='whitegrid')
 
 palette = sns.color_palette("Set1", n_colors=len(labels))
@@ -68,9 +70,10 @@ ax = sns.lineplot(data=data, x="layer", y="relative diff first",
 ax.set_xlabel("Layer")
 ax.set_ylabel("% change in prediction probability")
 ax.set_xlim(0, num_layers - 0.5)
+ax.set_ylim(-100, 50)
 ax.axhline(y=0, color='gray', linewidth=0.5, linestyle='--', alpha=0.7)
 ax.set_title("Attention Knockout — LLaVA-NeXT-Video-7B", fontweight='bold')
-plt.legend(title='Knockout pair', fontsize=9, handlelength=2.5)
+plt.legend(title='Knockout pair', fontsize=11, handlelength=2.5)
 plt.tight_layout()
 
 save_path = os.path.join(BASE_DIR, "combined_single_plot.pdf")
