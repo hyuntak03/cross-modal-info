@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # CrossFrameFlow.py
 # Cross-Frame Interaction Analysis for LLaVA-OneVision Video Models
 # - 기존 InformationFlow.py의 Attention Knockout 프레임워크 기반
@@ -8,7 +11,6 @@ import copy
 import math
 import itertools
 import argparse
-import os
 
 import numpy as np
 import pandas as pd
@@ -27,104 +29,18 @@ from transformers.generation.utils import GenerateOutput
 
 from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN
 from llava.conversation import conv_templates
-from llava.model.builder import load_pretrained_model
 from llava.utils import disable_torch_init, process_video_with_decord
 from llava.mm_utils import tokenizer_image_token, process_images, get_model_name_from_path
 from torch.utils.data import Dataset, DataLoader
 
-from methods import trace_with_attn_block_llava, set_block_attn_hooks_llava, remove_wrapper_llava
-from utils import generate_plot
-from InformationFlow import (
+from core.methods import trace_with_attn_block_llava, set_block_attn_hooks_llava, remove_wrapper_llava
+from core.utils import generate_plot
+from core.data_pipeline import (
     CustomDataset, collate_fn, create_data_loader,
     find_token_range, generate_llava, blockdesc2range
 )
-from dataset_loader import load_dataset_as_questions, list_tasks
-
-
-# ============================================================
-#  model_args 파싱 (lmms_eval 호환)
-# ============================================================
-
-def parse_model_args(args_string):
-    """
-    lmms_eval 스타일 model_args 파싱.
-    "pretrained=lmms-lab/llava-onevision-qwen2-0.5b-si,conv_template=qwen_1_5,device_map=auto"
-    → {"pretrained": "...", "conv_template": "qwen_1_5", "device_map": "auto"}
-    """
-    if not args_string:
-        return {}
-    result = {}
-    for item in args_string.split(","):
-        item = item.strip()
-        if "=" not in item:
-            continue
-        key, val = item.split("=", 1)
-        # bool/int 자동 변환
-        if val.lower() == "true":
-            val = True
-        elif val.lower() == "false":
-            val = False
-        elif val.lower() == "none":
-            val = None
-        else:
-            try:
-                val = int(val)
-            except ValueError:
-                try:
-                    val = float(val)
-                except ValueError:
-                    pass
-        result[key.strip()] = val
-    return result
-
-
-def load_model_from_args(model_args_dict):
-    """
-    model_args dict로부터 모델을 로드한다.
-    lmms_eval 패턴 지원:
-      - pretrained: HF repo name 또는 local path
-      - lora_pretrained: LoRA weight 경로 (optional)
-      - conv_template: conversation template
-      - device_map: "auto" 등
-      - max_frames_num, video_decode_backend, ...
-    """
-    pretrained = model_args_dict.get("pretrained", "")
-    lora_pretrained = model_args_dict.get("lora_pretrained", None)
-    device_map = model_args_dict.get("device_map", "auto")
-    attn_implementation = model_args_dict.get("attn_implementation", None)
-    conv_template = model_args_dict.get("conv_template", "qwen_1_5")
-    cache_dir = os.environ.get("HF_HOME", None)
-
-    if lora_pretrained:
-        # LoRA: lora_pretrained이 model_path, pretrained이 model_base
-        model_path = lora_pretrained
-        model_base = pretrained
-        model_name = get_model_name_from_path(lora_pretrained)
-        print(f"[MODEL] LoRA loading: base={pretrained}, lora={lora_pretrained}")
-    else:
-        # 일반: pretrained가 model_path
-        model_path = pretrained
-        model_base = None
-        model_name = get_model_name_from_path(pretrained)
-        print(f"[MODEL] Loading: {pretrained}")
-
-    tokenizer, model, image_processor, context_len = load_pretrained_model(
-        model_path, model_base, model_name,
-        device_map=device_map,
-        attn_implementation=attn_implementation,
-        cache_dir=cache_dir,
-    )
-    model.eval()
-
-    # video 관련 config 오버라이드
-    if "max_frames_num" in model_args_dict:
-        pass  # frames_upbound로 외부에서 제어
-    if "mm_spatial_pool_stride" in model_args_dict:
-        model.config.mm_spatial_pool_stride = model_args_dict["mm_spatial_pool_stride"]
-    if "mm_spatial_pool_mode" in model_args_dict:
-        model.config.mm_spatial_pool_mode = model_args_dict["mm_spatial_pool_mode"]
-
-    return tokenizer, model, image_processor, context_len, model_name, conv_template
+from core.dataset_loader import load_dataset_as_questions, list_tasks
+from core.model_loader import parse_model_args, load_model_from_args, load_model_legacy
 
 
 # ============================================================
@@ -369,13 +285,8 @@ def CrossFrameFlowAna(args):
             load_model_from_args(model_args_dict)
         args.conv_mode = conv_template
     else:
-        model_path = os.path.expanduser(args.model_path)
-        model_name = get_model_name_from_path(model_path)
-        tokenizer, model, image_processor, context_len = load_pretrained_model(
-            model_path, args.model_base, model_name,
-            device_map="auto", attn_implementation=None, cache_dir=cache_dir
-        )
-        model.eval()
+        tokenizer, model, image_processor, context_len, model_name, _ = \
+            load_model_legacy(args.model_path, args.model_base, args.conv_mode)
 
     # Dataset: HuggingFace task 또는 CSV에서 로딩
     if args.task:

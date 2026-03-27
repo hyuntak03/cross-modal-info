@@ -114,7 +114,7 @@ def load_yaml_config(yaml_path, mode="full"):
 # ============================================================
 
 _TASK_REGISTRY = {}
-_DEFAULT_TASKS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks")
+_DEFAULT_TASKS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tasks")
 
 
 def discover_tasks(task_dir: str = None) -> dict:
