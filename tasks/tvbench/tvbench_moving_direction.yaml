@@ -1,0 +1,3 @@
+task: tvbench_moving_direction
+dataset_name: moving_direction
+include: _default_template_yaml

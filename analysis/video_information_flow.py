@@ -327,6 +327,12 @@ def CrossFrameFlowAna(args):
         tokenizer, model, image_processor, context_len, model_name, _ = \
             load_model_legacy(args.model_path, args.model_base, args.conv_mode)
 
+    # v1.6/v1.5 등 이미지 전용 모델에 비디오 입력 시 spatial pool config 기본값 설정
+    if not hasattr(model.config, "mm_spatial_pool_mode") or model.config.mm_spatial_pool_mode is None:
+        model.config.mm_spatial_pool_mode = "average"
+    if not hasattr(model.config, "mm_spatial_pool_stride") or model.config.mm_spatial_pool_stride is None:
+        model.config.mm_spatial_pool_stride = 2
+
     # Dataset: HuggingFace task 또는 CSV에서 로딩
     if args.task:
         # HuggingFace 데이터셋 로딩
@@ -362,8 +368,12 @@ def CrossFrameFlowAna(args):
     results = []
     index = 0
 
-    for (input_ids, image_tensor, original_image_sizes, prompts, mask_tensor, modality), line in tqdm(
-            zip(data_loader, questions), total=len(questions)):
+    for batch, line in tqdm(zip(data_loader, questions), total=len(questions)):
+
+        # 로드 실패한 샘플 스킵
+        if batch is None:
+            continue
+        input_ids, image_tensor, original_image_sizes, prompts, mask_tensor, modality = batch
 
         # 새 샘플마다 mask 캐시 클리어 (seq_len이 바뀔 수 있음)
         _precomputed_mask_cache.clear()
@@ -385,10 +395,7 @@ def CrossFrameFlowAna(args):
         input_ids = input_ids.to(device='cuda')
         image_tensor = [img_t.to(device='cuda') for img_t in image_tensor]
 
-        if "v1.6" in model_name.lower() or "v1.5" in model_name.lower():
-            effective_modality = "image"
-        else:
-            effective_modality = modality
+        effective_modality = modality
 
         inps = {
             "inputs": input_ids,

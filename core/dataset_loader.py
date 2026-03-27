@@ -397,12 +397,23 @@ def load_dataset_as_questions(
         else:
             answer_text = str(doc.get("answer", ""))
 
+        # MCQ: answer가 텍스트이고 candidates가 있으면 자동으로 option letter로 변환
+        options_field = field_map.get("options", "candidates")
+        candidates = doc.get(options_field, [])
+        if candidates and len(answer_text) > 1:
+            for ci, cand in enumerate(candidates):
+                if str(cand).strip() == answer_text.strip():
+                    answer_text = chr(65 + ci)  # A, B, C, ...
+                    break
+
         # visual path
+        # video_folder 비어있으면 HF_DATASETS_CACHE fallback
+        effective_video_folder = video_folder or os.environ.get("HF_DATASETS_CACHE", "")
         if callable(doc_to_visual):
             # 함수 시그니처에 따라 호출 방식 분기
             sig = inspect.signature(doc_to_visual)
             if "video_folder" in sig.parameters:
-                vis_result = doc_to_visual(doc, task_kwargs, video_folder=video_folder, image_folder=image_folder)
+                vis_result = doc_to_visual(doc, task_kwargs, video_folder=effective_video_folder, image_folder=image_folder)
             else:
                 vis_result = doc_to_visual(doc, task_kwargs)
             vis_path = vis_result[0] if isinstance(vis_result, list) else str(vis_result)

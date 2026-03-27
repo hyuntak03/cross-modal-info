@@ -52,6 +52,13 @@ class CustomDataset(Dataset):
             self.image_processor_mask.rescale_factor = 1
 
     def __getitem__(self, index):
+        try:
+            return self._load_item(index)
+        except Exception as e:
+            print(f"[WARN] Sample {index} 로드 실패 (스킵): {e}")
+            return None
+
+    def _load_item(self, index):
 
         line = self.questions[index]
         question = line["question"]
@@ -154,6 +161,10 @@ class CustomDataset(Dataset):
 
 
 def collate_fn(batch):
+    # None 필터링 (로드 실패 샘플 스킵)
+    batch = [b for b in batch if b is not None]
+    if len(batch) == 0:
+        return None
     input_ids, image_tensors, image_sizes, prompts, mask_tensors, modalities = zip(*batch)
 
     input_ids = input_ids[0]
@@ -180,16 +191,22 @@ def find_token_range(tokenizer, token_array, substring, model_name):
   """Find the tokens corresponding to the given substring in token_array."""
   toks = tokenizer.convert_ids_to_tokens(token_array)
 
+  # 토큰별로 normalize하여 위치 추적을 정확하게 수행
   if model_name in ("llava-v1.6-vicuna-7b", "llava-v1.5-7b", "llava-v1.5-13b", "LLaVA-NeXT-Video-7B"):
-      whole_string = "".join(toks).replace("▁", " ")
+      norm = lambda t: t.replace("▁", " ").replace("<0x0A>", "\n")
   elif model_name in ("llama3-llava-next-8b", "llava-next-qwen-32b", "llava-onevision-qwen2-7b-si") or "onevision" in model_name.lower() or "qwen2" in model_name.lower():
-    whole_string = "".join(toks).replace("Ġ"," ").replace("Ċ","\n")
+      norm = lambda t: t.replace("Ġ", " ").replace("Ċ", "\n")
+  else:
+      norm = lambda t: t
+
+  normed = [norm(t) for t in toks]
+  whole_string = "".join(normed)
 
   char_loc = whole_string.index(substring)
   loc = 0
   tok_start, tok_end = None, None
-  for i, t in enumerate(toks):
-    loc += len(t)
+  for i, nt in enumerate(normed):
+    loc += len(nt)
     if tok_start is None and loc > char_loc:
       tok_start = i
     if tok_end is None and loc >= char_loc + len(substring):

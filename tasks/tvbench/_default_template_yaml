@@ -1,17 +1,8 @@
 dataset_path: FunAILab/TVBench
 dataset_kwargs:
   token: true
-  video: true
-  revision: video
 
 test_split: train
-
-field_map:
-  question_id: video
-  question: question
-  answer: answer
-  options: candidates
-  video: video
 
 doc_to_visual: !function utils.doc_to_visual
 doc_to_text: !function utils.doc_to_text
