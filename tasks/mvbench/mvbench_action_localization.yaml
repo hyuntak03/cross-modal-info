@@ -1,0 +1,3 @@
+task: mvbench_action_localization
+dataset_name: action_localization
+include: _default_template_yaml

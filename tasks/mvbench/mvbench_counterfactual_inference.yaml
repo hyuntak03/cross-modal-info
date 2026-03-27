@@ -1,0 +1,3 @@
+task: mvbench_counterfactual_inference
+dataset_name: counterfactual_inference
+include: _default_template_yaml

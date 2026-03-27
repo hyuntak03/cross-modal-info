@@ -1,0 +1,20 @@
+task: activitynetqa
+
+dataset_path: lmms-lab/ActivityNetQA
+test_split: test
+dataset_kwargs:
+  token: true
+
+field_map:
+  question_id: question_id
+  question: question
+  answer: answer
+  video: video_name
+
+doc_to_visual: !function utils.doc_to_visual
+doc_to_text: !function utils.doc_to_text
+doc_to_target: "answer"
+
+task_specific_kwargs:
+  video_prefix: "v_"
+  video_ext: ".mp4"

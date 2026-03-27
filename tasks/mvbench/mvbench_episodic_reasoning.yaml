@@ -1,0 +1,3 @@
+task: mvbench_episodic_reasoning
+dataset_name: episodic_reasoning
+include: _default_template_yaml

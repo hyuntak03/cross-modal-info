@@ -1,0 +1,3 @@
+task: mvbench_character_order
+dataset_name: character_order
+include: _default_template_yaml

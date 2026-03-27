@@ -1,0 +1,3 @@
+task: mvbench_object_count
+dataset_name: object_count
+include: _default_template_yaml

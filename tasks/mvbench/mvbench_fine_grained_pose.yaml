@@ -1,0 +1,3 @@
+task: mvbench_fine_grained_pose
+dataset_name: fine_grained_pose
+include: _default_template_yaml

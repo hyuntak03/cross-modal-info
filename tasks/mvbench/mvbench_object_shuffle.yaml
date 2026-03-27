@@ -1,0 +1,3 @@
+task: mvbench_object_shuffle
+dataset_name: object_shuffle
+include: _default_template_yaml

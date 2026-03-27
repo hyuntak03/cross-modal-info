@@ -1,0 +1,23 @@
+task: videomme
+
+dataset_path: lmms-lab/Video-MME
+test_split: test
+dataset_kwargs:
+  token: true
+  cache_dir: videomme
+
+field_map:
+  question_id: question_id
+  question: question
+  answer: answer
+  options: options
+  video: videoID
+
+doc_to_visual: !function utils.doc_to_visual
+doc_to_text: !function utils.doc_to_text
+doc_to_target: !function utils.doc_to_target
+doc_to_false_option: !function utils.doc_to_false_option
+
+task_specific_kwargs:
+  post_prompt: "\nOnly give the best option."
+  video_ext: ".mp4"

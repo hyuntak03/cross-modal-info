@@ -26,5 +26,10 @@ sh_files/
 
 make_csv/
 
+z_claude_conv/
+
+scripts/
+
+
 # utils_addon 폴더 제외
 utils_addon/

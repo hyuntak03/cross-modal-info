@@ -1,0 +1,3 @@
+task: mvbench_object_interaction
+dataset_name: object_interaction
+include: _default_template_yaml

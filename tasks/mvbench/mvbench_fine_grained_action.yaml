@@ -1,0 +1,3 @@
+task: mvbench_fine_grained_action
+dataset_name: fine_grained_action
+include: _default_template_yaml
