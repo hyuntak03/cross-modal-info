@@ -2,6 +2,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # InformationFlow.py
+import re
 import copy
 import pdb
 
@@ -43,6 +44,15 @@ from core.model_loader import parse_model_args, load_model_from_args, load_model
 
 
 #! Attention Knock out 없이 그냥 모델 돌리기
+def _extract_mcq_letter(text: str) -> str:
+    """MCQ 응답에서 옵션 letter 추출. '(a)', '(A)', 'A.', 'a' 등 다양한 포맷 대응."""
+    text = text.strip()
+    m = re.match(r'^\(?([a-eA-E])\)?', text)
+    if m:
+        return m.group(1).upper()
+    return text[0].upper() if text else ""
+
+
 def run_original(model, inps, tokenizer, model_name, answer, mask_tensor=None, args=None):
     with torch.inference_mode():
         model.old_generate= model.generate
@@ -53,14 +63,12 @@ def run_original(model, inps, tokenizer, model_name, answer, mask_tensor=None, a
             inputs_embeds_shape, output_details = model.generate(args=args,**inps)
         model.generate = model.old_generate
 
-
     answer_token_id = output_details['sequences']
     generated_first_id = answer_token_id[:, 0]
-    decoded_generated_first_id = tokenizer.decode(generated_first_id.item())
+
     #! 정답의 첫 토큰 ID
-    #! csv 파일 기준 answer를 captalized해서 동일하게 맞추기
-    answer = answer.capitalize()
-    gt_token_ids = tokenizer.encode(answer, add_special_tokens=False)
+    answer_cap = answer.strip().upper()
+    gt_token_ids = tokenizer.encode(answer_cap, add_special_tokens=False)
     gt_first_token_id = gt_token_ids[0]
     gt_first_token_id_tensor = torch.tensor([gt_first_token_id], device=generated_first_id.device)
     logits_first_answer_token = output_details['scores'][0]
@@ -68,14 +76,14 @@ def run_original(model, inps, tokenizer, model_name, answer, mask_tensor=None, a
     #! GT 토큰과 예측 토큰 각각의 base score
     gt_base_score = probs[gt_first_token_id_tensor].item()
     predicted_base_score = probs[generated_first_id].item()
-    if decoded_generated_first_id.strip().lower() == answer.strip().lower():
-        is_correct_bool = True
-    else:
-        is_correct_bool = False
-    predicted_answer = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip().lower()
+
+    # 전체 디코딩 후 MCQ letter 추출
+    raw_predicted = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip()
+    predicted_answer = _extract_mcq_letter(raw_predicted)
+
+    is_correct_bool = predicted_answer == answer_cap
+
     if args.certain_part_image:
-        #! gt_first_token_id_tensor 기준으로 앞으로 정답이 모두 tracing 됨
-        #! Left는 19941임
         return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool, objects_indices, pad_indices, original_patch_indices, hd_patch_indice, objects_indices_in_hd, patched_mask
     else:
         return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool

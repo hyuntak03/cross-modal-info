@@ -3,6 +3,7 @@
 # lmms_eval 패턴 참고: tasks/ 폴더에 YAML 넣으면 자동 등록
 
 import os
+import inspect
 import importlib.util
 import collections
 from typing import List, Optional
@@ -114,15 +115,17 @@ def load_yaml_config(yaml_path, mode="full"):
 # ============================================================
 
 _TASK_REGISTRY = {}
+_GROUP_REGISTRY = {}   # group 이름 → 하위 task 이름 리스트
 _DEFAULT_TASKS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tasks")
 
 
 def discover_tasks(task_dir: str = None) -> dict:
     """
     task_dir 하위를 재귀 탐색하여 YAML task 설정을 자동 발견.
-    task: "이름" (문자열)이 있는 YAML만 등록.
+    - task: "이름" (문자열) → 개별 task 등록
+    - task: [리스트]  + group: "이름" → 그룹 등록 (lmms_eval 패턴)
     """
-    global _TASK_REGISTRY
+    global _TASK_REGISTRY, _GROUP_REGISTRY
 
     if task_dir is None:
         task_dir = _DEFAULT_TASKS_DIR
@@ -153,18 +156,43 @@ def discover_tasks(task_dir: str = None) -> dict:
             if not config:
                 continue
 
-            # task (문자열)이 있으면 등록
-            if "task" in config and isinstance(config["task"], str):
-                _TASK_REGISTRY[config["task"]] = yaml_path
+            task_val = config.get("task")
+            if task_val is None:
+                continue
+
+            # 개별 task: task가 문자열
+            if isinstance(task_val, str):
+                _TASK_REGISTRY[task_val] = yaml_path
+            # 그룹: task가 리스트
+            elif isinstance(task_val, list):
+                group_name = config.get("group")
+                if group_name and isinstance(group_name, str):
+                    _GROUP_REGISTRY[group_name] = task_val
 
     return _TASK_REGISTRY
 
 
-def list_tasks() -> List[str]:
-    """등록된 task 이름 목록 반환"""
+def _expand_group(group_name: str) -> List[str]:
+    """그룹을 재귀적으로 펼쳐서 개별 task 이름 리스트로 반환"""
+    tasks = []
+    for name in _GROUP_REGISTRY.get(group_name, []):
+        if name in _GROUP_REGISTRY:
+            tasks.extend(_expand_group(name))
+        elif name in _TASK_REGISTRY:
+            tasks.append(name)
+        else:
+            print(f"[WARN] 그룹 '{group_name}'의 하위 task '{name}'이 등록되지 않음 (건너뜀)")
+    return tasks
+
+
+def list_tasks(include_groups: bool = True) -> List[str]:
+    """등록된 task (+ 그룹) 이름 목록 반환"""
     if not _TASK_REGISTRY:
         discover_tasks()
-    return sorted(_TASK_REGISTRY.keys())
+    names = set(_TASK_REGISTRY.keys())
+    if include_groups:
+        names |= set(_GROUP_REGISTRY.keys())
+    return sorted(names)
 
 
 def get_task_config(task_name: str) -> dict:
@@ -172,14 +200,42 @@ def get_task_config(task_name: str) -> dict:
     if not _TASK_REGISTRY:
         discover_tasks()
 
-    if task_name not in _TASK_REGISTRY:
+    if task_name in _TASK_REGISTRY:
+        yaml_path = _TASK_REGISTRY[task_name]
+        return load_yaml_config(yaml_path, mode="full")
+
+    if task_name in _GROUP_REGISTRY:
         raise ValueError(
-            f"Unknown task: '{task_name}'. "
-            f"Available: {list_tasks()}"
+            f"'{task_name}'은 그룹입니다. "
+            f"expand_group('{task_name}')으로 하위 task 목록을 얻거나, "
+            f"개별 task 이름을 사용하세요.\n"
+            f"하위 tasks: {_expand_group(task_name)}"
         )
 
-    yaml_path = _TASK_REGISTRY[task_name]
-    return load_yaml_config(yaml_path, mode="full")
+    raise ValueError(
+        f"Unknown task: '{task_name}'. "
+        f"Available: {list_tasks()}"
+    )
+
+
+def expand_group(task_name: str) -> List[str]:
+    """
+    task 이름이 그룹이면 하위 task 리스트 반환,
+    개별 task면 [task_name] 반환.
+    그룹 안의 그룹도 재귀적으로 펼침.
+    """
+    if not _TASK_REGISTRY:
+        discover_tasks()
+
+    if task_name in _GROUP_REGISTRY:
+        return _expand_group(task_name)
+    elif task_name in _TASK_REGISTRY:
+        return [task_name]
+    else:
+        raise ValueError(
+            f"Unknown task or group: '{task_name}'. "
+            f"Available: {list_tasks()}"
+        )
 
 
 # ============================================================
@@ -192,7 +248,7 @@ def load_dataset_as_questions(
     video_folder: str = "",
     image_folder: str = "",
     hf_cache_dir: str = None,
-    max_samples: int = -1,
+    limit: int = -1,
     split_override: str = None,
 ) -> tuple:
     """
@@ -212,8 +268,8 @@ def load_dataset_as_questions(
         dataset_dict = df.set_index('question_id').T.to_dict('dict')
         questions = [{**detail, "q_id": qu_id} for qu_id, detail in dataset_dict.items()]
 
-        if max_samples > 0:
-            questions = questions[:max_samples]
+        if limit > 0:
+            questions = questions[:limit]
             dataset_dict = {q["q_id"]: q for q in questions}
 
         return questions, dataset_dict
@@ -221,6 +277,28 @@ def load_dataset_as_questions(
     # ---- HuggingFace 로딩 ----
     if task_name is None:
         raise ValueError("task_name 또는 csv_path 중 하나는 필수")
+
+    # 그룹이면 하위 task들 합쳐서 반환
+    if task_name in _GROUP_REGISTRY:
+        sub_tasks = expand_group(task_name)
+        print(f"[dataset_loader] 그룹 '{task_name}' → {len(sub_tasks)}개 하위 task 로딩")
+        all_questions = []
+        for st in sub_tasks:
+            qs, _ = load_dataset_as_questions(
+                task_name=st,
+                video_folder=video_folder,
+                image_folder=image_folder,
+                hf_cache_dir=hf_cache_dir,
+                limit=limit,
+                split_override=split_override,
+            )
+            # task 출처 표시
+            for q in qs:
+                q["source_task"] = st
+            all_questions.extend(qs)
+        all_dict = {q["q_id"]: q for q in all_questions}
+        print(f"[dataset_loader] 그룹 '{task_name}' 총 {len(all_questions)}개 샘플 로딩 완료")
+        return all_questions, all_dict
 
     config = get_task_config(task_name)
 
@@ -257,7 +335,7 @@ def load_dataset_as_questions(
 
     questions = []
     for idx, doc in enumerate(ds):
-        if max_samples > 0 and idx >= max_samples:
+        if limit > 0 and idx >= limit:
             break
 
         # question ID
@@ -281,7 +359,12 @@ def load_dataset_as_questions(
 
         # visual path
         if callable(doc_to_visual):
-            vis_result = doc_to_visual(doc, task_kwargs, video_folder=video_folder, image_folder=image_folder)
+            # 함수 시그니처에 따라 호출 방식 분기
+            sig = inspect.signature(doc_to_visual)
+            if "video_folder" in sig.parameters:
+                vis_result = doc_to_visual(doc, task_kwargs, video_folder=video_folder, image_folder=image_folder)
+            else:
+                vis_result = doc_to_visual(doc, task_kwargs)
             vis_path = vis_result[0] if isinstance(vis_result, list) else str(vis_result)
         else:
             vid_field = field_map.get("video", "video")

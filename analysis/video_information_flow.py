@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # - map-the-flow의 cross-frame interaction 분석 기법 통합
 # - LLaVA-OneVision의 spatial_unpad + 2dPool 비디오 토큰 구조 대응
 
+import re
 import copy
 import math
 import itertools
@@ -219,6 +220,16 @@ def find_perframe_to_text_block_ranges(frame_ranges, text_range):
 #  원본 모델 실행 (generate_llava 기반)
 # ============================================================
 
+def _extract_mcq_letter(text: str) -> str:
+    """MCQ 응답에서 옵션 letter 추출. '(a)', '(A)', 'A.', 'a' 등 다양한 포맷 대응."""
+    text = text.strip()
+    # (A), (a) 형태
+    m = re.match(r'^\(?([a-eA-E])\)?', text)
+    if m:
+        return m.group(1).upper()
+    return text[0].upper() if text else ""
+
+
 def run_original(model, inps, tokenizer, model_name, answer, args=None):
     with torch.inference_mode():
         model.old_generate = model.generate
@@ -228,9 +239,8 @@ def run_original(model, inps, tokenizer, model_name, answer, args=None):
 
     answer_token_id = output_details['sequences']
     generated_first_id = answer_token_id[:, 0]
-    decoded_generated_first_id = tokenizer.decode(generated_first_id.item())
 
-    answer_cap = answer.capitalize()
+    answer_cap = answer.strip().upper()
     gt_token_ids = tokenizer.encode(answer_cap, add_special_tokens=False)
     gt_first_token_id = gt_token_ids[0]
     gt_first_token_id_tensor = torch.tensor([gt_first_token_id], device=generated_first_id.device)
@@ -240,8 +250,11 @@ def run_original(model, inps, tokenizer, model_name, answer, args=None):
     gt_base_score = probs[gt_first_token_id_tensor].item()
     predicted_base_score = probs[generated_first_id].item()
 
-    is_correct_bool = decoded_generated_first_id.strip().lower() == answer_cap.strip().lower()
-    predicted_answer = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip().lower()
+    # 전체 디코딩 후 MCQ letter 추출
+    raw_predicted = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip()
+    predicted_answer = _extract_mcq_letter(raw_predicted)
+
+    is_correct_bool = predicted_answer == answer_cap
 
     return gt_base_score, predicted_base_score, predicted_answer, gt_first_token_id_tensor, generated_first_id, inputs_embeds_shape, is_correct_bool
 
@@ -297,7 +310,7 @@ def CrossFrameFlowAna(args):
             video_folder=args.video_folder,
             image_folder=args.image_folder,
             hf_cache_dir=cache_dir,
-            max_samples=args.max_samples,
+            limit=args.limit,
         )
     elif args.refined_dataset:
         # 기존 CSV 로딩 (하위 호환)
@@ -307,7 +320,7 @@ def CrossFrameFlowAna(args):
             task_name = args.refined_dataset.split("/")[-1].split(".csv")[0].split("_")[-1]
         questions, dataset_dict = load_dataset_as_questions(
             csv_path=args.refined_dataset,
-            max_samples=args.max_samples,
+            limit=args.limit,
         )
     else:
         raise ValueError("--task (HuggingFace) 또는 --refined_dataset (CSV) 중 하나는 필수")
@@ -662,7 +675,7 @@ if __name__ == "__main__":
                         help=f"HuggingFace task 이름. 사용 가능: {list_tasks()}")
     parser.add_argument('--refined_dataset', type=str, default=None,
                         help="CSV 파일 경로 (기존 방식, --task와 택일)")
-    parser.add_argument('--max_samples', type=int, default=-1,
+    parser.add_argument('--limit', type=int, default=-1,
                         help="최대 샘플 수 제한 (-1이면 전체). 디버깅용.")
 
     # Video 관련

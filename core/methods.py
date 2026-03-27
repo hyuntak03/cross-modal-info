@@ -287,7 +287,7 @@ def trace_with_attn_block_llava(
 
     #! knockout 후 예측 토큰 디코딩
     knocked_first_token_id = probs.argmax().item()
-    knocked_predicted_answer = tokenizer.decode(knocked_first_token_id).strip().lower() if tokenizer else None
+    knocked_predicted_answer = tokenizer.decode(knocked_first_token_id).strip().upper() if tokenizer else None
 
     return probs, knocked_predicted_answer
 

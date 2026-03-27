@@ -1,6 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import re
 import copy
 import pdb
 
@@ -82,6 +83,15 @@ def generate_plot_attrscore(data, save_file, x="layer", ys="", layer_num=0):
 
 
 
+def _extract_mcq_letter(text: str) -> str:
+    """MCQ 응답에서 옵션 letter 추출. '(a)', '(A)', 'A.', 'a' 등 다양한 포맷 대응."""
+    text = text.strip()
+    m = re.match(r'^\(?([a-eA-E])\)?', text)
+    if m:
+        return m.group(1).upper()
+    return text[0].upper() if text else ""
+
+
 def run_original(model, inps, tokenizer, model_name):
     with torch.inference_mode():
         output_details = model.generate(**inps)
@@ -90,7 +100,8 @@ def run_original(model, inps, tokenizer, model_name):
 
     first_answer_hidden_id=0
 
-    predicted_answer = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip().lower()
+    raw_predicted = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip()
+    predicted_answer = _extract_mcq_letter(raw_predicted)
 
 
 
@@ -156,7 +167,7 @@ def cache_hiddenstate(data_loader, questions, model, tokenizer, dataset_dict, mo
         hs_cache_first_answer_gen, predicted_answer = run_original(model, inps,tokenizer,model_name)
 
         #! 정답인지, 오답인지 확인
-        is_correct = (answer.lower() == predicted_answer)
+        is_correct = (answer.strip().upper() == predicted_answer)
 
         hs_cache_first_answer_gen_all[question_id]={}
 
@@ -199,7 +210,7 @@ def main(args):
             video_folder=args.video_folder,
             image_folder=args.image_folder,
             hf_cache_dir=cache_dir,
-            max_samples=args.max_samples,
+            limit=args.limit,
         )
     elif args.refined_dataset:
         #! option argument로 MCQ 또는 일반론적으로 분기 처리
@@ -463,7 +474,7 @@ if __name__ == "__main__":
     #! HuggingFace task support
     parser.add_argument('--task', type=str, default=None,
                         help=f"HuggingFace task name. Available: {list_tasks()}")
-    parser.add_argument('--max_samples', type=int, default=-1,
+    parser.add_argument('--limit', type=int, default=-1,
                         help="Max samples limit (-1 for all). For debugging.")
 
     args = parser.parse_args()

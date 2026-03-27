@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(find /data/takhyun03/project/2026/vlm_direction/LLaVA-NeXT -name *.py -type f)",
+      "Bash(python3:*)",
+      "Bash(grep -E \"\\\\.py$|^d\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''VideoInformationFlow.py'', doraise=True\\)\")"
+    ]
+  }
+}
