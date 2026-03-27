@@ -1,5 +1,5 @@
-#methos.py
-import pdb
+#methods.py
+import hashlib
 
 import torch
 import os
@@ -97,11 +97,15 @@ def set_block_attn_hooks_llava(model, from_to_index_per_layer, opposite=False, b
     for i in from_to_index_per_layer.keys():
         from_to_index = from_to_index_per_layer[i]
 
-        # 내용 기반 캐시 키 (id() 대신 — GC 주소 재사용 문제 방지)
+        # 내용 기반 캐시 키: pairs 내용의 해시로 충돌 방지
         if from_to_index:
-            cache_key = (len(from_to_index), from_to_index[0], from_to_index[-1], last_token_idx)
+            n = len(from_to_index)
+            # 길이 + 앞/뒤/중간 샘플로 빠른 해시 (100만 pairs를 str()하면 느림)
+            sample = (n, from_to_index[0], from_to_index[-1],
+                      from_to_index[n // 4], from_to_index[n // 2], from_to_index[3 * n // 4])
+            cache_key = (hash(sample), last_token_idx)
         else:
-            cache_key = (0, None, None, last_token_idx)
+            cache_key = (0, last_token_idx)
 
         # row/col 인덱스 텐서를 글로벌 캐시에서 재사용
         if cache_key not in _precomputed_index_cache:

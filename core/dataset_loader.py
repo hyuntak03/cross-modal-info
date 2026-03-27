@@ -305,13 +305,45 @@ def load_dataset_as_questions(
     hf_path = config["dataset_path"]
     hf_name = config.get("dataset_name", None)
     hf_split = split_override or config.get("test_split", "test")
-    hf_kwargs = config.get("dataset_kwargs", {})
+    hf_kwargs = dict(config.get("dataset_kwargs", {}))
+
+    # lmms_eval 전용 커스텀 키 분리 (datasets.load_dataset에 넘기면 에러)
+    _CUSTOM_KEYS = {"video", "force_download", "force_unzip", "create_link",
+                    "builder_script", "From_YouTube", "load_from_disk"}
+    is_video_dataset = hf_kwargs.pop("video", False)
+    for ck in _CUSTOM_KEYS - {"video"}:
+        hf_kwargs.pop(ck, None)
+
+    # 빈 문자열 cache_dir 제거 (lmms_eval YAML에서 cache_dir: "" 로 오는 경우)
+    if hf_kwargs.get("cache_dir") == "":
+        hf_kwargs.pop("cache_dir")
 
     # 캐시 디렉토리 우선순위: 인자 > HF_DATASETS_CACHE 환경변수 > YAML의 cache_dir
     if hf_cache_dir:
         hf_kwargs["cache_dir"] = hf_cache_dir
     elif os.environ.get("HF_DATASETS_CACHE"):
         hf_kwargs["cache_dir"] = os.environ["HF_DATASETS_CACHE"]
+
+    # token=True이면 환경변수 HF_TOKEN 또는 huggingface-cli 로그인 토큰 사용
+    if hf_kwargs.get("token") is True:
+        env_token = os.environ.get("HF_TOKEN")
+        if env_token:
+            hf_kwargs["token"] = env_token
+
+    # video 데이터셋이면 snapshot_download로 비디오 파일 미리 확보
+    # if is_video_dataset:
+    #     from huggingface_hub import snapshot_download
+    #     cache_dir = hf_kwargs.get("cache_dir", None)
+    #     revision = hf_kwargs.get("revision", None)
+    #     token = hf_kwargs.get("token", None)
+    #     try:
+    #         snapshot_download(
+    #             repo_id=hf_path, repo_type="dataset",
+    #             cache_dir=cache_dir, revision=revision, token=token,
+    #             local_files_only=False,
+    #         )
+    #     except Exception as e:
+    #         print(f"[dataset_loader] snapshot_download 실패 (캐시 사용 시도): {e}")
 
     print(f"[dataset_loader] Loading from HuggingFace: {hf_path}"
           f"{f' / {hf_name}' if hf_name else ''} (split={hf_split})")
@@ -331,7 +363,15 @@ def load_dataset_as_questions(
     doc_to_false_option = config.get("doc_to_false_option", None)
 
     field_map = config.get("field_map", {})
+    # task_specific_kwargs 또는 lmms_eval_specific_kwargs 지원
     task_kwargs = config.get("task_specific_kwargs", {})
+    lmms_kwargs = config.get("lmms_eval_specific_kwargs", {})
+    if lmms_kwargs:
+        # lmms_eval_specific_kwargs.default 구조 지원
+        if "default" in lmms_kwargs:
+            task_kwargs.update(lmms_kwargs["default"])
+        else:
+            task_kwargs.update(lmms_kwargs)
 
     questions = []
     for idx, doc in enumerate(ds):

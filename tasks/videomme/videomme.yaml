@@ -4,7 +4,7 @@ dataset_path: lmms-lab/Video-MME
 test_split: test
 dataset_kwargs:
   token: true
-  cache_dir: videomme
+  cache_dir: ""
 
 field_map:
   question_id: question_id

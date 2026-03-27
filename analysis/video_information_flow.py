@@ -48,9 +48,15 @@ from core.model_loader import parse_model_args, load_model_from_args, load_model
 #  프레임 경계 계산
 # ============================================================
 
-def compute_frame_boundaries(model, model_name, input_ids, image_tensor, image_sizes, modality):
+def compute_frame_boundaries(model, model_name, input_ids, image_tensor, image_sizes, modality,
+                             include_newline=False):
     """
     LLaVA-OneVision 비디오 입력에서 프레임별 vision token 경계를 계산한다.
+
+    Args:
+        include_newline: True면 newline 토큰도 해당 프레임의 frame_range에 포함.
+                         False면 newline 제외 (기본값, 기존 동작).
+                         True일 때: cross-frame knockout 시 newline을 통한 간접 정보 전달도 차단됨.
 
     Returns:
         frame_ranges: list of list[int]  -- frame_ranges[i] = [token_idx, ...] (absolute position in input_embeds)
@@ -120,11 +126,18 @@ def compute_frame_boundaries(model, model_name, input_ids, image_tensor, image_s
             end = start + tokens_per_frame
             frame_ranges.append(list(range(start, end)))
         newline_idx = offset + num_frames * tokens_per_frame
+        if include_newline:
+            # trailing newline을 마지막 프레임에 포함
+            frame_ranges[-1].append(newline_idx)
     elif mm_newline_position == "frame":
         for f in range(num_frames):
             start = offset + f * tokens_per_frame_with_nl
             end = start + tokens_per_frame  # newline 제외
-            frame_ranges.append(list(range(start, end)))
+            frame_tokens = list(range(start, end))
+            if include_newline:
+                # 프레임별 newline을 해당 프레임에 포함
+                frame_tokens.append(start + tokens_per_frame)
+            frame_ranges.append(frame_tokens)
         newline_idx = None
     elif mm_newline_position == "grid":
         for f in range(num_frames):
@@ -302,6 +315,14 @@ def CrossFrameFlowAna(args):
         tokenizer, model, image_processor, context_len, model_name, conv_template = \
             load_model_from_args(model_args_dict)
         args.conv_mode = conv_template
+
+        # model_args에서 비디오 관련 설정 자동 반영 (명시적 CLI 인자가 없을 때)
+        if "max_frames_num" in model_args_dict and args.frames_upbound == 32:
+            args.frames_upbound = int(model_args_dict["max_frames_num"])
+        if "force_sample" in model_args_dict:
+            args.force_sample = str(model_args_dict["force_sample"]).lower() == "true"
+        if "video_fps" in model_args_dict and args.video_fps == 1:
+            args.video_fps = int(model_args_dict["video_fps"])
     else:
         tokenizer, model, image_processor, context_len, model_name, _ = \
             load_model_legacy(args.model_path, args.model_base, args.conv_mode)
@@ -415,7 +436,8 @@ def CrossFrameFlowAna(args):
 
         # ========== 프레임 경계 계산 ==========
         frame_ranges, num_vis_tokens, newline_idx = compute_frame_boundaries(
-            model, model_name, input_ids, image_tensor, original_image_sizes, modality
+            model, model_name, input_ids, image_tensor, original_image_sizes, modality,
+            include_newline=args.include_newline_in_frames,
         )
         num_frames = len(frame_ranges)
         print(f"  [INFO] {question_id}: {num_frames} frames, {num_vis_tokens} vision tokens, "
@@ -719,6 +741,11 @@ if __name__ == "__main__":
 
     # MCQ 옵션
     parser.add_argument("--option", type=str, default="standard")
+
+    # Newline 토큰 포함 여부
+    parser.add_argument('--include_newline_in_frames', default=False, action="store_true",
+                        help="Newline 토큰을 frame_ranges에 포함. "
+                             "True면 cross-frame knockout 시 newline을 통한 간접 정보 전달도 차단됨.")
 
     # Inference only
     parser.add_argument('--inference_only', default=False, action="store_true",
