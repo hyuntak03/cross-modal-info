@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: extrapolation_bench_vlm4d_real_mc
+dataset_name: VLM4D_real_mc
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

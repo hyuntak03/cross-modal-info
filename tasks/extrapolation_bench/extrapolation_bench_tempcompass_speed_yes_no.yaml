@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: extrapolation_bench_tempcompass_speed_yes_no
+dataset_name: TempCompass_speed_yes_no
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

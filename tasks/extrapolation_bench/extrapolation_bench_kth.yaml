@@ -1,0 +1,3 @@
+group: extrapolation_bench_kth
+task:
+  - extrapolation_bench_kth_vp_default

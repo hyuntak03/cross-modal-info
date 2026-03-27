@@ -1,0 +1,6 @@
+group: extrapolation_bench_tempcompass_direction
+task:
+  - extrapolation_bench_tempcompass_direction_caption_matching
+  - extrapolation_bench_tempcompass_direction_captioning
+  - extrapolation_bench_tempcompass_direction_multi_choice
+  - extrapolation_bench_tempcompass_direction_yes_no

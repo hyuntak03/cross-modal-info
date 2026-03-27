@@ -1,0 +1,4 @@
+group: extrapolation_bench_vlm4d
+task:
+  - extrapolation_bench_vlm4d_real_mc
+  - extrapolation_bench_vlm4d_synthetic_mc

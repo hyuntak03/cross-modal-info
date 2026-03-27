@@ -1,0 +1,80 @@
+group: extrapolation_bench
+task:
+  # ===========================
+  # SSV2 (1 config)
+  # ===========================
+  - extrapolation_bench_ssv2_vp_default
+
+  # ===========================
+  # KTH (1 config)
+  # ===========================
+  - extrapolation_bench_kth_vp_default
+
+  # ===========================
+  # TempCompass - direction (4 configs)
+  # ===========================
+  - extrapolation_bench_tempcompass_direction_caption_matching
+  - extrapolation_bench_tempcompass_direction_captioning
+  - extrapolation_bench_tempcompass_direction_multi_choice
+  - extrapolation_bench_tempcompass_direction_yes_no
+
+  # ===========================
+  # TempCompass - speed (4 configs)
+  # ===========================
+  - extrapolation_bench_tempcompass_speed_caption_matching
+  - extrapolation_bench_tempcompass_speed_captioning
+  - extrapolation_bench_tempcompass_speed_multi_choice
+  - extrapolation_bench_tempcompass_speed_yes_no
+
+  # ===========================
+  # TOMATO - count (3 configs)
+  # ===========================
+  - extrapolation_bench_tomato_count_human
+  - extrapolation_bench_tomato_count_object
+  - extrapolation_bench_tomato_count_simulated
+
+  # ===========================
+  # TOMATO - direction (3 configs)
+  # ===========================
+  - extrapolation_bench_tomato_direction_human
+  - extrapolation_bench_tomato_direction_object
+  - extrapolation_bench_tomato_direction_simulated
+
+  # ===========================
+  # TOMATO - rotation (3 configs)
+  # ===========================
+  - extrapolation_bench_tomato_rotation_human
+  - extrapolation_bench_tomato_rotation_object
+  - extrapolation_bench_tomato_rotation_simulated
+
+  # ===========================
+  # TOMATO - shape_trend (2 configs)
+  # ===========================
+  - extrapolation_bench_tomato_shape_trend_human
+  - extrapolation_bench_tomato_shape_trend_simulated
+
+  # ===========================
+  # TOMATO - velocity_frequency (3 configs)
+  # ===========================
+  - extrapolation_bench_tomato_velocity_frequency_human
+  - extrapolation_bench_tomato_velocity_frequency_object
+  - extrapolation_bench_tomato_velocity_frequency_simulated
+
+  # ===========================
+  # VLM4D (2 configs)
+  # ===========================
+  - extrapolation_bench_vlm4d_real_mc
+  - extrapolation_bench_vlm4d_synthetic_mc
+
+  # ===========================
+  # MVBench (4 configs)
+  # ===========================
+  - extrapolation_bench_mvbench_moving_attribute
+  - extrapolation_bench_mvbench_moving_direction
+  - extrapolation_bench_mvbench_object_shuffle
+  - extrapolation_bench_mvbench_counterfactual_inference
+
+  # ===========================
+  # Synthetic testbed (8 configs)
+  # ===========================
+  - extrapolation_bench_synthetic

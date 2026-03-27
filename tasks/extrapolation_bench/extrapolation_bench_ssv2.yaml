@@ -1,0 +1,3 @@
+group: extrapolation_bench_ssv2
+task:
+  - extrapolation_bench_ssv2_vp_default

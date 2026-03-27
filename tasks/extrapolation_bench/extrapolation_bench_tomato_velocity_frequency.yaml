@@ -1,0 +1,5 @@
+group: extrapolation_bench_tomato_velocity_frequency
+task:
+  - extrapolation_bench_tomato_velocity_frequency_human
+  - extrapolation_bench_tomato_velocity_frequency_object
+  - extrapolation_bench_tomato_velocity_frequency_simulated

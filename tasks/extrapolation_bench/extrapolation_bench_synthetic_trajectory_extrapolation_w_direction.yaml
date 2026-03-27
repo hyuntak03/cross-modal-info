@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: extrapolation_bench_synthetic_trajectory_extrapolation_w_direction
+dataset_name: synthetic_trajectory_extrapolation_w_direction
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

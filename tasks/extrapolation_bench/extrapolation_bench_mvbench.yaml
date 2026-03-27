@@ -1,0 +1,6 @@
+group: extrapolation_bench_mvbench
+task:
+  - extrapolation_bench_mvbench_moving_attribute
+  - extrapolation_bench_mvbench_moving_direction
+  - extrapolation_bench_mvbench_object_shuffle
+  - extrapolation_bench_mvbench_counterfactual_inference

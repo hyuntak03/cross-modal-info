@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: extrapolation_bench_tomato_rotation_human
+dataset_name: TOMATO_rotation_human
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

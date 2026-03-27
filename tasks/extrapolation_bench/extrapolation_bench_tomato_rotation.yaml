@@ -1,0 +1,5 @@
+group: extrapolation_bench_tomato_rotation
+task:
+  - extrapolation_bench_tomato_rotation_human
+  - extrapolation_bench_tomato_rotation_object
+  - extrapolation_bench_tomato_rotation_simulated

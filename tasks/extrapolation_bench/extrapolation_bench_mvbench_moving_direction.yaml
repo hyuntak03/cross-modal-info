@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: extrapolation_bench_mvbench_moving_direction
+dataset_name: mvbench_moving_direction
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

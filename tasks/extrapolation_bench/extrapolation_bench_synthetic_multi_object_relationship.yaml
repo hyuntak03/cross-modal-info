@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: extrapolation_bench_synthetic_multi_object_relationship
+dataset_name: synthetic_multi_object_relationship
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

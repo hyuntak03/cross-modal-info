@@ -1,0 +1,5 @@
+group: extrapolation_bench_tomato_direction
+task:
+  - extrapolation_bench_tomato_direction_human
+  - extrapolation_bench_tomato_direction_object
+  - extrapolation_bench_tomato_direction_simulated

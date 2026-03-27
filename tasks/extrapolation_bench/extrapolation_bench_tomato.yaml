@@ -1,0 +1,7 @@
+group: extrapolation_bench_tomato
+task:
+  - extrapolation_bench_tomato_count
+  - extrapolation_bench_tomato_direction
+  - extrapolation_bench_tomato_rotation
+  - extrapolation_bench_tomato_shape_trend
+  - extrapolation_bench_tomato_velocity_frequency

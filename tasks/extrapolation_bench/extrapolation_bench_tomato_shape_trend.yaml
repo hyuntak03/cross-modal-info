@@ -1,0 +1,4 @@
+group: extrapolation_bench_tomato_shape_trend
+task:
+  - extrapolation_bench_tomato_shape_trend_human
+  - extrapolation_bench_tomato_shape_trend_simulated

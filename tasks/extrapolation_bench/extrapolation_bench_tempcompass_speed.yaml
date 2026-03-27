@@ -1,0 +1,6 @@
+group: extrapolation_bench_tempcompass_speed
+task:
+  - extrapolation_bench_tempcompass_speed_caption_matching
+  - extrapolation_bench_tempcompass_speed_captioning
+  - extrapolation_bench_tempcompass_speed_multi_choice
+  - extrapolation_bench_tempcompass_speed_yes_no

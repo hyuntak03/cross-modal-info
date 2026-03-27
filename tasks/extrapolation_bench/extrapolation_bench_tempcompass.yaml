@@ -1,0 +1,4 @@
+group: extrapolation_bench_tempcompass
+task:
+  - extrapolation_bench_tempcompass_direction
+  - extrapolation_bench_tempcompass_speed

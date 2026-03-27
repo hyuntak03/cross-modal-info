@@ -1,0 +1,12 @@
+group: extrapolation_bench_synthetic
+task:
+  # - extrapolation_bench_synthetic_counterfactual_direction
+  # - extrapolation_bench_synthetic_multi_object_relationship
+  # - extrapolation_bench_synthetic_multi_obj_direction
+  # - extrapolation_bench_synthetic_static_identification
+  # - extrapolation_bench_synthetic_mover_direction
+  # - extrapolation_bench_synthetic_parallel_recog
+  # - extrapolation_bench_synthetic_2obj_direction
+  - extrapolation_bench_synthetic_single_object_direction
+  # - extrapolation_bench_synthetic_trajectory_extrapolation
+  # - extrapolation_bench_synthetic_trajectory_extrapolation_w_direction
