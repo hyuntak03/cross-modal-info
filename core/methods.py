@@ -41,86 +41,96 @@ def set_block_attn_add_hooks_llava(model, values_per_layer, coef_value=0, only_k
         hooks.append(model.model.layers[layer].self_attn.o_proj.register_forward_hook(change_values(values, coef_value, only_knockout_question, question_range)))
     return hooks
 
+_precomputed_index_cache = {}   # cache_key → (prefill_rows, prefill_cols, decode_rows, decode_cols)
+_precomputed_mask_cache = {}    # (q_length, num_tokens, cache_key, opposite) → GPU mask tensor
+
+
 def set_block_attn_hooks_llava(model, from_to_index_per_layer, opposite=False, block_desc=None, last_token_idx=None):
     """
     Only works on llava
     """
-    def wrap_attn_forward(forward_fn, model_, from_to_index_, opposite_, block_desc_, last_token_idx_):
+    def wrap_attn_forward(forward_fn, model_, pairs_id_, opposite_,
+                          prefill_rows_, prefill_cols_, decode_rows_, decode_cols_):
         @functools.wraps(forward_fn)
         def wrapper_fn(*args, **kwargs):
-
-            new_args = []
-            new_kwargs = {}
-            for arg in args:
-                new_args.append(arg)
-            for (k, v) in kwargs.items():
-                new_kwargs[k] = v
+            new_args = list(args)
+            new_kwargs = dict(kwargs)
 
             num_tokens = kwargs["position_ids"][0][-1].item()+1
-
-            #! q_length: 이번 self-attn forward에서 "query로 들어오는 토큰 개수" (Q_len)
-            #! - prompt(prefill) 단계: 입력 시퀀스 전체를 한 번에 처리하므로 Q_len = seq_len (>1)
-            #! - decode(generation) 단계: KV-cache를 사용하므로, 새로 생성할 "현재 토큰 1개"만 query로 들어옴 → Q_len = 1
             q_length = kwargs["hidden_states"][0].size(0)
 
-            if q_length==1:
-                #! decode 단계: ->Last pair만 적용
-                #! from_to_index_는 (target_row, source_col) 형태
-                #! target이 last_token_idx인 pair만 decode에서 새 생성 토큰(row=0)에 적용
-                if last_token_idx_ is not None:
-                    from_to_index = [(0, t) for s, t in from_to_index_ if s == last_token_idx_]
+            # 글로벌 mask 캐시: 같은 pairs + 같은 shape면 재사용
+            mask_key = (q_length, num_tokens, pairs_id_, opposite_)
+            if mask_key not in _precomputed_mask_cache:
+                if q_length == 1:
+                    use_rows, use_cols = decode_rows_, decode_cols_
                 else:
-                    #! fallback: last_token_idx 미제공 시 기존 동작 (하위호환)
-                    has_last_target = any(
-                        bd.strip().split("->")[-1].strip() == "Last"
-                        for bd in block_desc_.split(",")
-                    )
-                    if has_last_target:
-                        from_to_index=[(0, t) for _, t in from_to_index_]
+                    use_rows, use_cols = prefill_rows_, prefill_cols_
+
+                if opposite_:
+                    if q_length == 1:
+                        attn_mask = torch.zeros((q_length, num_tokens), dtype=torch.uint8)
                     else:
-                        from_to_index = []
-
-            else:
-                from_to_index=from_to_index_
-
-            if opposite_:
-                if q_length == 1:
-                    attn_mask = torch.zeros((q_length, num_tokens), dtype=torch.uint8)
+                        attn_mask = torch.tril(torch.zeros((q_length, num_tokens), dtype=torch.uint8))
+                    if use_rows is not None:
+                        attn_mask[use_rows, use_cols] = 1
                 else:
-                    attn_mask = torch.tril(torch.zeros((q_length, num_tokens), dtype=torch.uint8))
+                    if q_length == 1:
+                        attn_mask = torch.ones((q_length, num_tokens), dtype=torch.uint8)
+                    else:
+                        attn_mask = torch.tril(torch.ones((q_length, num_tokens), dtype=torch.uint8))
+                    if use_rows is not None:
+                        attn_mask[use_rows, use_cols] = 0
 
-                if from_to_index !=[]:
-                    rows, cols = zip(*from_to_index)
-                    attn_mask[rows, cols] = 1
-            else:
-                if q_length == 1:
-                    attn_mask = torch.ones((q_length, num_tokens), dtype=torch.uint8)
-                else:
-                    # set the upper triangular part of a matrix (the part above the main diagonal) to zero.
-                    attn_mask = torch.tril(torch.ones((q_length, num_tokens), dtype=torch.uint8))
+                attn_mask = attn_mask.unsqueeze(0).unsqueeze(0)
+                attn_mask = attn_mask.to(dtype=model_.dtype)
+                attn_mask = (1.0 - attn_mask) * torch.finfo(model_.dtype).min
+                attn_mask = attn_mask.to(model_.device)
+                _precomputed_mask_cache[mask_key] = attn_mask
 
-                if from_to_index !=[]:
-                    rows, cols = zip(*from_to_index)
-                    attn_mask[rows, cols] = 0
-
-            #! (B, num_heads, q_length, num_tokens) 이때, num_heads=1 임 (broadcasting함, 차피 모든 head에 동일한 mask 적용)
-            # repeat는 단순 차원 확장
-            attn_mask = attn_mask.repeat(1, 1, 1, 1)
-
-            attn_mask = attn_mask.to(dtype=model_.dtype)  # fp16 compatibility
-            #! 0인 부분은 매우 작은 fp16 type에서 min value인 -65504로 바꿔줌 (softmax 시 0 됨)
-            attn_mask = (1.0 - attn_mask) * torch.finfo(model_.dtype).min
-            attn_mask = attn_mask.to(model_.device)
-            new_kwargs["attention_mask"] = attn_mask
+            new_kwargs["attention_mask"] = _precomputed_mask_cache[mask_key]
             return forward_fn(*new_args, **new_kwargs)
 
         return wrapper_fn
 
     hooks = []
     for i in from_to_index_per_layer.keys():
+        from_to_index = from_to_index_per_layer[i]
+
+        # 내용 기반 캐시 키 (id() 대신 — GC 주소 재사용 문제 방지)
+        if from_to_index:
+            cache_key = (len(from_to_index), from_to_index[0], from_to_index[-1], last_token_idx)
+        else:
+            cache_key = (0, None, None, last_token_idx)
+
+        # row/col 인덱스 텐서를 글로벌 캐시에서 재사용
+        if cache_key not in _precomputed_index_cache:
+            if from_to_index:
+                prefill_rows = torch.tensor([r for r, c in from_to_index], dtype=torch.long)
+                prefill_cols = torch.tensor([c for r, c in from_to_index], dtype=torch.long)
+            else:
+                prefill_rows = prefill_cols = None
+
+            if last_token_idx is not None and from_to_index:
+                decode_filtered = [(0, c) for r, c in from_to_index if r == last_token_idx]
+                if decode_filtered:
+                    decode_rows = torch.tensor([r for r, c in decode_filtered], dtype=torch.long)
+                    decode_cols = torch.tensor([c for r, c in decode_filtered], dtype=torch.long)
+                else:
+                    decode_rows = decode_cols = None
+            else:
+                decode_rows = decode_cols = None
+
+            _precomputed_index_cache[cache_key] = (prefill_rows, prefill_cols, decode_rows, decode_cols)
+
+        prefill_rows, prefill_cols, decode_rows, decode_cols = _precomputed_index_cache[cache_key]
+
         hook = model.model.layers[i].self_attn.forward
-        model.model.layers[i].self_attn.forward = wrap_attn_forward(model.model.layers[i].self_attn.forward,
-                                                                model, from_to_index_per_layer[i], opposite, block_desc, last_token_idx)
+        model.model.layers[i].self_attn.forward = wrap_attn_forward(
+            model.model.layers[i].self_attn.forward,
+            model, cache_key, opposite,
+            prefill_rows, prefill_cols, decode_rows, decode_cols,
+        )
         hooks.append((i, hook))
 
     return hooks

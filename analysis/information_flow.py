@@ -6,7 +6,11 @@ import re
 import copy
 import pdb
 
-from core.methods import *
+from types import MethodType
+from core.methods import (
+    trace_with_attn_block_llava, set_block_attn_hooks_llava, remove_wrapper_llava,
+    _precomputed_mask_cache, _precomputed_index_cache,
+)
 
 # Scienfitic packages
 import numpy as np
@@ -133,6 +137,10 @@ def InforFlowAna(args):
     block_descs = []
     for (input_ids, image_tensor, original_image_sizes, prompts, mask_tensor, modality), line in tqdm(zip(data_loader, questions), total=len(questions)):
 
+        # 새 샘플마다 mask 캐시 클리어
+        _precomputed_mask_cache.clear()
+        _precomputed_index_cache.clear()
+
         question_id = line["q_id"]
         # img_id= str(line["img_id"]) + ".png"
 
@@ -216,7 +224,7 @@ def InforFlowAna(args):
 
         #! inference_only 모드: knockout 없이 정확도만 측정
         if args.inference_only:
-            re = {
+            re_result = {
                 "question_id": question_id,
                 "image": img_id,
                 "goden answer": answer,
@@ -226,21 +234,23 @@ def InforFlowAna(args):
                 "gt_base_score": gt_base_score,
                 "predicted_base_score": predicted_base_score,
             }
-            results.append(re)
+            results.append(re_result)
             continue
 
         for temp2, block_desc in block_descs:
 
             if args.block_all_layers:
                 block_config = {
-                    l: copy.deepcopy(temp2)
+                    l: temp2
                     for l in range(model.config.num_hidden_layers)
                 }
                 inps["max_new_tokens"] = 1
 
                 #! full probs 반환 → GT/predicted 둘 다 indexing
                 new_probs, knocked_predicted_answer = trace_with_attn_block_llava(
-                    model, inps, block_config, block_desc, model_name, tokenizer=tokenizer, last_token_idx=last_token_idx
+                    model, inps, block_config, block_desc, model_name,
+                    tokenizer=tokenizer, last_token_idx=last_token_idx,
+                    use_cached_embeds=True,
                 )
 
                 new_score_gt = new_probs[gt_first_token_id].cpu().item()
@@ -291,13 +301,15 @@ def InforFlowAna(args):
                         )
                     ]
                     block_config = {
-                        l: copy.deepcopy(temp2)
+                        l: temp2
                         for l in layerlist
                     }
 
                     inps["max_new_tokens"] = 1
                     new_probs, knocked_predicted_answer = trace_with_attn_block_llava(
-                        model, inps, block_config, block_desc, model_name, tokenizer=tokenizer, last_token_idx=last_token_idx
+                        model, inps, block_config, block_desc, model_name,
+                        tokenizer=tokenizer, last_token_idx=last_token_idx,
+                        use_cached_embeds=True,
                     )
 
                     new_score_gt = new_probs[gt_first_token_id].cpu().item()

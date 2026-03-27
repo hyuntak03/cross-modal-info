@@ -34,7 +34,7 @@ from llava.utils import disable_torch_init, process_video_with_decord
 from llava.mm_utils import tokenizer_image_token, process_images, get_model_name_from_path
 from torch.utils.data import Dataset, DataLoader
 
-from core.methods import trace_with_attn_block_llava, set_block_attn_hooks_llava, remove_wrapper_llava
+from core.methods import trace_with_attn_block_llava, set_block_attn_hooks_llava, remove_wrapper_llava, _precomputed_mask_cache, _precomputed_index_cache
 from core.utils import generate_plot
 from core.data_pipeline import (
     CustomDataset, collate_fn, create_data_loader,
@@ -250,9 +250,14 @@ def run_original(model, inps, tokenizer, model_name, answer, args=None):
     gt_base_score = probs[gt_first_token_id_tensor].item()
     predicted_base_score = probs[generated_first_id].item()
 
-    # 전체 디코딩 후 MCQ letter 추출
+    # 전체 디코딩
     raw_predicted = tokenizer.batch_decode(answer_token_id, skip_special_tokens=True)[0].strip()
-    predicted_answer = _extract_mcq_letter(raw_predicted)
+
+    # MCQ면 letter 추출, 아니면 전체 텍스트 비교
+    if args and getattr(args, 'option', None) == "MCQ":
+        predicted_answer = _extract_mcq_letter(raw_predicted)
+    else:
+        predicted_answer = raw_predicted.upper()
 
     is_correct_bool = predicted_answer == answer_cap
 
@@ -338,6 +343,10 @@ def CrossFrameFlowAna(args):
 
     for (input_ids, image_tensor, original_image_sizes, prompts, mask_tensor, modality), line in tqdm(
             zip(data_loader, questions), total=len(questions)):
+
+        # 새 샘플마다 mask 캐시 클리어 (seq_len이 바뀔 수 있음)
+        _precomputed_mask_cache.clear()
+        _precomputed_index_cache.clear()
 
         question_id = line["q_id"]
 
@@ -462,7 +471,7 @@ def CrossFrameFlowAna(args):
             if args.block_all_layers:
                 # 전체 레이어에서 한번에 knockout
                 block_config = {
-                    l: copy.deepcopy(block_pairs)
+                    l: block_pairs
                     for l in range(model.config.num_hidden_layers)
                 }
                 inps["max_new_tokens"] = 1
@@ -515,7 +524,8 @@ def CrossFrameFlowAna(args):
 
             else:
                 # Layer-wise sliding window knockout
-                for layer in range(model.config.num_hidden_layers):
+                num_layers = model.config.num_hidden_layers
+                for layer in tqdm(range(num_layers), desc=f"  Knockout [{block_desc}]", leave=False):
                     layerlist = [
                         l for l in range(
                             max(0, layer - args.window // 2),
@@ -523,7 +533,7 @@ def CrossFrameFlowAna(args):
                         )
                     ]
                     block_config = {
-                        l: copy.deepcopy(block_pairs)
+                        l: block_pairs
                         for l in layerlist
                     }
                     inps["max_new_tokens"] = 1
