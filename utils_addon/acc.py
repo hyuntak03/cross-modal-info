@@ -133,5 +133,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python acc.py ../output/information_flow/LLaVA_NeXT_Video_7B/shape/val
+# python acc.py ../output/information_flow/LLaVA_NeXT_Video_7B/existence/val
 # ./output/information_flow/llava_v1_6_vicuna_7b/position/val
