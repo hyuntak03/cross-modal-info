@@ -469,7 +469,8 @@ def CrossFrameFlowAna(args):
 
                 new_probs, knocked_predicted_answer = trace_with_attn_block_llava(
                     model, inps, block_config, block_desc, model_name,
-                    tokenizer=tokenizer, last_token_idx=last_token_idx
+                    tokenizer=tokenizer, last_token_idx=last_token_idx,
+                    use_cached_embeds=True,
                 )
 
                 new_score_gt = new_probs[gt_first_token_id].cpu().item()
@@ -529,7 +530,8 @@ def CrossFrameFlowAna(args):
 
                     new_probs, knocked_predicted_answer = trace_with_attn_block_llava(
                         model, inps, block_config, block_desc, model_name,
-                        tokenizer=tokenizer, last_token_idx=last_token_idx
+                        tokenizer=tokenizer, last_token_idx=last_token_idx,
+                        use_cached_embeds=True,
                     )
 
                     new_score_gt = new_probs[gt_first_token_id].cpu().item()

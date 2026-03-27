@@ -234,7 +234,21 @@ def generate_llava(
             return patched_mask, objects_indices, pad_indices,original_patch_indices,hd_patch_indice,objects_indices_in_hd, inputs_embeds.shape, super(self.__class__, self).generate(position_ids=position_ids, attention_mask=attention_mask, inputs_embeds=inputs_embeds, **kwargs)
         else:
             (inputs_, position_ids, attention_mask, _, inputs_embeds, _) = self.prepare_inputs_labels_for_multimodal(inputs, position_ids, attention_mask, None, None, images, modalities, image_sizes=image_sizes)
+            # knockout 재사용을 위해 캐싱
+            self._cached_inputs_embeds = inputs_embeds
+            self._cached_position_ids = position_ids
+            self._cached_attention_mask = attention_mask
             return inputs_embeds.shape, super(self.__class__, self).generate(position_ids=position_ids, attention_mask=attention_mask, inputs_embeds=inputs_embeds, **kwargs)
+
+
+def generate_llava_cached(self, **kwargs):
+    """vision encoder를 건너뛰고 캐시된 inputs_embeds로 generate 수행."""
+    inputs_embeds = self._cached_inputs_embeds
+    position_ids = self._cached_position_ids
+    attention_mask = self._cached_attention_mask
+    return inputs_embeds.shape, super(self.__class__, self).generate(
+        position_ids=position_ids, attention_mask=attention_mask,
+        inputs_embeds=inputs_embeds, **kwargs)
 
 
 def blockdesc2range(des, dataset_dict, question_id, input_ids, inputs_embeds_shape, tokenizer, model_name, args=None):

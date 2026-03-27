@@ -275,11 +275,24 @@ def trace_with_attn_block_llava(
         block_desc,
         model_name,
         tokenizer=None,
-        last_token_idx=None
+        last_token_idx=None,
+        use_cached_embeds=False,
 ):
     with torch.inference_mode():
         block_attn_hooks = set_block_attn_hooks_llava(model, from_to_index_per_layer, block_desc=block_desc, last_token_idx=last_token_idx)
-        output_details = model.generate(**inp)
+
+        if use_cached_embeds and hasattr(model, '_cached_inputs_embeds'):
+            from types import MethodType
+            from core.data_pipeline import generate_llava_cached
+            gen_kwargs = {k: v for k, v in inp.items()
+                          if k not in ("inputs", "images", "image_sizes", "modalities", "args")}
+            old_generate = model.generate
+            model.generate = MethodType(generate_llava_cached, model)
+            _, output_details = model.generate(**gen_kwargs)
+            model.generate = old_generate
+        else:
+            output_details = model.generate(**inp)
+
         logits_first_answer_token = output_details['scores'][0]
         remove_wrapper_llava(model, block_attn_hooks)
 
