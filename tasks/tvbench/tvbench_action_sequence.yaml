@@ -1,0 +1,3 @@
+task: tvbench_action_sequence
+dataset_name: action_sequence
+include: _default_template_yaml
