@@ -1,0 +1,7 @@
+include: _default_template_yaml
+task: direction_testbed_ablation_4way
+dataset_name: 4way
+test_split: val
+lmms_eval_specific_kwargs:
+  default:
+    post_prompt: "Only give the best option.\n"

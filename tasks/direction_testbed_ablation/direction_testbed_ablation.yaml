@@ -1,0 +1,6 @@
+group: direction_testbed_ablation
+task:
+  - direction_testbed_ablation_2H
+  - direction_testbed_ablation_2V
+  - direction_testbed_ablation_4way
+  - direction_testbed_ablation_8way
