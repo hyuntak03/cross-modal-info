@@ -299,6 +299,11 @@ def extract_attention_fast(
             if selected_layers[-1] != n_total_layers - 1:
                 selected_layers.append(n_total_layers - 1)
 
+            # Detect RoPE API once
+            import inspect as _inspect
+            _first_attn = decoder_layers[0].self_attn
+            _rope_uses_pos_ids = 'position_ids' in _inspect.signature(_first_attn.rotary_emb.forward).parameters
+
             print(f"  [hooks] {len(selected_layers)}/{n_total_layers} layers (stride={layer_stride})")
 
             for i in selected_layers:
@@ -337,8 +342,13 @@ def extract_attention_fast(
                         q = q_raw.view(bsz, q_len, n_heads, head_dim).transpose(1, 2).half()
                         k = k_raw.view(bsz, q_len, n_kv_heads, head_dim).transpose(1, 2).half()
 
-                        cos, sin = attn_mod.rotary_emb(k, seq_len=q_len)
-                        pos_ids = torch.arange(q_len, device=q.device).unsqueeze(0)
+                        # Use actual position_ids from prepare_inputs_labels_for_multimodal
+                        pos_ids = position_ids if position_ids is not None else \
+                            torch.arange(q_len, device=q.device).unsqueeze(0)
+                        if _rope_uses_pos_ids:
+                            cos, sin = attn_mod.rotary_emb(k, pos_ids)
+                        else:
+                            cos, sin = attn_mod.rotary_emb(k, seq_len=q_len)
                         q, k = apply_rotary_pos_emb(q, k, cos, sin, pos_ids)
 
                         if n_groups > 1:

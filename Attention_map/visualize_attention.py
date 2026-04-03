@@ -1396,7 +1396,7 @@ def main():
                         help="Colormap for heatmap (inferno, viridis, hot, jet, etc.)")
 
     # Performance
-    parser.add_argument("--num_workers", type=int, default=4,
+    parser.add_argument("--num_workers", type=int, default=12,
                         help="Parallel workers for visualization (default: 4)")
 
     args = parser.parse_args()

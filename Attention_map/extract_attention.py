@@ -475,34 +475,81 @@ def run_batch(args, model, tokenizer, image_processor, model_name, conv_template
 # ============================================================
 
 def detect_model_type(pretrained_path):
-    """Detect model type from config.json."""
-    # Handle HF cache layout (models--Org--Name/snapshots/hash/)
-    config_path = os.path.join(pretrained_path, "config.json")
-    if not os.path.exists(config_path):
-        # Try snapshots
-        snap_dir = os.path.join(pretrained_path, "snapshots")
-        if os.path.isdir(snap_dir):
-            hashes = os.listdir(snap_dir)
-            if hashes:
-                config_path = os.path.join(snap_dir, hashes[0], "config.json")
-    if os.path.exists(config_path):
-        with open(config_path) as f:
-            config = json.load(f)
-        model_type = config.get("model_type", "")
-        if "qwen3_vl" in model_type:
-            return "qwen3_vl"
+    """Detect model type from config.json or model name heuristic.
+
+    Supports: local paths, HF cache layout (models--Org--Name/), HF repo names.
+    """
+    # 1. Try local config.json directly
+    candidates = [os.path.join(pretrained_path, "config.json")]
+
+    # 2. HF cache layout: models--Org--Name/snapshots/hash/
+    snap_dir = os.path.join(pretrained_path, "snapshots")
+    if os.path.isdir(snap_dir):
+        for h in os.listdir(snap_dir):
+            candidates.append(os.path.join(snap_dir, h, "config.json"))
+
+    # 3. HF_HOME cache: convert "Org/Model" → "$HF_HOME/models--Org--Model/snapshots/*/config.json"
+    hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+    if "/" in pretrained_path and not os.path.isdir(pretrained_path):
+        cache_dir_name = "models--" + pretrained_path.replace("/", "--")
+        cache_snap = os.path.join(hf_home, cache_dir_name, "snapshots")
+        if os.path.isdir(cache_snap):
+            for h in os.listdir(cache_snap):
+                candidates.append(os.path.join(cache_snap, h, "config.json"))
+
+    for config_path in candidates:
+        if os.path.exists(config_path):
+            try:
+                with open(config_path) as f:
+                    config = json.load(f)
+                model_type = config.get("model_type", "")
+                if "qwen3_vl" in model_type:
+                    return "qwen3_vl"
+                if model_type:  # found a valid config, trust it
+                    return "llava"
+            except (json.JSONDecodeError, IOError):
+                continue
+
+    # 4. Fallback: name-based heuristic
+    name_lower = pretrained_path.lower()
+    if "qwen3-vl" in name_lower or "qwen3_vl" in name_lower:
+        return "qwen3_vl"
+
     return "llava"
 
 
 def _resolve_pretrained_path(pretrained_path):
-    """Resolve HF cache layout to actual snapshot path."""
+    """Resolve HF cache layout or HF repo name to actual snapshot path.
+
+    Handles:
+      - Direct path with config.json → return as-is
+      - models--Org--Name/snapshots/hash/ layout → return snapshot path
+      - HF repo name "Org/Model" → look up in $HF_HOME cache
+      - Otherwise return as-is (let from_pretrained handle it)
+    """
+    # Direct path
     if os.path.exists(os.path.join(pretrained_path, "config.json")):
         return pretrained_path
+
+    # Local cache layout: models--Org--Name/snapshots/hash/
     snap_dir = os.path.join(pretrained_path, "snapshots")
     if os.path.isdir(snap_dir):
         hashes = os.listdir(snap_dir)
         if hashes:
             return os.path.join(snap_dir, hashes[0])
+
+    # HF repo name → $HF_HOME cache
+    if "/" in pretrained_path and not os.path.isdir(pretrained_path):
+        hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+        cache_dir_name = "models--" + pretrained_path.replace("/", "--")
+        cache_snap = os.path.join(hf_home, cache_dir_name, "snapshots")
+        if os.path.isdir(cache_snap):
+            hashes = os.listdir(cache_snap)
+            if hashes:
+                resolved = os.path.join(cache_snap, hashes[0])
+                print(f"  [resolve] {pretrained_path} → {resolved}")
+                return resolved
+
     return pretrained_path
 
 
@@ -703,8 +750,7 @@ def run_single_image_qwen3vl(args, model, processor, model_name):
 
 def run_batch_qwen3vl(args, model, processor, model_name):
     """Extract attention for a batch dataset (Qwen3-VL)."""
-    from core.dataset_loader import load_dataset_as_questions
-
+    # load_dataset_as_questions already imported at top level (direct module load)
     if args.task:
         questions, dataset_dict = load_dataset_as_questions(
             task_name=args.task,
