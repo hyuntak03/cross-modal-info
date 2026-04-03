@@ -1,0 +1,9 @@
+group: e2e_real_vp
+task:
+  - e2e_real_vp_colored_area
+  - e2e_real_vp_colored_edge
+  - e2e_real_vp_text
+  - e2e_real_vp_default
+  - e2e_real_vp_default_8way
+  - e2e_real_vp_shape_realbg
+  - e2e_real_vp_real_shape

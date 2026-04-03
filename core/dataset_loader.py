@@ -414,6 +414,8 @@ def load_dataset_as_questions(
             sig = inspect.signature(doc_to_visual)
             if "video_folder" in sig.parameters:
                 vis_result = doc_to_visual(doc, task_kwargs, video_folder=effective_video_folder, image_folder=image_folder)
+            elif len(sig.parameters) == 1:
+                vis_result = doc_to_visual(doc)
             else:
                 vis_result = doc_to_visual(doc, task_kwargs)
             vis_path = vis_result[0] if isinstance(vis_result, list) else str(vis_result)
