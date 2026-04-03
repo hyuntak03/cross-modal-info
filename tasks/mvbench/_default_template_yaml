@@ -1,22 +1,12 @@
-dataset_path: FunAILab/TVBench
+dataset_path: OpenGVLab/MVBench
 dataset_kwargs:
-  token: true
-  video: true
+  token: True
+  cache_dir: ""
+  video: True
   revision: video
-
-test_split: train
-
-field_map:
-  question_id: video
-  question: question
-  answer: answer
-  options: candidates
-  video: video
+  create_link: True
 
 doc_to_visual: !function utils.doc_to_visual
 doc_to_text: !function utils.doc_to_text
 doc_to_target: !function utils.doc_to_target
 doc_to_false_option: !function utils.doc_to_false_option
-
-task_specific_kwargs:
-  post_prompt: "\nOnly give the best option."

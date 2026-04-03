@@ -1,3 +1,8 @@
+include: _default_template_yaml
 task: mvbench_action_sequence
 dataset_name: action_sequence
-include: _default_template_yaml
+test_split: train
+lmms_eval_specific_kwargs:
+  default:
+    sub_task: action_sequence
+    post_prompt: "Only give the best option.\n"
