@@ -1,0 +1,6 @@
+group: identity_testbed
+task:
+  - identity_testbed_realobj_realbg
+  - identity_testbed_realobj_synbg
+  - identity_testbed_synobj_realbg
+  - identity_testbed_synobj_synbg

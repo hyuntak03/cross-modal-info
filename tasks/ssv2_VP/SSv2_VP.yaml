@@ -1,0 +1,5 @@
+group: ssv2_vp_lr
+task:
+  - ssv2_vp_colored_edge_lr
+  - ssv2_vp_text_lr
+  - ssv2_vp_default_lr

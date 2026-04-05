@@ -1,0 +1,22 @@
+group: cot_new_version_ssv2
+task:
+
+  - ssv2_plain_light
+  - ssv2_plain_temporal
+  - ssv2_plain_full
+
+  - ssv2_colored_edge_observe_light
+  - ssv2_colored_edge_observe_temporal
+  - ssv2_colored_edge_observe_full
+
+  - ssv2_colored_edge_informed_light
+  - ssv2_colored_edge_informed_temporal
+  - ssv2_colored_edge_informed_full
+
+  - ssv2_text_edge_observe_light
+  - ssv2_text_edge_observe_temporal
+  - ssv2_text_edge_observe_full
+
+  - ssv2_text_edge_informed_light
+  - ssv2_text_edge_informed_temporal
+  - ssv2_text_edge_informed_full

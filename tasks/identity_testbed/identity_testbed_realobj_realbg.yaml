@@ -1,0 +1,12 @@
+task: identity_testbed_realobj_realbg
+dataset_name: realobj_realbg
+include: default.yaml
+test_split: val
+doc_to_visual: !function utils.doc_to_visual
+doc_to_text: !function utils.close_ended_doc_to_text
+doc_to_target: "answer"
+process_results: !function utils.process_results
+metric_list:
+  - metric: accuracy
+    aggregation: !function utils.realobj_realbg_aggregate
+    higher_is_better: true
