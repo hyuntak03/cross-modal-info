@@ -64,7 +64,8 @@ except (ImportError, Exception):
 # Shared: compute stats from post-RoPE Q, K
 # ============================================================
 
-def _compute_stats(q, k, img_start, img_end, seq_len, head_dim, frame_ranges=None):
+def _compute_stats(q, k, img_start, img_end, seq_len, head_dim,
+                   frame_ranges=None, q_pre_rope=None, k_pre_rope=None):
     """
     Compute Q-K metrics for 3 query groups: answer, question, vision.
     Optionally computes per-frame intra/cross similarity.
@@ -73,6 +74,8 @@ def _compute_stats(q, k, img_start, img_end, seq_len, head_dim, frame_ranges=Non
         q: (n_heads, seq_len, head_dim) — post-RoPE
         k: (n_heads, seq_len, head_dim) — post-RoPE, GQA-expanded
         frame_ranges: list of (start, end) tuples for each frame (optional)
+        q_pre_rope: (n_heads, seq_len, head_dim) — pre-RoPE Q (optional, for RoPE effect isolation)
+        k_pre_rope: (n_heads, seq_len, head_dim) — pre-RoPE K (optional)
 
     Query groups:
         answer:   last token (generates the answer)
@@ -89,10 +92,10 @@ def _compute_stats(q, k, img_start, img_end, seq_len, head_dim, frame_ranges=Non
 
     system_idx = list(range(0, img_start))
     vision_idx = list(range(img_start, img_end))
-    question_idx = list(range(img_end, seq_len))
+    question_idx = list(range(img_end, seq_len - 1))  # answer(last token) 제외
 
     def _mean(t, idx):
-        return t[idx].mean().item() if idx else 0.0
+        return t[idx].mean().item() if idx else float('nan')
 
     # --- H1: K norms (shared, query-independent) ---
     k_norms = k.norm(dim=-1).mean(dim=0)  # (seq_len,)
@@ -212,11 +215,84 @@ def _compute_stats(q, k, img_start, img_end, seq_len, head_dim, frame_ranges=Non
             if not np.isnan(v):
                 distant_vals.append(v)
         stats['cos_distant_frame'] = np.mean(distant_vals) if distant_vals else float('nan')
+
+        # --- Per-frame K-norm ---
+        for fi, (fs, fe) in enumerate(frame_ranges):
+            k_f_norms = k[:, fs:fe, :].norm(dim=-1).mean().item()  # avg over heads and tokens
+            stats[f'k_norm_frame_{fi}'] = k_f_norms
+
+        # --- Per-frame cos(Q_answer, K_fi) and cos(Q_question, K_fi) ---
+        q_ans_unit = q[:, -1, :]  # (H, D)
+        q_ans_unit = q_ans_unit / q_ans_unit.norm(dim=-1, keepdim=True).clamp(min=1e-8)
+
+        question_end = seq_len - 1
+        if img_end < question_end:
+            q_que = q[:, img_end:question_end, :].mean(dim=1)  # (H, D)
+            q_que_unit = q_que / q_que.norm(dim=-1, keepdim=True).clamp(min=1e-8)
+        else:
+            q_que_unit = None
+
+        for fi, (fs, fe) in enumerate(frame_ranges):
+            k_fi_unit = k_frames_raw[fi] / k_frames_raw[fi].norm(dim=-1, keepdim=True).clamp(min=1e-8)
+            # Answer → Frame_i
+            stats[f'cos_answer_frame_{fi}'] = (q_ans_unit.unsqueeze(1) * k_fi_unit).sum(dim=-1).mean().item()
+            # Question → Frame_i
+            if q_que_unit is not None:
+                stats[f'cos_question_frame_{fi}'] = (q_que_unit.unsqueeze(1) * k_fi_unit).sum(dim=-1).mean().item()
+            else:
+                stats[f'cos_question_frame_{fi}'] = float('nan')
+
+        # --- Per-frame actual attention weight (softmax output) ---
+        # Answer → each frame
+        scores_ans = torch.matmul(q[:, -1:, :], k.transpose(-1, -2)).squeeze(1) / scale  # (H, S)
+        attn_ans = torch.softmax(scores_ans, dim=-1).mean(dim=0)  # (S,)
+        for fi, (fs, fe) in enumerate(frame_ranges):
+            stats[f'attn_answer_frame_{fi}'] = attn_ans[fs:fe].sum().item()
+
+        # Question → each frame
+        question_end_fr = seq_len - 1
+        if img_end < question_end_fr:
+            q_que_mean = q[:, img_end:question_end_fr, :].mean(dim=1, keepdim=True)  # (H, 1, D)
+            scores_que = torch.matmul(q_que_mean, k.transpose(-1, -2)).squeeze(1) / scale  # (H, S)
+            scores_que[:, question_end_fr:] = float('-inf')  # causal mask
+            attn_que = torch.softmax(scores_que, dim=-1).mean(dim=0)  # (S,)
+            for fi, (fs, fe) in enumerate(frame_ranges):
+                stats[f'attn_question_frame_{fi}'] = attn_que[fs:fe].sum().item()
+        else:
+            for fi in range(nf):
+                stats[f'attn_question_frame_{fi}'] = float('nan')
+
+        # --- F×F cosine similarity matrix (flattened for storage) ---
+        for fi in range(nf):
+            for fj in range(nf):
+                v = frame_cos[fi, fj].item()
+                stats[f'frame_cos_{fi}_{fj}'] = v
+        stats['num_frames'] = nf
     else:
         stats['cos_intra_frame'] = float('nan')
         stats['cos_cross_frame'] = float('nan')
         stats['cos_adj_frame'] = float('nan')
         stats['cos_distant_frame'] = float('nan')
+        stats['num_frames'] = 0
+
+    # --- Pre-RoPE vs Post-RoPE comparison (RoPE effect isolation) ---
+    if q_pre_rope is not None and k_pre_rope is not None:
+        q_ans_pre = q_pre_rope[:, -1, :]  # (H, D)
+        q_ans_pre_u = q_ans_pre / q_ans_pre.norm(dim=-1, keepdim=True).clamp(min=1e-8)
+        k_pre_u = k_pre_rope / k_pre_rope.norm(dim=-1, keepdim=True).clamp(min=1e-8)
+        cos_pre = (q_ans_pre_u.unsqueeze(1) * k_pre_u).sum(dim=-1).mean(dim=0)  # (S,)
+
+        stats['cos_pre_rope_system'] = _mean(cos_pre, system_idx)
+        stats['cos_pre_rope_vision'] = _mean(cos_pre, vision_idx)
+        stats['cos_pre_rope_question'] = _mean(cos_pre, question_idx)
+
+        # Per-frame pre-RoPE cosine sim (RoPE effect isolation on F0 bias)
+        if frame_ranges and len(frame_ranges) > 1:
+            for fi, (fs, fe) in enumerate(frame_ranges):
+                k_fi_pre_u = k_pre_u[:, fs:fe, :]  # (H, T, D)
+                stats[f'cos_pre_rope_answer_frame_{fi}'] = (
+                    q_ans_pre_u.unsqueeze(1) * k_fi_pre_u
+                ).sum(dim=-1).mean().item()
 
     return stats
 
@@ -226,7 +302,7 @@ def _compute_stats(q, k, img_start, img_end, seq_len, head_dim, frame_ranges=Non
 # ============================================================
 
 @torch.no_grad()
-def analyze_sample_llava(model, inputs_embeds, attention_mask, position_ids,
+def analyze_sample_llava(model, tokenizer, inputs_embeds, attention_mask, position_ids,
                          img_start, img_end, layer_stride=1, frame_ranges=None):
     """Run LLaVA forward with hooks to get post-RoPE Q, K per layer."""
     from transformers.models.qwen2.modeling_qwen2 import apply_rotary_pos_emb
@@ -276,6 +352,12 @@ def analyze_sample_llava(model, inputs_embeds, attention_mask, position_ids,
                 q = q_raw.view(seq_len, n_heads, head_dim).transpose(0, 1).unsqueeze(0)
                 k = k_raw.view(seq_len, n_kv_heads, head_dim).transpose(0, 1).unsqueeze(0)
 
+                # Pre-RoPE Q,K for comparison (GQA-expanded)
+                q_pre = q[0].clone()
+                k_pre = k[0].clone()
+                if n_groups > 1:
+                    k_pre = k_pre.repeat_interleave(n_groups, dim=0)
+
                 # Apply RoPE
                 if _rope_uses_position_ids:
                     cos, sin = attn_mod.rotary_emb(k, _pos_default)
@@ -288,11 +370,12 @@ def analyze_sample_llava(model, inputs_embeds, attention_mask, position_ids,
                     k = k.repeat_interleave(n_groups, dim=1)
 
                 stats = _compute_stats(q[0], k[0], img_start, img_end, seq_len, head_dim,
-                                      frame_ranges=frame_ranges)
+                                      frame_ranges=frame_ranges,
+                                      q_pre_rope=q_pre, k_pre_rope=k_pre)
                 stats['layer_idx'] = layer_idx
                 layer_stats.append(stats)
 
-                del q, k, q_raw, k_raw
+                del q, k, q_raw, k_raw, q_pre, k_pre
                 return output
             return h
 
@@ -300,14 +383,18 @@ def analyze_sample_llava(model, inputs_embeds, attention_mask, position_ids,
         hooks.append(attn_mod.k_proj.register_forward_hook(_kh(captured)))
         hooks.append(decoder_layers[i].register_forward_hook(_lh(i, captured, attn_mod, i in selected_set)))
 
+    predicted_token = ""
     try:
-        model(inputs_embeds=inputs_embeds, attention_mask=attention_mask,
-              position_ids=position_ids, output_attentions=False, return_dict=True)
+        outputs = model(inputs_embeds=inputs_embeds, attention_mask=attention_mask,
+                        position_ids=position_ids, output_attentions=False, return_dict=True)
+        predicted_id = outputs.logits[0, -1].argmax().item()
+        predicted_token = tokenizer.decode([predicted_id], skip_special_tokens=True).strip()
+        del outputs
     finally:
         for h in hooks:
             h.remove()
 
-    return layer_stats
+    return layer_stats, predicted_token
 
 
 def run_llava(args):
@@ -338,6 +425,9 @@ def run_llava(args):
     print(f"[INFO] Samples: {len(questions)}")
 
     all_stats = []
+    correct_stats = []
+    incorrect_stats = []
+
     for (input_ids, image_tensor, image_sizes, prompts, mask_tensor, modality), line in tqdm(
         zip(data_loader, questions), total=len(questions), desc="Q-K Analysis (LLaVA)"
     ):
@@ -369,15 +459,25 @@ def run_llava(args):
             if fs < img_end:
                 fr.append((fs, fe))
 
-        stats = analyze_sample_llava(
-            model, inputs_embeds, attention_mask, position_ids,
+        stats, predicted = analyze_sample_llava(
+            model, tokenizer, inputs_embeds, attention_mask, position_ids,
             img_start, img_end, args.layer_stride,
             frame_ranges=fr if len(fr) > 1 else None,
         )
         all_stats.append(stats)
+
+        # Correct/incorrect classification
+        gt_answer = str(line.get("answer", "")).strip().upper()
+        pred_upper = predicted.strip().upper()
+        if gt_answer and (pred_upper == gt_answer or (len(gt_answer) == 1 and gt_answer in pred_upper)):
+            correct_stats.append(stats)
+        elif gt_answer:
+            incorrect_stats.append(stats)
+
         torch.cuda.empty_cache()
 
-    return all_stats, model_name
+    print(f"[INFO] correct={len(correct_stats)}, incorrect={len(incorrect_stats)}")
+    return all_stats, correct_stats, incorrect_stats, model_name
 
 
 # ============================================================
@@ -385,7 +485,7 @@ def run_llava(args):
 # ============================================================
 
 @torch.no_grad()
-def analyze_sample_qwen3vl(model, inputs, img_start, img_end, layer_stride=1, frame_ranges=None):
+def analyze_sample_qwen3vl(model, processor, inputs, img_start, img_end, layer_stride=1, frame_ranges=None):
     """Run Qwen3-VL forward with hooks to get post-RoPE Q, K per layer."""
     from transformers.models.qwen3_vl.modeling_qwen3_vl import apply_rotary_pos_emb
 
@@ -444,6 +544,12 @@ def analyze_sample_qwen3vl(model, inputs, img_start, img_end, layer_stride=1, fr
                 q = attn_mod.q_norm(q)
                 k = attn_mod.k_norm(k)
 
+                # Pre-RoPE Q,K (after norm, before rotation)
+                q_pre = q[0].clone()
+                k_pre = k[0].clone()
+                if n_groups > 1:
+                    k_pre = k_pre.repeat_interleave(n_groups, dim=0)
+
                 # Apply M-RoPE using captured cos, sin (move to same device as Q/K)
                 cos = rope_cache['cos'].to(device=q.device, dtype=torch.float32)
                 sin = rope_cache['sin'].to(device=q.device, dtype=torch.float32)
@@ -454,11 +560,12 @@ def analyze_sample_qwen3vl(model, inputs, img_start, img_end, layer_stride=1, fr
                     k = k.repeat_interleave(n_groups, dim=1)
 
                 stats = _compute_stats(q[0], k[0], img_start, img_end, seq_len, head_dim,
-                                      frame_ranges=frame_ranges)
+                                      frame_ranges=frame_ranges,
+                                      q_pre_rope=q_pre, k_pre_rope=k_pre)
                 stats['layer_idx'] = layer_idx
                 layer_stats.append(stats)
 
-                del q, k, q_raw, k_raw
+                del q, k, q_raw, k_raw, q_pre, k_pre
                 return output
             return h
 
@@ -466,13 +573,17 @@ def analyze_sample_qwen3vl(model, inputs, img_start, img_end, layer_stride=1, fr
         hooks.append(attn_mod.k_proj.register_forward_hook(_kh(captured)))
         hooks.append(decoder_layers[i].register_forward_hook(_lh(i, captured, attn_mod, i in selected_set)))
 
+    predicted_token = ""
     try:
-        model(**inputs, output_attentions=False, return_dict=True)
+        outputs = model(**inputs, output_attentions=False, return_dict=True)
+        predicted_id = outputs.logits[0, -1].argmax().item()
+        predicted_token = processor.tokenizer.decode([predicted_id], skip_special_tokens=True).strip()
+        del outputs
     finally:
         for h in hooks:
             h.remove()
 
-    return layer_stats
+    return layer_stats, predicted_token
 
 
 def run_qwen3vl(args):
@@ -511,6 +622,9 @@ def run_qwen3vl(args):
     print(f"[INFO] Samples: {len(questions)}")
 
     all_stats = []
+    correct_stats = []
+    incorrect_stats = []
+
     for line in tqdm(questions, desc="Q-K Analysis (Qwen3-VL)"):
         video_rel = line.get("video", "")
         if not video_rel:
@@ -552,14 +666,22 @@ def run_qwen3vl(args):
             if fs < img_end:
                 fr.append((fs, fe))
 
-        stats = analyze_sample_qwen3vl(model, inputs, img_start, img_end, args.layer_stride,
-                                       frame_ranges=fr if len(fr) > 1 else None)
+        stats, predicted = analyze_sample_qwen3vl(model, processor, inputs, img_start, img_end, args.layer_stride,
+                                                    frame_ranges=fr if len(fr) > 1 else None)
         all_stats.append(stats)
+
+        gt_answer = str(line.get("answer", "")).strip().upper()
+        pred_upper = predicted.strip().upper()
+        if gt_answer and (pred_upper == gt_answer or (len(gt_answer) == 1 and gt_answer in pred_upper)):
+            correct_stats.append(stats)
+        elif gt_answer:
+            incorrect_stats.append(stats)
 
         del inputs
         torch.cuda.empty_cache()
 
-    return all_stats, model_name
+    print(f"[INFO] correct={len(correct_stats)}, incorrect={len(incorrect_stats)}")
+    return all_stats, correct_stats, incorrect_stats, model_name
 
 
 # ============================================================
@@ -610,7 +732,13 @@ def _detect_model_type(pretrained):
 def aggregate_stats(all_stats):
     if not all_stats or not all_stats[0]: return {}
     layer_indices = sorted(set(s['layer_idx'] for sample in all_stats for s in sample))
-    keys = [k for k in all_stats[0][0].keys() if k != 'layer_idx']
+    # Collect all keys across all samples (handles variable frame counts)
+    all_keys = set()
+    for sample in all_stats:
+        for s in sample:
+            all_keys.update(s.keys())
+    all_keys.discard('layer_idx')
+    keys = sorted(all_keys)
     agg = {k: [] for k in keys}
     agg['layer_idx'] = layer_indices
     for li in layer_indices:
@@ -618,7 +746,9 @@ def aggregate_stats(all_stats):
         for sample in all_stats:
             for s in sample:
                 if s['layer_idx'] == li:
-                    for k in keys: vals[k].append(s[k])
+                    for k in keys:
+                        if k in s:
+                            vals[k].append(s[k])
                     break
         for k in keys:
             agg[k].append(np.nanmean(vals[k]) if vals[k] else float('nan'))
@@ -743,6 +873,98 @@ def plot_results(agg, output_dir, model_name):
         plt.close(fig)
         print(f'[SAVED] {output_dir}/qk_frame_similarity.png')
 
+    # ---- Figure 5: Per-frame deep analysis (2×3) ----
+    nf = int(agg.get('num_frames', np.array(0)).mean()) if 'num_frames' in agg else 0
+    if nf > 1:
+        fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+        frame_labels = [f'F{i}' for i in range(nf)]
+        cmap = plt.cm.viridis(np.linspace(0, 1, nf))
+
+        # Row 0, Col 0: Per-frame K-norm
+        ax = axes[0, 0]
+        for fi in range(nf):
+            key = f'k_norm_frame_{fi}'
+            if key in agg:
+                ax.plot(layers, agg[key], color=cmap[fi], marker='o', markersize=2, label=f'F{fi}')
+        ax.set_xlabel('Layer'); ax.set_ylabel('Mean ||K||')
+        ax.set_title('Per-Frame K-norm'); ax.legend(fontsize=7); ax.grid(alpha=0.3)
+
+        # Row 0, Col 1: cos(Q_answer, K_fi)
+        ax = axes[0, 1]
+        for fi in range(nf):
+            key = f'cos_answer_frame_{fi}'
+            if key in agg:
+                ax.plot(layers, agg[key], color=cmap[fi], marker='o', markersize=2, label=f'F{fi}')
+        ax.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+        ax.set_xlabel('Layer'); ax.set_ylabel('Cosine Similarity')
+        ax.set_title('cos(Q_answer, K_frame_i)'); ax.legend(fontsize=7); ax.grid(alpha=0.3)
+
+        # Row 0, Col 2: F×F cosine similarity matrix (layer-averaged)
+        ax = axes[0, 2]
+        fmat = np.full((nf, nf), np.nan)
+        for fi in range(nf):
+            for fj in range(nf):
+                key = f'frame_cos_{fi}_{fj}'
+                if key in agg:
+                    fmat[fi, fj] = np.nanmean(agg[key])
+        im = ax.imshow(fmat, cmap='RdBu_r', vmin=-0.3, vmax=0.3, aspect='equal')
+        ax.set_xticks(range(nf)); ax.set_xticklabels(frame_labels, fontsize=8)
+        ax.set_yticks(range(nf)); ax.set_yticklabels(frame_labels, fontsize=8)
+        ax.set_xlabel('Key Frame'); ax.set_ylabel('Query Frame')
+        ax.set_title('F×F Cosine Sim (layer avg)')
+        fig.colorbar(im, ax=ax, shrink=0.8)
+
+        # Row 1, Col 0: cos(Q_question, K_fi)
+        ax = axes[1, 0]
+        for fi in range(nf):
+            key = f'cos_question_frame_{fi}'
+            if key in agg:
+                ax.plot(layers, agg[key], color=cmap[fi], marker='o', markersize=2, label=f'F{fi}')
+        ax.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+        ax.set_xlabel('Layer'); ax.set_ylabel('Cosine Similarity')
+        ax.set_title('cos(Q_question, K_frame_i)'); ax.legend(fontsize=7); ax.grid(alpha=0.3)
+
+        # Row 1, Col 1: Per-frame actual attention (answer + question)
+        ax = axes[1, 1]
+        for fi in range(nf):
+            key = f'attn_answer_frame_{fi}'
+            if key in agg:
+                ax.plot(layers, agg[key], color=cmap[fi], marker='o', markersize=2,
+                        linestyle='-', label=f'F{fi} (ans)')
+            key_q = f'attn_question_frame_{fi}'
+            if key_q in agg:
+                ax.plot(layers, agg[key_q], color=cmap[fi], marker='s', markersize=2,
+                        linestyle='--', alpha=0.6)
+        ax.set_xlabel('Layer'); ax.set_ylabel('Attention Fraction')
+        ax.set_title('Actual Attn per Frame (solid=ans, dash=que)'); ax.legend(fontsize=6); ax.grid(alpha=0.3)
+
+        # Row 1, Col 2: Pre-RoPE vs Post-RoPE per-frame
+        ax = axes[1, 2]
+        has_pre = any(f'cos_pre_rope_answer_frame_{fi}' in agg for fi in range(nf))
+        if has_pre:
+            for fi in range(nf):
+                post_key = f'cos_answer_frame_{fi}'
+                pre_key = f'cos_pre_rope_answer_frame_{fi}'
+                if post_key in agg and pre_key in agg:
+                    ax.plot(layers, agg[post_key], color=cmap[fi], linestyle='-',
+                            marker='o', markersize=2, label=f'F{fi} post')
+                    ax.plot(layers, agg[pre_key], color=cmap[fi], linestyle='--',
+                            marker='s', markersize=2, alpha=0.5)
+            ax.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+            ax.set_title('Pre(--) vs Post(-) RoPE: cos(Q_ans, K_fi)')
+        else:
+            ax.text(0.5, 0.5, 'Pre-RoPE data\nnot available', ha='center', va='center',
+                    transform=ax.transAxes, fontsize=12, color='gray')
+            ax.set_title('Pre vs Post RoPE')
+        ax.set_xlabel('Layer'); ax.set_ylabel('Cosine Similarity')
+        ax.legend(fontsize=6); ax.grid(alpha=0.3)
+
+        fig.suptitle(f'Per-Frame Analysis — {model_name}', fontsize=14, fontweight='bold')
+        fig.tight_layout()
+        fig.savefig(os.path.join(output_dir, 'qk_per_frame.png'), dpi=150, bbox_inches='tight')
+        plt.close(fig)
+        print(f'[SAVED] {output_dir}/qk_per_frame.png')
+
     print(f'[SAVED] {output_dir}/qk_analysis.png, qk_multi_query.png, qk_vision_by_query.png')
 
     np.savez(os.path.join(output_dir, 'qk_stats.npz'), **{k: np.array(v) for k, v in agg.items()})
@@ -823,13 +1045,24 @@ def main():
         print(f"[INFO] Detected: {mt}")
 
     if mt == "qwen3_vl":
-        all_stats, model_name = run_qwen3vl(args)
+        all_stats, correct_stats, incorrect_stats, model_name = run_qwen3vl(args)
     else:
-        all_stats, model_name = run_llava(args)
+        all_stats, correct_stats, incorrect_stats, model_name = run_llava(args)
 
     agg = aggregate_stats(all_stats)
     if agg:
         plot_results(agg, args.output_dir, model_name)
+
+        # Save correct/incorrect separately
+        for label, sub_stats in [('correct', correct_stats), ('incorrect', incorrect_stats)]:
+            if sub_stats:
+                sub_agg = aggregate_stats(sub_stats)
+                sub_dir = os.path.join(args.output_dir, label)
+                os.makedirs(sub_dir, exist_ok=True)
+                np.savez(os.path.join(sub_dir, 'qk_stats.npz'),
+                         **{k: np.array(v) for k, v in sub_agg.items()})
+                plot_results(sub_agg, sub_dir, f"{model_name} ({label}, n={len(sub_stats)})")
+                print(f"[SAVED] {sub_dir}/qk_stats.npz")
         print(f"\n{'='*60}")
         print(f"  Q-K Analysis (post-RoPE): {model_name}")
         print(f"  Samples: {len(all_stats)}")
