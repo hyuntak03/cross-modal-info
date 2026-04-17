@@ -32,6 +32,8 @@ scripts/
 
 .claude/
 
+analysis/swap_intervention/
+
 /logs/
 # utils_addon 폴더 제외
 utils_addon/
