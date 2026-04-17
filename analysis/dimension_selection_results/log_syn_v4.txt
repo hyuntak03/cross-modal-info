@@ -1,0 +1,137 @@
+
+  [llava-video-7b_lora_syn_v4_baseline] shape_color / vision_encoder
+    Feature shape: (200, 1152) (mean-pooled, 1152d)
+    Full (1152d): 18.3%
+    k=10: Fisher=23.3%, PCA=15.0%, Random=23.3% (PCA var=84.4%)
+    k=25: Fisher=23.3%, PCA=10.0%, Random=21.7% (PCA var=98.6%)
+    k=50: Fisher=21.7%, PCA=25.0%, Random=13.3% (PCA var=99.7%)
+    k=100: Fisher=23.3%, PCA=26.7%, Random=15.0% (PCA var=99.9%)
+    k=200: Fisher=26.7%, PCA=15.0%, Random=18.3% (PCA var=100.0%)
+    k=500: Fisher=18.3%, PCA=15.0%, Random=18.3% (PCA var=100.0%)
+    k=1000: Fisher=16.7%, PCA=15.0%, Random=18.3% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] shape_color / after_projector
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 18.3%
+    k=10: Fisher=28.3%, PCA=25.0%, Random=15.0% (PCA var=85.9%)
+    k=25: Fisher=13.3%, PCA=16.7%, Random=16.7% (PCA var=98.6%)
+    k=50: Fisher=21.7%, PCA=20.0%, Random=13.3% (PCA var=99.7%)
+    k=100: Fisher=18.3%, PCA=15.0%, Random=8.3% (PCA var=99.9%)
+    k=200: Fisher=20.0%, PCA=15.0%, Random=13.3% (PCA var=100.0%)
+    k=500: Fisher=25.0%, PCA=15.0%, Random=13.3% (PCA var=100.0%)
+    k=1000: Fisher=21.7%, PCA=15.0%, Random=16.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] shape_color / vision_token
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 95.0%
+    k=10: Fisher=53.3%, PCA=38.3%, Random=40.0% (PCA var=78.9%)
+    k=25: Fisher=80.0%, PCA=56.7%, Random=75.0% (PCA var=95.9%)
+    k=50: Fisher=85.0%, PCA=68.3%, Random=71.7% (PCA var=98.7%)
+    k=100: Fisher=91.7%, PCA=38.3%, Random=86.7% (PCA var=99.4%)
+    k=200: Fisher=96.7%, PCA=5.0%, Random=90.0% (PCA var=100.0%)
+    k=500: Fisher=96.7%, PCA=5.0%, Random=90.0% (PCA var=100.0%)
+    k=1000: Fisher=95.0%, PCA=5.0%, Random=95.0% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] obj_color / vision_encoder
+    Feature shape: (200, 1152) (mean-pooled, 1152d)
+    Full (1152d): 23.3%
+    k=10: Fisher=30.0%, PCA=23.3%, Random=23.3% (PCA var=74.9%)
+    k=25: Fisher=38.3%, PCA=18.3%, Random=18.3% (PCA var=90.5%)
+    k=50: Fisher=26.7%, PCA=18.3%, Random=16.7% (PCA var=96.1%)
+    k=100: Fisher=40.0%, PCA=30.0%, Random=16.7% (PCA var=98.5%)
+    k=200: Fisher=31.7%, PCA=25.0%, Random=20.0% (PCA var=100.0%)
+    k=500: Fisher=35.0%, PCA=25.0%, Random=11.7% (PCA var=100.0%)
+    k=1000: Fisher=28.3%, PCA=25.0%, Random=16.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] obj_color / after_projector
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 18.3%
+    k=10: Fisher=30.0%, PCA=28.3%, Random=25.0% (PCA var=80.5%)
+    k=25: Fisher=31.7%, PCA=15.0%, Random=20.0% (PCA var=93.3%)
+    k=50: Fisher=35.0%, PCA=18.3%, Random=20.0% (PCA var=97.7%)
+    k=100: Fisher=36.7%, PCA=30.0%, Random=18.3% (PCA var=99.4%)
+    k=200: Fisher=41.7%, PCA=25.0%, Random=15.0% (PCA var=100.0%)
+    k=500: Fisher=31.7%, PCA=25.0%, Random=20.0% (PCA var=100.0%)
+    k=1000: Fisher=30.0%, PCA=25.0%, Random=21.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] obj_color / vision_token
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 48.3%
+    k=10: Fisher=46.7%, PCA=31.7%, Random=31.7% (PCA var=82.0%)
+    k=25: Fisher=53.3%, PCA=36.7%, Random=33.3% (PCA var=93.2%)
+    k=50: Fisher=48.3%, PCA=35.0%, Random=38.3% (PCA var=97.3%)
+    k=100: Fisher=61.7%, PCA=35.0%, Random=36.7% (PCA var=99.1%)
+    k=200: Fisher=65.0%, PCA=15.0%, Random=40.0% (PCA var=100.0%)
+    k=500: Fisher=60.0%, PCA=15.0%, Random=45.0% (PCA var=100.0%)
+    k=1000: Fisher=60.0%, PCA=15.0%, Random=51.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] shape_place / vision_encoder
+    Feature shape: (200, 1152) (mean-pooled, 1152d)
+    Full (1152d): 1.7%
+    k=10: Fisher=25.0%, PCA=20.0%, Random=21.7% (PCA var=83.8%)
+    k=25: Fisher=20.0%, PCA=13.3%, Random=20.0% (PCA var=93.2%)
+    k=50: Fisher=10.0%, PCA=8.3%, Random=11.7% (PCA var=99.9%)
+    k=100: Fisher=3.3%, PCA=16.7%, Random=1.7% (PCA var=100.0%)
+    k=200: Fisher=1.7%, PCA=23.3%, Random=1.7% (PCA var=100.0%)
+    k=500: Fisher=1.7%, PCA=23.3%, Random=1.7% (PCA var=100.0%)
+    k=1000: Fisher=1.7%, PCA=23.3%, Random=1.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] shape_place / after_projector
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 1.7%
+    k=10: Fisher=16.7%, PCA=21.7%, Random=18.3% (PCA var=78.4%)
+    k=25: Fisher=15.0%, PCA=16.7%, Random=8.3% (PCA var=93.2%)
+    k=50: Fisher=15.0%, PCA=6.7%, Random=8.3% (PCA var=99.9%)
+    k=100: Fisher=6.7%, PCA=11.7%, Random=1.7% (PCA var=100.0%)
+    k=200: Fisher=6.7%, PCA=21.7%, Random=1.7% (PCA var=100.0%)
+    k=500: Fisher=1.7%, PCA=21.7%, Random=1.7% (PCA var=100.0%)
+    k=1000: Fisher=1.7%, PCA=21.7%, Random=1.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] shape_place / vision_token
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 16.7%
+    k=10: Fisher=21.7%, PCA=18.3%, Random=16.7% (PCA var=76.8%)
+    k=25: Fisher=28.3%, PCA=10.0%, Random=15.0% (PCA var=91.6%)
+    k=50: Fisher=31.7%, PCA=15.0%, Random=13.3% (PCA var=99.2%)
+    k=100: Fisher=28.3%, PCA=26.7%, Random=6.7% (PCA var=99.9%)
+    k=200: Fisher=33.3%, PCA=5.0%, Random=5.0% (PCA var=100.0%)
+    k=500: Fisher=30.0%, PCA=5.0%, Random=11.7% (PCA var=100.0%)
+    k=1000: Fisher=28.3%, PCA=5.0%, Random=11.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] obj_place / vision_encoder
+    Feature shape: (200, 1152) (mean-pooled, 1152d)
+    Full (1152d): 20.0%
+    k=10: Fisher=26.7%, PCA=21.7%, Random=28.3% (PCA var=89.2%)
+    k=25: Fisher=21.7%, PCA=26.7%, Random=18.3% (PCA var=95.7%)
+    k=50: Fisher=21.7%, PCA=16.7%, Random=23.3% (PCA var=98.8%)
+    k=100: Fisher=20.0%, PCA=20.0%, Random=15.0% (PCA var=99.8%)
+    k=200: Fisher=23.3%, PCA=25.0%, Random=16.7% (PCA var=100.0%)
+    k=500: Fisher=23.3%, PCA=25.0%, Random=16.7% (PCA var=100.0%)
+    k=1000: Fisher=20.0%, PCA=25.0%, Random=16.7% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] obj_place / after_projector
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 23.3%
+    k=10: Fisher=25.0%, PCA=26.7%, Random=23.3% (PCA var=79.9%)
+    k=25: Fisher=31.7%, PCA=16.7%, Random=13.3% (PCA var=93.6%)
+    k=50: Fisher=33.3%, PCA=16.7%, Random=15.0% (PCA var=98.6%)
+    k=100: Fisher=30.0%, PCA=21.7%, Random=23.3% (PCA var=99.8%)
+    k=200: Fisher=23.3%, PCA=16.7%, Random=23.3% (PCA var=100.0%)
+    k=500: Fisher=23.3%, PCA=16.7%, Random=18.3% (PCA var=100.0%)
+    k=1000: Fisher=23.3%, PCA=16.7%, Random=20.0% (PCA var=100.0%)
+
+  [llava-video-7b_lora_syn_v4_baseline] obj_place / vision_token
+    Feature shape: (200, 3584) (mean-pooled, 3584d)
+    Full (3584d): 21.7%
+    k=10: Fisher=33.3%, PCA=25.0%, Random=18.3% (PCA var=77.6%)
+    k=25: Fisher=35.0%, PCA=21.7%, Random=20.0% (PCA var=92.8%)
+    k=50: Fisher=30.0%, PCA=18.3%, Random=20.0% (PCA var=97.8%)
+    k=100: Fisher=36.7%, PCA=26.7%, Random=21.7% (PCA var=99.6%)
+    k=200: Fisher=30.0%, PCA=23.3%, Random=21.7% (PCA var=100.0%)
+    k=500: Fisher=28.3%, PCA=23.3%, Random=16.7% (PCA var=100.0%)
+    k=1000: Fisher=30.0%, PCA=23.3%, Random=18.3% (PCA var=100.0%)
+
+[SAVED] analysis/dimension_selection_results/dim_selection_llava-video-7b_lora_syn_v4_baseline.json
+[SAVED] analysis/dimension_selection_results/dim_sweep_llava-video-7b_lora_syn_v4_baseline_vision_encoder.png
+[SAVED] analysis/dimension_selection_results/dim_sweep_llava-video-7b_lora_syn_v4_baseline_after_projector.png
+[SAVED] analysis/dimension_selection_results/dim_sweep_llava-video-7b_lora_syn_v4_baseline_vision_token.png

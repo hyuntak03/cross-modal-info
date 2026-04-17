@@ -1,0 +1,411 @@
+
+############################################################
+  llava-video-7b_lora_4combo_v2_baseline / shape_color
+############################################################
+
+[Exp A] Vision Mean-Pool Trajectory
+  Layer  0: vision_meanpool = 15.0%
+  Layer  1: vision_meanpool = 16.7%
+  Layer  2: vision_meanpool = 18.3%
+  Layer  3: vision_meanpool = 18.3%
+  Layer  4: vision_meanpool = 18.3%
+  Layer  5: vision_meanpool = 21.7%
+  Layer  6: vision_meanpool = 35.0%
+  Layer  7: vision_meanpool = 38.3%
+  Layer  8: vision_meanpool = 40.0%
+  Layer  9: vision_meanpool = 61.7%
+  Layer 10: vision_meanpool = 65.0%
+  Layer 11: vision_meanpool = 76.7%
+  Layer 12: vision_meanpool = 71.7%
+  Layer 13: vision_meanpool = 75.0%
+  Layer 14: vision_meanpool = 83.3%
+  Layer 15: vision_meanpool = 93.3%
+  Layer 16: vision_meanpool = 96.7%
+  Layer 17: vision_meanpool = 95.0%
+  Layer 18: vision_meanpool = 95.0%
+  Layer 19: vision_meanpool = 96.7%
+  Layer 20: vision_meanpool = 95.0%
+  Layer 21: vision_meanpool = 95.0%
+  Layer 22: vision_meanpool = 95.0%
+  Layer 23: vision_meanpool = 100.0%
+  Layer 24: vision_meanpool = 95.0%
+  Layer 25: vision_meanpool = 96.7%
+  Layer 26: vision_meanpool = 96.7%
+  Layer 27: vision_meanpool = 96.7%
+  Layer 28: vision_meanpool = 98.3%
+
+[Exp B] Answer Token Trajectory
+  Layer  0: answer_token = 21.7%
+  Layer  1: answer_token = 30.0%
+  Layer  2: answer_token = 48.3%
+  Layer  3: answer_token = 51.7%
+  Layer  4: answer_token = 50.0%
+  Layer  5: answer_token = 41.7%
+  Layer  6: answer_token = 50.0%
+  Layer  7: answer_token = 45.0%
+  Layer  8: answer_token = 55.0%
+  Layer  9: answer_token = 58.3%
+  Layer 10: answer_token = 63.3%
+  Layer 11: answer_token = 56.7%
+  Layer 12: answer_token = 71.7%
+  Layer 13: answer_token = 80.0%
+  Layer 14: answer_token = 85.0%
+  Layer 15: answer_token = 93.3%
+  Layer 16: answer_token = 96.7%
+  Layer 17: answer_token = 95.0%
+  Layer 18: answer_token = 96.7%
+  Layer 19: answer_token = 96.7%
+  Layer 20: answer_token = 100.0%
+  Layer 21: answer_token = 98.3%
+  Layer 22: answer_token = 100.0%
+  Layer 23: answer_token = 98.3%
+  Layer 24: answer_token = 98.3%
+  Layer 25: answer_token = 98.3%
+  Layer 26: answer_token = 98.3%
+  Layer 27: answer_token = 98.3%
+  Layer 28: answer_token = 98.3%
+
+[Exp C] Fisher Criterion (Last Layer)
+  Vision mean-pool Fisher: mean=7.0240, max=67.0652, top50=38.1031
+  Answer token Fisher:     mean=40.6396, max=300.2590, top50=187.2658
+  Ratio (answer/vision):   mean=5.79x, top50=4.91x
+
+[Exp D] Temporal Delta Trajectory
+  Layer  0: temporal_delta = 95.0%
+  Layer  1: temporal_delta = 95.0%
+  Layer  2: temporal_delta = 93.3%
+  Layer  3: temporal_delta = 93.3%
+  Layer  4: temporal_delta = 93.3%
+  Layer  5: temporal_delta = 91.7%
+  Layer  6: temporal_delta = 93.3%
+  Layer  7: temporal_delta = 91.7%
+  Layer  8: temporal_delta = 96.7%
+  Layer  9: temporal_delta = 93.3%
+  Layer 10: temporal_delta = 90.0%
+  Layer 11: temporal_delta = 93.3%
+  Layer 12: temporal_delta = 91.7%
+  Layer 13: temporal_delta = 93.3%
+  Layer 14: temporal_delta = 95.0%
+  Layer 15: temporal_delta = 96.7%
+  Layer 16: temporal_delta = 96.7%
+  Layer 17: temporal_delta = 96.7%
+  Layer 18: temporal_delta = 96.7%
+  Layer 19: temporal_delta = 96.7%
+  Layer 20: temporal_delta = 96.7%
+  Layer 21: temporal_delta = 96.7%
+  Layer 22: temporal_delta = 96.7%
+  Layer 23: temporal_delta = 95.0%
+  Layer 24: temporal_delta = 95.0%
+  Layer 25: temporal_delta = 95.0%
+  Layer 26: temporal_delta = 95.0%
+  Layer 27: temporal_delta = 95.0%
+  Layer 28: temporal_delta = 95.0%
+
+############################################################
+  llava-video-7b_lora_4combo_v2_baseline / obj_color
+############################################################
+
+[Exp A] Vision Mean-Pool Trajectory
+  Layer  0: vision_meanpool = 18.3%
+  Layer  1: vision_meanpool = 18.3%
+  Layer  2: vision_meanpool = 18.3%
+  Layer  3: vision_meanpool = 18.3%
+  Layer  4: vision_meanpool = 20.0%
+  Layer  5: vision_meanpool = 18.3%
+  Layer  6: vision_meanpool = 20.0%
+  Layer  7: vision_meanpool = 21.7%
+  Layer  8: vision_meanpool = 18.3%
+  Layer  9: vision_meanpool = 23.3%
+  Layer 10: vision_meanpool = 33.3%
+  Layer 11: vision_meanpool = 35.0%
+  Layer 12: vision_meanpool = 40.0%
+  Layer 13: vision_meanpool = 40.0%
+  Layer 14: vision_meanpool = 51.7%
+  Layer 15: vision_meanpool = 73.3%
+  Layer 16: vision_meanpool = 81.7%
+  Layer 17: vision_meanpool = 78.3%
+  Layer 18: vision_meanpool = 81.7%
+  Layer 19: vision_meanpool = 80.0%
+  Layer 20: vision_meanpool = 86.7%
+  Layer 21: vision_meanpool = 90.0%
+  Layer 22: vision_meanpool = 90.0%
+  Layer 23: vision_meanpool = 88.3%
+  Layer 24: vision_meanpool = 85.0%
+  Layer 25: vision_meanpool = 83.3%
+  Layer 26: vision_meanpool = 85.0%
+  Layer 27: vision_meanpool = 81.7%
+  Layer 28: vision_meanpool = 76.7%
+
+[Exp B] Answer Token Trajectory
+  Layer  0: answer_token = 21.7%
+  Layer  1: answer_token = 28.3%
+  Layer  2: answer_token = 31.7%
+  Layer  3: answer_token = 31.7%
+  Layer  4: answer_token = 38.3%
+  Layer  5: answer_token = 33.3%
+  Layer  6: answer_token = 30.0%
+  Layer  7: answer_token = 30.0%
+  Layer  8: answer_token = 38.3%
+  Layer  9: answer_token = 41.7%
+  Layer 10: answer_token = 38.3%
+  Layer 11: answer_token = 33.3%
+  Layer 12: answer_token = 53.3%
+  Layer 13: answer_token = 60.0%
+  Layer 14: answer_token = 63.3%
+  Layer 15: answer_token = 73.3%
+  Layer 16: answer_token = 86.7%
+  Layer 17: answer_token = 91.7%
+  Layer 18: answer_token = 98.3%
+  Layer 19: answer_token = 98.3%
+  Layer 20: answer_token = 96.7%
+  Layer 21: answer_token = 96.7%
+  Layer 22: answer_token = 96.7%
+  Layer 23: answer_token = 95.0%
+  Layer 24: answer_token = 95.0%
+  Layer 25: answer_token = 93.3%
+  Layer 26: answer_token = 93.3%
+  Layer 27: answer_token = 93.3%
+  Layer 28: answer_token = 91.7%
+
+[Exp C] Fisher Criterion (Last Layer)
+  Vision mean-pool Fisher: mean=2.5200, max=18.0782, top50=12.5189
+  Answer token Fisher:     mean=24.4787, max=149.1083, top50=102.9263
+  Ratio (answer/vision):   mean=9.71x, top50=8.22x
+
+[Exp D] Temporal Delta Trajectory
+  Layer  0: temporal_delta = 90.0%
+  Layer  1: temporal_delta = 90.0%
+  Layer  2: temporal_delta = 93.3%
+  Layer  3: temporal_delta = 90.0%
+  Layer  4: temporal_delta = 90.0%
+  Layer  5: temporal_delta = 88.3%
+  Layer  6: temporal_delta = 88.3%
+  Layer  7: temporal_delta = 83.3%
+  Layer  8: temporal_delta = 86.7%
+  Layer  9: temporal_delta = 80.0%
+  Layer 10: temporal_delta = 73.3%
+  Layer 11: temporal_delta = 88.3%
+  Layer 12: temporal_delta = 90.0%
+  Layer 13: temporal_delta = 93.3%
+  Layer 14: temporal_delta = 96.7%
+  Layer 15: temporal_delta = 98.3%
+  Layer 16: temporal_delta = 98.3%
+  Layer 17: temporal_delta = 98.3%
+  Layer 18: temporal_delta = 98.3%
+  Layer 19: temporal_delta = 100.0%
+  Layer 20: temporal_delta = 98.3%
+  Layer 21: temporal_delta = 100.0%
+  Layer 22: temporal_delta = 100.0%
+  Layer 23: temporal_delta = 98.3%
+  Layer 24: temporal_delta = 98.3%
+  Layer 25: temporal_delta = 98.3%
+  Layer 26: temporal_delta = 98.3%
+  Layer 27: temporal_delta = 96.7%
+  Layer 28: temporal_delta = 98.3%
+
+############################################################
+  llava-video-7b_lora_4combo_v2_baseline / shape_place
+############################################################
+
+[Exp A] Vision Mean-Pool Trajectory
+  Layer  0: vision_meanpool = 1.7%
+  Layer  1: vision_meanpool = 1.7%
+  Layer  2: vision_meanpool = 1.7%
+  Layer  3: vision_meanpool = 1.7%
+  Layer  4: vision_meanpool = 1.7%
+  Layer  5: vision_meanpool = 0.0%
+  Layer  6: vision_meanpool = 1.7%
+  Layer  7: vision_meanpool = 0.0%
+  Layer  8: vision_meanpool = 3.3%
+  Layer  9: vision_meanpool = 5.0%
+  Layer 10: vision_meanpool = 1.7%
+  Layer 11: vision_meanpool = 5.0%
+  Layer 12: vision_meanpool = 6.7%
+  Layer 13: vision_meanpool = 13.3%
+  Layer 14: vision_meanpool = 16.7%
+  Layer 15: vision_meanpool = 33.3%
+  Layer 16: vision_meanpool = 40.0%
+  Layer 17: vision_meanpool = 43.3%
+  Layer 18: vision_meanpool = 36.7%
+  Layer 19: vision_meanpool = 36.7%
+  Layer 20: vision_meanpool = 48.3%
+  Layer 21: vision_meanpool = 46.7%
+  Layer 22: vision_meanpool = 41.7%
+  Layer 23: vision_meanpool = 40.0%
+  Layer 24: vision_meanpool = 33.3%
+  Layer 25: vision_meanpool = 30.0%
+  Layer 26: vision_meanpool = 33.3%
+  Layer 27: vision_meanpool = 30.0%
+  Layer 28: vision_meanpool = 31.7%
+
+[Exp B] Answer Token Trajectory
+  Layer  0: answer_token = 21.7%
+  Layer  1: answer_token = 1.7%
+  Layer  2: answer_token = 1.7%
+  Layer  3: answer_token = 3.3%
+  Layer  4: answer_token = 1.7%
+  Layer  5: answer_token = 3.3%
+  Layer  6: answer_token = 3.3%
+  Layer  7: answer_token = 8.3%
+  Layer  8: answer_token = 5.0%
+  Layer  9: answer_token = 6.7%
+  Layer 10: answer_token = 15.0%
+  Layer 11: answer_token = 18.3%
+  Layer 12: answer_token = 30.0%
+  Layer 13: answer_token = 35.0%
+  Layer 14: answer_token = 36.7%
+  Layer 15: answer_token = 53.3%
+  Layer 16: answer_token = 61.7%
+  Layer 17: answer_token = 81.7%
+  Layer 18: answer_token = 80.0%
+  Layer 19: answer_token = 86.7%
+  Layer 20: answer_token = 83.3%
+  Layer 21: answer_token = 90.0%
+  Layer 22: answer_token = 90.0%
+  Layer 23: answer_token = 88.3%
+  Layer 24: answer_token = 88.3%
+  Layer 25: answer_token = 86.7%
+  Layer 26: answer_token = 85.0%
+  Layer 27: answer_token = 85.0%
+  Layer 28: answer_token = 83.3%
+
+[Exp C] Fisher Criterion (Last Layer)
+  Vision mean-pool Fisher: mean=0.4605, max=6.4611, top50=2.9165
+  Answer token Fisher:     mean=20.9389, max=107.2772, top50=83.4490
+  Ratio (answer/vision):   mean=45.47x, top50=28.61x
+
+[Exp D] Temporal Delta Trajectory
+  Layer  0: temporal_delta = 71.7%
+  Layer  1: temporal_delta = 75.0%
+  Layer  2: temporal_delta = 71.7%
+  Layer  3: temporal_delta = 68.3%
+  Layer  4: temporal_delta = 71.7%
+  Layer  5: temporal_delta = 66.7%
+  Layer  6: temporal_delta = 65.0%
+  Layer  7: temporal_delta = 60.0%
+  Layer  8: temporal_delta = 46.7%
+  Layer  9: temporal_delta = 41.7%
+  Layer 10: temporal_delta = 36.7%
+  Layer 11: temporal_delta = 45.0%
+  Layer 12: temporal_delta = 53.3%
+  Layer 13: temporal_delta = 55.0%
+  Layer 14: temporal_delta = 65.0%
+  Layer 15: temporal_delta = 70.0%
+  Layer 16: temporal_delta = 76.7%
+  Layer 17: temporal_delta = 75.0%
+  Layer 18: temporal_delta = 76.7%
+  Layer 19: temporal_delta = 80.0%
+  Layer 20: temporal_delta = 83.3%
+  Layer 21: temporal_delta = 81.7%
+  Layer 22: temporal_delta = 78.3%
+  Layer 23: temporal_delta = 75.0%
+  Layer 24: temporal_delta = 71.7%
+  Layer 25: temporal_delta = 73.3%
+  Layer 26: temporal_delta = 73.3%
+  Layer 27: temporal_delta = 73.3%
+  Layer 28: temporal_delta = 75.0%
+
+############################################################
+  llava-video-7b_lora_4combo_v2_baseline / obj_place
+############################################################
+
+[Exp A] Vision Mean-Pool Trajectory
+  Layer  0: vision_meanpool = 25.0%
+  Layer  1: vision_meanpool = 25.0%
+  Layer  2: vision_meanpool = 23.3%
+  Layer  3: vision_meanpool = 23.3%
+  Layer  4: vision_meanpool = 21.7%
+  Layer  5: vision_meanpool = 20.0%
+  Layer  6: vision_meanpool = 20.0%
+  Layer  7: vision_meanpool = 21.7%
+  Layer  8: vision_meanpool = 18.3%
+  Layer  9: vision_meanpool = 21.7%
+  Layer 10: vision_meanpool = 21.7%
+  Layer 11: vision_meanpool = 20.0%
+  Layer 12: vision_meanpool = 21.7%
+  Layer 13: vision_meanpool = 23.3%
+  Layer 14: vision_meanpool = 28.3%
+  Layer 15: vision_meanpool = 33.3%
+  Layer 16: vision_meanpool = 36.7%
+  Layer 17: vision_meanpool = 41.7%
+  Layer 18: vision_meanpool = 41.7%
+  Layer 19: vision_meanpool = 40.0%
+  Layer 20: vision_meanpool = 46.7%
+  Layer 21: vision_meanpool = 41.7%
+  Layer 22: vision_meanpool = 43.3%
+  Layer 23: vision_meanpool = 46.7%
+  Layer 24: vision_meanpool = 36.7%
+  Layer 25: vision_meanpool = 35.0%
+  Layer 26: vision_meanpool = 35.0%
+  Layer 27: vision_meanpool = 35.0%
+  Layer 28: vision_meanpool = 41.7%
+
+[Exp B] Answer Token Trajectory
+  Layer  0: answer_token = 21.7%
+  Layer  1: answer_token = 20.0%
+  Layer  2: answer_token = 20.0%
+  Layer  3: answer_token = 20.0%
+  Layer  4: answer_token = 15.0%
+  Layer  5: answer_token = 18.3%
+  Layer  6: answer_token = 21.7%
+  Layer  7: answer_token = 21.7%
+  Layer  8: answer_token = 20.0%
+  Layer  9: answer_token = 21.7%
+  Layer 10: answer_token = 28.3%
+  Layer 11: answer_token = 25.0%
+  Layer 12: answer_token = 30.0%
+  Layer 13: answer_token = 31.7%
+  Layer 14: answer_token = 35.0%
+  Layer 15: answer_token = 53.3%
+  Layer 16: answer_token = 53.3%
+  Layer 17: answer_token = 75.0%
+  Layer 18: answer_token = 73.3%
+  Layer 19: answer_token = 70.0%
+  Layer 20: answer_token = 80.0%
+  Layer 21: answer_token = 80.0%
+  Layer 22: answer_token = 83.3%
+  Layer 23: answer_token = 81.7%
+  Layer 24: answer_token = 78.3%
+  Layer 25: answer_token = 78.3%
+  Layer 26: answer_token = 78.3%
+  Layer 27: answer_token = 80.0%
+  Layer 28: answer_token = 78.3%
+
+[Exp C] Fisher Criterion (Last Layer)
+  Vision mean-pool Fisher: mean=0.8268, max=6.8316, top50=3.6674
+  Answer token Fisher:     mean=14.5122, max=72.0074, top50=59.3349
+  Ratio (answer/vision):   mean=17.55x, top50=16.18x
+
+[Exp D] Temporal Delta Trajectory
+  Layer  0: temporal_delta = 75.0%
+  Layer  1: temporal_delta = 75.0%
+  Layer  2: temporal_delta = 75.0%
+  Layer  3: temporal_delta = 73.3%
+  Layer  4: temporal_delta = 76.7%
+  Layer  5: temporal_delta = 73.3%
+  Layer  6: temporal_delta = 75.0%
+  Layer  7: temporal_delta = 70.0%
+  Layer  8: temporal_delta = 58.3%
+  Layer  9: temporal_delta = 56.7%
+  Layer 10: temporal_delta = 50.0%
+  Layer 11: temporal_delta = 56.7%
+  Layer 12: temporal_delta = 71.7%
+  Layer 13: temporal_delta = 70.0%
+  Layer 14: temporal_delta = 71.7%
+  Layer 15: temporal_delta = 75.0%
+  Layer 16: temporal_delta = 76.7%
+  Layer 17: temporal_delta = 73.3%
+  Layer 18: temporal_delta = 75.0%
+  Layer 19: temporal_delta = 71.7%
+  Layer 20: temporal_delta = 81.7%
+  Layer 21: temporal_delta = 80.0%
+  Layer 22: temporal_delta = 76.7%
+  Layer 23: temporal_delta = 78.3%
+  Layer 24: temporal_delta = 70.0%
+  Layer 25: temporal_delta = 71.7%
+  Layer 26: temporal_delta = 73.3%
+  Layer 27: temporal_delta = 68.3%
+  Layer 28: temporal_delta = 65.0%
+
+[SAVED] analysis/mechanism_results/mechanism_llava-video-7b_lora_4combo_v2_baseline.json
+[SAVED] analysis/mechanism_results/trajectory_llava-video-7b_lora_4combo_v2_baseline.png

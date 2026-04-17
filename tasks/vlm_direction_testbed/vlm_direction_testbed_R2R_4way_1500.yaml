@@ -1,0 +1,6 @@
+group: vlm_direction_testbed_R2R_4way_1500
+task:
+  - vlm_direction_testbed_R2R_4way_1500_shape_color
+  - vlm_direction_testbed_R2R_4way_1500_shape_place
+  - vlm_direction_testbed_R2R_4way_1500_obj_color
+  - vlm_direction_testbed_R2R_4way_1500_obj_place

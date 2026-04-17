@@ -1,0 +1,14 @@
+
+============================================================
+Generating obj_place (K=1)
+============================================================
+Total videos: 100
+obj_place:   0%|          | 0/100 [00:00<?, ?it/s]obj_place:   1%|          | 1/100 [00:00<01:26,  1.14it/s]obj_place:  38%|███▊      | 38/100 [00:00<00:01, 52.76it/s]obj_place:  78%|███████▊  | 78/100 [00:01<00:00, 110.37it/s]obj_place: 100%|██████████| 100/100 [00:01<00:00, 84.88it/s]
+[obj_place] 100 videos -> /local_datasets/vlm_direction/factorial_dataset/obj_place_metadata.json
+
+============================================================
+Generating shape_color (K=1)
+============================================================
+Total videos: 100
+shape_color:   0%|          | 0/100 [00:00<?, ?it/s]shape_color:   1%|          | 1/100 [00:00<00:43,  2.27it/s]shape_color:  42%|████▏     | 42/100 [00:00<00:00, 100.86it/s]shape_color:  92%|█████████▏| 92/100 [00:00<00:00, 194.69it/s]shape_color: 100%|██████████| 100/100 [00:00<00:00, 140.84it/s]
+[shape_color] 100 videos -> /local_datasets/vlm_direction/factorial_dataset/shape_color_metadata.json

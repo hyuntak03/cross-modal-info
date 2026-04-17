@@ -13,14 +13,14 @@ Usage (LLaVA):
     python linear_probing_per_layer/extract_vision_features.py \
         --model_args "pretrained=...,conv_template=qwen_1_5,device_map=auto" \
         --task direction_testbed_ablation_8way \
-        --output_dir output/linear_probe_features
+        --output_dir linear_probe_features/MODEL_NAME/TASK
 
 Usage (Qwen3-VL):
     python linear_probing_per_layer/extract_vision_features.py \
         --model_type qwen3_vl \
         --model_args "pretrained=/path/to/Qwen3-VL-4B-Instruct" \
         --task direction_testbed_ablation_8way \
-        --output_dir output/linear_probe_features_qwen3vl
+        --output_dir linear_probe_features/MODEL_NAME/TASK
 """
 
 import sys, os
@@ -34,6 +34,7 @@ import importlib.util
 import json
 import math
 import string
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import torch
@@ -173,9 +174,10 @@ def compute_frame_boundaries(model, model_name, input_ids, image_tensor, image_s
         total_vis = num_frames * tokens_per_frame_with_nl
     elif mm_newline_position == "grid":
         grid_h = int(math.sqrt(tokens_per_frame))
-        tokens_per_frame_grid = grid_h * (grid_h + 1)
+        tokens_per_frame_grid = grid_h * (grid_h + 1)  # newline 포함 stride
         total_vis = num_frames * tokens_per_frame_grid
-        tokens_per_frame = tokens_per_frame_grid
+        # tokens_per_frame는 순수 vision token만 (newline 제외)
+        # frame_ranges에서 newline을 건너뛰기 위해 별도 처리
     elif mm_newline_position == "no_token":
         total_vis = num_frames * tokens_per_frame
     else:
@@ -198,9 +200,13 @@ def compute_frame_boundaries(model, model_name, input_ids, image_tensor, image_s
             frame_ranges.append(list(range(start, end)))
     elif mm_newline_position == "grid":
         for f in range(num_frames):
-            start = offset + f * tokens_per_frame
-            end = start + tokens_per_frame
-            frame_ranges.append(list(range(start, end)))
+            frame_start = offset + f * tokens_per_frame_grid
+            indices = []
+            for row in range(grid_h):
+                row_start = frame_start + row * (grid_h + 1)
+                indices.extend(range(row_start, row_start + grid_h))  # newline skip
+            frame_ranges.append(indices)
+        tokens_per_frame = grid_h * grid_h  # 순수 vision token (14x14=196)
     else:  # no_token
         for f in range(num_frames):
             start = offset + f * tokens_per_frame
@@ -535,9 +541,12 @@ def save_results(output_dir, all_features, all_labels, all_qids, num_layers, num
     np.save(os.path.join(output_dir, "labels.npy"), labels_array)
     np.save(os.path.join(output_dir, "qids.npy"), np.array(all_qids))
 
-    for layer_idx in range(num_layers):
+    def _save_layer(layer_idx):
         features = torch.stack(all_features[layer_idx], dim=0).numpy()
         np.save(os.path.join(output_dir, f"features_layer_{layer_idx}.npy"), features)
+
+    with ThreadPoolExecutor(max_workers=min(8, num_layers)) as executor:
+        list(executor.map(_save_layer, range(num_layers)))
 
     meta = {
         "num_layers": num_layers,
@@ -568,7 +577,7 @@ if __name__ == "__main__":
                         choices=["auto", "llava", "qwen3_vl"],
                         help="모델 타입 (auto: config.json에서 자동 감지)")
     parser.add_argument("--task", type=str, required=True)
-    parser.add_argument("--output_dir", type=str, default="output/linear_probe_features")
+    parser.add_argument("--output_dir", type=str, default="linear_probe_features")
     parser.add_argument("--limit", type=int, default=-1)
 
     parser.add_argument("--image-folder", type=str, default="")

@@ -37,3 +37,7 @@ scripts/
 utils_addon/
 
 output/
+
+linear_probe_features/
+
+previous_output/

@@ -1,0 +1,242 @@
+
+############################################################
+  MODEL: llava-video-7b_lora_4combo_v2_baseline / TASK: shape_color
+############################################################
+
+============================================================
+  Exp1: Pooling Strategy — shape_color (layer -1)
+============================================================
+  (a) Flattened: (200, 5619712)
+      → test_acc = 91.7%
+  (b) Mean pool (all tokens): (200, 3584)
+      → test_acc = 98.3%
+  (c) Per-frame mean: (200, 28672)
+      → test_acc = 91.7%
+  (d) Temporal delta mean: (200, 25088)
+      → test_acc = 91.7%
+  (e) Answer token: (200, 3584)
+      → test_acc = 98.3%
+
+============================================================
+  Exp2: Per-Frame Probing — shape_color (layer -1)
+============================================================
+  Frame 0: 21.7%
+  Frame 1: 33.3%
+  Frame 2: 56.7%
+  Frame 3: 78.3%
+  Frame 4: 91.7%
+  Frame 5: 96.7%
+  Frame 6: 95.0%
+  Frame 7: 96.7%
+  Delta 0→1: 41.7%
+  Delta 1→2: 76.7%
+  Delta 2→3: 81.7%
+  Delta 3→4: 85.0%
+  Delta 4→5: 93.3%
+  Delta 5→6: 90.0%
+  Delta 6→7: 88.3%
+
+============================================================
+  Exp4: Label Shuffle Control — shape_color
+============================================================
+  Real labels:     98.3%
+  Shuffled labels: 21.7% ± 3.7% (chance=25.0%)
+
+============================================================
+  Exp5: Linear vs MLP — shape_color (layer -1)
+============================================================
+  Linear (mean pool): 98.3%
+  MLP-256 (mean pool): 98.3%
+  MLP-512 (mean pool): 93.3%
+
+############################################################
+  MODEL: llava-video-7b_lora_4combo_v2_baseline / TASK: obj_color
+############################################################
+
+============================================================
+  Exp1: Pooling Strategy — obj_color (layer -1)
+============================================================
+  (a) Flattened: (200, 5619712)
+      → test_acc = 91.7%
+  (b) Mean pool (all tokens): (200, 3584)
+      → test_acc = 76.7%
+  (c) Per-frame mean: (200, 28672)
+      → test_acc = 76.7%
+  (d) Temporal delta mean: (200, 25088)
+      → test_acc = 91.7%
+  (e) Answer token: (200, 3584)
+      → test_acc = 91.7%
+
+============================================================
+  Exp2: Per-Frame Probing — obj_color (layer -1)
+============================================================
+  Frame 0: 13.3%
+  Frame 1: 18.3%
+  Frame 2: 33.3%
+  Frame 3: 46.7%
+  Frame 4: 70.0%
+  Frame 5: 85.0%
+  Frame 6: 93.3%
+  Frame 7: 96.7%
+  Delta 0→1: 36.7%
+  Delta 1→2: 53.3%
+  Delta 2→3: 73.3%
+  Delta 3→4: 71.7%
+  Delta 4→5: 88.3%
+  Delta 5→6: 76.7%
+  Delta 6→7: 68.3%
+
+============================================================
+  Exp4: Label Shuffle Control — obj_color
+============================================================
+  Real labels:     91.7%
+  Shuffled labels: 30.3% ± 5.7% (chance=25.0%)
+
+============================================================
+  Exp5: Linear vs MLP — obj_color (layer -1)
+============================================================
+  Linear (mean pool): 76.7%
+  MLP-256 (mean pool): 78.3%
+  MLP-512 (mean pool): 81.7%
+
+############################################################
+  MODEL: llava-video-7b_lora_4combo_v2_baseline / TASK: shape_place
+############################################################
+
+============================================================
+  Exp1: Pooling Strategy — shape_place (layer -1)
+============================================================
+  (a) Flattened: (200, 5619712)
+      → test_acc = 23.3%
+  (b) Mean pool (all tokens): (200, 3584)
+      → test_acc = 31.7%
+  (c) Per-frame mean: (200, 28672)
+      → test_acc = 50.0%
+  (d) Temporal delta mean: (200, 25088)
+      → test_acc = 65.0%
+  (e) Answer token: (200, 3584)
+      → test_acc = 83.3%
+
+============================================================
+  Exp2: Per-Frame Probing — shape_place (layer -1)
+============================================================
+  Frame 0: 5.0%
+  Frame 1: 5.0%
+  Frame 2: 3.3%
+  Frame 3: 20.0%
+  Frame 4: 33.3%
+  Frame 5: 43.3%
+  Frame 6: 58.3%
+  Frame 7: 78.3%
+  Delta 0→1: 6.7%
+  Delta 1→2: 25.0%
+  Delta 2→3: 45.0%
+  Delta 3→4: 55.0%
+  Delta 4→5: 65.0%
+  Delta 5→6: 61.7%
+  Delta 6→7: 60.0%
+
+============================================================
+  Exp4: Label Shuffle Control — shape_place
+============================================================
+  Real labels:     83.3%
+  Shuffled labels: 24.3% ± 3.1% (chance=25.0%)
+
+============================================================
+  Exp5: Linear vs MLP — shape_place (layer -1)
+============================================================
+  Linear (mean pool): 31.7%
+  MLP-256 (mean pool): 25.0%
+  MLP-512 (mean pool): 30.0%
+
+############################################################
+  MODEL: llava-video-7b_lora_4combo_v2_baseline / TASK: obj_place
+############################################################
+
+============================================================
+  Exp1: Pooling Strategy — obj_place (layer -1)
+============================================================
+  (a) Flattened: (200, 5619712)
+      → test_acc = 35.0%
+  (b) Mean pool (all tokens): (200, 3584)
+      → test_acc = 41.7%
+  (c) Per-frame mean: (200, 28672)
+      → test_acc = 48.3%
+  (d) Temporal delta mean: (200, 25088)
+      → test_acc = 55.0%
+  (e) Answer token: (200, 3584)
+      → test_acc = 78.3%
+
+============================================================
+  Exp2: Per-Frame Probing — obj_place (layer -1)
+============================================================
+  Frame 0: 20.0%
+  Frame 1: 20.0%
+  Frame 2: 15.0%
+  Frame 3: 23.3%
+  Frame 4: 36.7%
+  Frame 5: 46.7%
+  Frame 6: 56.7%
+  Frame 7: 65.0%
+  Delta 0→1: 31.7%
+  Delta 1→2: 21.7%
+  Delta 2→3: 28.3%
+  Delta 3→4: 43.3%
+  Delta 4→5: 58.3%
+  Delta 5→6: 65.0%
+  Delta 6→7: 53.3%
+
+============================================================
+  Exp4: Label Shuffle Control — obj_place
+============================================================
+  Real labels:     78.3%
+  Shuffled labels: 19.3% ± 3.1% (chance=25.0%)
+
+============================================================
+  Exp5: Linear vs MLP — obj_place (layer -1)
+============================================================
+  Linear (mean pool): 41.7%
+  MLP-256 (mean pool): 26.7%
+  MLP-512 (mean pool): 31.7%
+
+============================================================
+  Exp3: Cross-Task Generalization (layer -1)
+============================================================
+  Train: shape_color     → Test: 100.0 |  86.0 |  74.5 |  68.5
+  Train: obj_color       → Test:  99.5 | 100.0 |  80.0 |  76.5
+  Train: shape_place     → Test:  96.5 |  89.0 | 100.0 |  76.5
+  Train: obj_place       → Test:  92.0 |  90.0 |  86.5 | 100.0
+
+[SAVED] analysis/results/probe_analysis_llava-video-7b_lora_4combo_v2_baseline.json
+
+============================================================
+  SUMMARY: llava-video-7b_lora_4combo_v2_baseline
+============================================================
+
+  shape_color:
+    Flattened (5.6M):    91.7%
+    Mean pool (3584):    98.3%
+    Per-frame (28672):   91.7%
+    Temporal delta:      91.7%
+    Answer token (3584): 98.3%
+
+  obj_color:
+    Flattened (5.6M):    91.7%
+    Mean pool (3584):    76.7%
+    Per-frame (28672):   76.7%
+    Temporal delta:      91.7%
+    Answer token (3584): 91.7%
+
+  shape_place:
+    Flattened (5.6M):    23.3%
+    Mean pool (3584):    31.7%
+    Per-frame (28672):   50.0%
+    Temporal delta:      65.0%
+    Answer token (3584): 83.3%
+
+  obj_place:
+    Flattened (5.6M):    35.0%
+    Mean pool (3584):    41.7%
+    Per-frame (28672):   48.3%
+    Temporal delta:      55.0%
+    Answer token (3584): 78.3%

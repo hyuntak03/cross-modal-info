@@ -1,0 +1,554 @@
+
+############################################################
+  llava-video-7b / shape_color
+############################################################
+
+============================================================
+  Exp1: Layer-wise Probe — shape_color
+============================================================
+  Layer  0: direction= 21.7%  shape= 16.7%
+  Layer  1: direction= 46.7%  shape=100.0%
+  Layer  2: direction= 45.0%  shape=100.0%
+  Layer  3: direction= 46.7%  shape=100.0%
+  Layer  4: direction= 48.3%  shape=100.0%
+  Layer  5: direction= 41.7%  shape=100.0%
+  Layer  6: direction= 50.0%  shape=100.0%
+  Layer  7: direction= 51.7%  shape=100.0%
+  Layer  8: direction= 50.0%  shape=100.0%
+  Layer  9: direction= 56.7%  shape=100.0%
+  Layer 10: direction= 48.3%  shape=100.0%
+  Layer 11: direction= 60.0%  shape=100.0%
+  Layer 12: direction= 58.3%  shape=100.0%
+  Layer 13: direction= 58.3%  shape=100.0%
+  Layer 14: direction= 56.7%  shape=100.0%
+  Layer 15: direction= 58.3%  shape=100.0%
+  Layer 16: direction= 65.0%  shape=100.0%
+  Layer 17: direction= 68.3%  shape= 98.3%
+  Layer 18: direction= 63.3%  shape= 96.7%
+  Layer 19: direction= 65.0%  shape= 85.0%
+  Layer 20: direction= 73.3%  shape= 75.0%
+  Layer 21: direction= 73.3%  shape= 71.7%
+  Layer 22: direction= 71.7%  shape= 68.3%
+  Layer 23: direction= 73.3%  shape= 68.3%
+  Layer 24: direction= 71.7%  shape= 68.3%
+  Layer 25: direction= 68.3%  shape= 63.3%
+  Layer 26: direction= 68.3%  shape= 58.3%
+  Layer 27: direction= 65.0%  shape= 65.0%
+  Layer 28: direction= 65.0%  shape= 65.0%
+
+============================================================
+  Exp2: Layer-wise FDR — shape_color
+============================================================
+  Layer  0: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  1: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer  2: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer  3: dir-selective=  0.1%  FDR ratio=0.03x
+  Layer  4: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer  5: dir-selective=  0.1%  FDR ratio=0.03x
+  Layer  6: dir-selective=  0.1%  FDR ratio=0.03x
+  Layer  7: dir-selective=  0.2%  FDR ratio=0.03x
+  Layer  8: dir-selective=  0.1%  FDR ratio=0.02x
+  Layer  9: dir-selective=  0.1%  FDR ratio=0.02x
+  Layer 10: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 11: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer 12: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer 13: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer 14: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer 15: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer 16: dir-selective=  0.1%  FDR ratio=0.03x
+  Layer 17: dir-selective=  0.3%  FDR ratio=0.05x
+  Layer 18: dir-selective=  0.8%  FDR ratio=0.07x
+  Layer 19: dir-selective=  4.7%  FDR ratio=0.18x
+  Layer 20: dir-selective=  9.0%  FDR ratio=0.28x
+  Layer 21: dir-selective= 10.9%  FDR ratio=0.34x
+  Layer 22: dir-selective= 11.7%  FDR ratio=0.36x
+  Layer 23: dir-selective= 11.3%  FDR ratio=0.38x
+  Layer 24: dir-selective= 10.5%  FDR ratio=0.38x
+  Layer 25: dir-selective= 11.9%  FDR ratio=0.42x
+  Layer 26: dir-selective= 10.2%  FDR ratio=0.41x
+  Layer 27: dir-selective= 10.2%  FDR ratio=0.40x
+  Layer 28: dir-selective=  7.5%  FDR ratio=0.38x
+
+============================================================
+  Exp3: Dimension Tracking — shape_color (top-100)
+============================================================
+  Direction top-100 dims: mean FDR ratio = 2.21
+  Identity top-100 dims: mean FDR ratio = 72.55
+  Layer  0: dir-dims→dir= 21.7% | id-dims→dir= 21.7% | dir-FDR=0.000 | id-FDR=0.000
+  Layer  1: dir-dims→dir= 30.0% | id-dims→dir= 21.7% | dir-FDR=0.016 | id-FDR=1.059
+  Layer  2: dir-dims→dir= 35.0% | id-dims→dir= 26.7% | dir-FDR=0.018 | id-FDR=1.034
+  Layer  3: dir-dims→dir= 35.0% | id-dims→dir= 35.0% | dir-FDR=0.021 | id-FDR=0.928
+  Layer  4: dir-dims→dir= 36.7% | id-dims→dir= 31.7% | dir-FDR=0.023 | id-FDR=0.908
+  Layer  5: dir-dims→dir= 40.0% | id-dims→dir= 26.7% | dir-FDR=0.023 | id-FDR=0.951
+  Layer  6: dir-dims→dir= 30.0% | id-dims→dir= 36.7% | dir-FDR=0.023 | id-FDR=0.907
+  Layer  7: dir-dims→dir= 20.0% | id-dims→dir= 36.7% | dir-FDR=0.021 | id-FDR=0.814
+  Layer  8: dir-dims→dir= 28.3% | id-dims→dir= 30.0% | dir-FDR=0.017 | id-FDR=0.824
+  Layer  9: dir-dims→dir= 28.3% | id-dims→dir= 25.0% | dir-FDR=0.017 | id-FDR=0.708
+  Layer 10: dir-dims→dir= 31.7% | id-dims→dir= 26.7% | dir-FDR=0.016 | id-FDR=0.692
+  Layer 11: dir-dims→dir= 30.0% | id-dims→dir= 31.7% | dir-FDR=0.015 | id-FDR=0.691
+  Layer 12: dir-dims→dir= 30.0% | id-dims→dir= 28.3% | dir-FDR=0.014 | id-FDR=0.682
+  Layer 13: dir-dims→dir= 33.3% | id-dims→dir= 35.0% | dir-FDR=0.017 | id-FDR=0.711
+  Layer 14: dir-dims→dir= 36.7% | id-dims→dir= 40.0% | dir-FDR=0.015 | id-FDR=0.925
+  Layer 15: dir-dims→dir= 33.3% | id-dims→dir= 36.7% | dir-FDR=0.016 | id-FDR=0.811
+  Layer 16: dir-dims→dir= 36.7% | id-dims→dir= 41.7% | dir-FDR=0.019 | id-FDR=0.609
+  Layer 17: dir-dims→dir= 35.0% | id-dims→dir= 38.3% | dir-FDR=0.025 | id-FDR=0.479
+  Layer 18: dir-dims→dir= 45.0% | id-dims→dir= 33.3% | dir-FDR=0.029 | id-FDR=0.437
+  Layer 19: dir-dims→dir= 48.3% | id-dims→dir= 56.7% | dir-FDR=0.040 | id-FDR=0.239
+  Layer 20: dir-dims→dir= 50.0% | id-dims→dir= 55.0% | dir-FDR=0.052 | id-FDR=0.156
+  Layer 21: dir-dims→dir= 58.3% | id-dims→dir= 55.0% | dir-FDR=0.053 | id-FDR=0.138
+  Layer 22: dir-dims→dir= 55.0% | id-dims→dir= 50.0% | dir-FDR=0.066 | id-FDR=0.125
+  Layer 23: dir-dims→dir= 51.7% | id-dims→dir= 50.0% | dir-FDR=0.073 | id-FDR=0.115
+  Layer 24: dir-dims→dir= 55.0% | id-dims→dir= 45.0% | dir-FDR=0.081 | id-FDR=0.123
+  Layer 25: dir-dims→dir= 55.0% | id-dims→dir= 40.0% | dir-FDR=0.061 | id-FDR=0.069
+  Layer 26: dir-dims→dir= 53.3% | id-dims→dir= 40.0% | dir-FDR=0.066 | id-FDR=0.068
+  Layer 27: dir-dims→dir= 51.7% | id-dims→dir= 41.7% | dir-FDR=0.080 | id-FDR=0.058
+  Layer 28: dir-dims→dir= 53.3% | id-dims→dir= 20.0% | dir-FDR=0.095 | id-FDR=0.047
+
+============================================================
+  Exp5: Head-Dimension Correspondence — shape_color
+============================================================
+  Direction top-100 dims distribution across heads:
+    Head  0:   5 dims █████      FDR ratio=0.37x
+    Head  1:   1 dims █          FDR ratio=0.38x
+    Head  2:   7 dims ███████    FDR ratio=0.38x
+    Head  3:   2 dims ██         FDR ratio=0.37x
+    Head  4:   5 dims █████      FDR ratio=0.40x
+    Head  5:   0 dims            FDR ratio=0.37x
+    Head  6:   2 dims ██         FDR ratio=0.36x
+    Head  7:   5 dims █████      FDR ratio=0.37x
+    Head  8:   5 dims █████      FDR ratio=0.37x
+    Head  9:   3 dims ███        FDR ratio=0.40x
+    Head 10:   4 dims ████       FDR ratio=0.38x
+    Head 11:   3 dims ███        FDR ratio=0.39x
+    Head 12:   1 dims █          FDR ratio=0.38x
+    Head 13:   4 dims ████       FDR ratio=0.39x
+    Head 14:   8 dims ████████   FDR ratio=0.41x
+    Head 15:   3 dims ███        FDR ratio=0.35x
+    Head 16:   4 dims ████       FDR ratio=0.36x
+    Head 17:   2 dims ██         FDR ratio=0.40x
+    Head 18:   4 dims ████       FDR ratio=0.38x
+    Head 19:   3 dims ███        FDR ratio=0.39x
+    Head 20:   6 dims ██████     FDR ratio=0.41x
+    Head 21:   3 dims ███        FDR ratio=0.34x
+    Head 22:   3 dims ███        FDR ratio=0.36x
+    Head 23:   4 dims ████       FDR ratio=0.37x
+    Head 24:   4 dims ████       FDR ratio=0.38x
+    Head 25:   4 dims ████       FDR ratio=0.40x
+    Head 26:   1 dims █          FDR ratio=0.39x
+    Head 27:   4 dims ████       FDR ratio=0.37x
+
+############################################################
+  llava-video-7b / obj_color
+############################################################
+
+============================================================
+  Exp1: Layer-wise Probe — obj_color
+============================================================
+  Layer  0: direction= 21.7%  obj_class=  0.0%
+  Layer  1: direction= 38.3%  obj_class= 75.0%
+  Layer  2: direction= 41.7%  obj_class= 71.7%
+  Layer  3: direction= 50.0%  obj_class= 71.7%
+  Layer  4: direction= 50.0%  obj_class= 65.0%
+  Layer  5: direction= 46.7%  obj_class= 66.7%
+  Layer  6: direction= 36.7%  obj_class= 66.7%
+  Layer  7: direction= 35.0%  obj_class= 68.3%
+  Layer  8: direction= 31.7%  obj_class= 70.0%
+  Layer  9: direction= 36.7%  obj_class= 65.0%
+  Layer 10: direction= 30.0%  obj_class= 53.3%
+  Layer 11: direction= 35.0%  obj_class= 50.0%
+  Layer 12: direction= 36.7%  obj_class= 45.0%
+  Layer 13: direction= 36.7%  obj_class= 41.7%
+  Layer 14: direction= 41.7%  obj_class= 55.0%
+  Layer 15: direction= 43.3%  obj_class= 51.7%
+  Layer 16: direction= 51.7%  obj_class= 41.7%
+  Layer 17: direction= 45.0%  obj_class= 43.3%
+  Layer 18: direction= 38.3%  obj_class= 36.7%
+  Layer 19: direction= 45.0%  obj_class= 33.3%
+  Layer 20: direction= 40.0%  obj_class= 26.7%
+  Layer 21: direction= 41.7%  obj_class= 26.7%
+  Layer 22: direction= 40.0%  obj_class= 33.3%
+  Layer 23: direction= 36.7%  obj_class= 30.0%
+  Layer 24: direction= 36.7%  obj_class= 28.3%
+  Layer 25: direction= 28.3%  obj_class= 28.3%
+  Layer 26: direction= 30.0%  obj_class= 28.3%
+  Layer 27: direction= 30.0%  obj_class= 26.7%
+  Layer 28: direction= 33.3%  obj_class= 28.3%
+
+============================================================
+  Exp2: Layer-wise FDR — obj_color
+============================================================
+  Layer  0: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  1: dir-selective=  0.0%  FDR ratio=0.02x
+  Layer  2: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer  3: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer  4: dir-selective=  0.0%  FDR ratio=0.04x
+  Layer  5: dir-selective=  0.0%  FDR ratio=0.04x
+  Layer  6: dir-selective=  0.0%  FDR ratio=0.04x
+  Layer  7: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer  8: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer  9: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 10: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 11: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 12: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 13: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 14: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 15: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 16: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 17: dir-selective=  0.0%  FDR ratio=0.03x
+  Layer 18: dir-selective=  0.0%  FDR ratio=0.05x
+  Layer 19: dir-selective=  0.0%  FDR ratio=0.07x
+  Layer 20: dir-selective=  0.1%  FDR ratio=0.07x
+  Layer 21: dir-selective=  0.1%  FDR ratio=0.09x
+  Layer 22: dir-selective=  0.1%  FDR ratio=0.09x
+  Layer 23: dir-selective=  0.1%  FDR ratio=0.09x
+  Layer 24: dir-selective=  0.0%  FDR ratio=0.09x
+  Layer 25: dir-selective=  0.1%  FDR ratio=0.09x
+  Layer 26: dir-selective=  0.0%  FDR ratio=0.08x
+  Layer 27: dir-selective=  0.0%  FDR ratio=0.09x
+  Layer 28: dir-selective=  0.1%  FDR ratio=0.10x
+
+============================================================
+  Exp3: Dimension Tracking — obj_color (top-100)
+============================================================
+  Direction top-100 dims: mean FDR ratio = 0.66
+  Identity top-100 dims: mean FDR ratio = 508.59
+  Layer  0: dir-dims→dir= 21.7% | id-dims→dir= 21.7% | dir-FDR=0.000 | id-FDR=0.000
+  Layer  1: dir-dims→dir= 35.0% | id-dims→dir= 30.0% | dir-FDR=0.017 | id-FDR=0.694
+  Layer  2: dir-dims→dir= 40.0% | id-dims→dir= 30.0% | dir-FDR=0.017 | id-FDR=0.673
+  Layer  3: dir-dims→dir= 36.7% | id-dims→dir= 41.7% | dir-FDR=0.021 | id-FDR=0.611
+  Layer  4: dir-dims→dir= 40.0% | id-dims→dir= 40.0% | dir-FDR=0.026 | id-FDR=0.598
+  Layer  5: dir-dims→dir= 43.3% | id-dims→dir= 41.7% | dir-FDR=0.029 | id-FDR=0.560
+  Layer  6: dir-dims→dir= 38.3% | id-dims→dir= 41.7% | dir-FDR=0.029 | id-FDR=0.551
+  Layer  7: dir-dims→dir= 35.0% | id-dims→dir= 26.7% | dir-FDR=0.020 | id-FDR=0.626
+  Layer  8: dir-dims→dir= 33.3% | id-dims→dir= 26.7% | dir-FDR=0.015 | id-FDR=0.603
+  Layer  9: dir-dims→dir= 28.3% | id-dims→dir= 28.3% | dir-FDR=0.015 | id-FDR=0.553
+  Layer 10: dir-dims→dir= 30.0% | id-dims→dir= 25.0% | dir-FDR=0.015 | id-FDR=0.477
+  Layer 11: dir-dims→dir= 23.3% | id-dims→dir= 21.7% | dir-FDR=0.013 | id-FDR=0.577
+  Layer 12: dir-dims→dir= 30.0% | id-dims→dir= 33.3% | dir-FDR=0.013 | id-FDR=0.558
+  Layer 13: dir-dims→dir= 28.3% | id-dims→dir= 28.3% | dir-FDR=0.016 | id-FDR=0.522
+  Layer 14: dir-dims→dir= 33.3% | id-dims→dir= 31.7% | dir-FDR=0.016 | id-FDR=0.599
+  Layer 15: dir-dims→dir= 21.7% | id-dims→dir= 33.3% | dir-FDR=0.017 | id-FDR=0.532
+  Layer 16: dir-dims→dir= 20.0% | id-dims→dir= 38.3% | dir-FDR=0.017 | id-FDR=0.539
+  Layer 17: dir-dims→dir= 20.0% | id-dims→dir= 30.0% | dir-FDR=0.016 | id-FDR=0.508
+  Layer 18: dir-dims→dir= 21.7% | id-dims→dir= 30.0% | dir-FDR=0.023 | id-FDR=0.468
+  Layer 19: dir-dims→dir= 30.0% | id-dims→dir= 28.3% | dir-FDR=0.023 | id-FDR=0.375
+  Layer 20: dir-dims→dir= 28.3% | id-dims→dir= 21.7% | dir-FDR=0.021 | id-FDR=0.329
+  Layer 21: dir-dims→dir= 26.7% | id-dims→dir= 28.3% | dir-FDR=0.031 | id-FDR=0.307
+  Layer 22: dir-dims→dir= 25.0% | id-dims→dir= 20.0% | dir-FDR=0.032 | id-FDR=0.295
+  Layer 23: dir-dims→dir= 31.7% | id-dims→dir= 25.0% | dir-FDR=0.035 | id-FDR=0.269
+  Layer 24: dir-dims→dir= 26.7% | id-dims→dir= 26.7% | dir-FDR=0.040 | id-FDR=0.269
+  Layer 25: dir-dims→dir= 25.0% | id-dims→dir= 28.3% | dir-FDR=0.039 | id-FDR=0.207
+  Layer 26: dir-dims→dir= 31.7% | id-dims→dir= 20.0% | dir-FDR=0.043 | id-FDR=0.210
+  Layer 27: dir-dims→dir= 35.0% | id-dims→dir= 16.7% | dir-FDR=0.054 | id-FDR=0.190
+  Layer 28: dir-dims→dir= 33.3% | id-dims→dir= 15.0% | dir-FDR=0.094 | id-FDR=0.144
+
+============================================================
+  Exp5: Head-Dimension Correspondence — obj_color
+============================================================
+  Direction top-100 dims distribution across heads:
+    Head  0:   4 dims ████       FDR ratio=0.10x
+    Head  1:   5 dims █████      FDR ratio=0.12x
+    Head  2:   5 dims █████      FDR ratio=0.11x
+    Head  3:   5 dims █████      FDR ratio=0.10x
+    Head  4:   3 dims ███        FDR ratio=0.10x
+    Head  5:   3 dims ███        FDR ratio=0.10x
+    Head  6:   5 dims █████      FDR ratio=0.10x
+    Head  7:   5 dims █████      FDR ratio=0.09x
+    Head  8:   1 dims █          FDR ratio=0.09x
+    Head  9:   6 dims ██████     FDR ratio=0.09x
+    Head 10:   4 dims ████       FDR ratio=0.11x
+    Head 11:   6 dims ██████     FDR ratio=0.11x
+    Head 12:   1 dims █          FDR ratio=0.10x
+    Head 13:   3 dims ███        FDR ratio=0.09x
+    Head 14:   3 dims ███        FDR ratio=0.10x
+    Head 15:   3 dims ███        FDR ratio=0.09x
+    Head 16:   2 dims ██         FDR ratio=0.11x
+    Head 17:   4 dims ████       FDR ratio=0.09x
+    Head 18:   6 dims ██████     FDR ratio=0.12x
+    Head 19:   3 dims ███        FDR ratio=0.09x
+    Head 20:   3 dims ███        FDR ratio=0.10x
+    Head 21:   1 dims █          FDR ratio=0.10x
+    Head 22:   5 dims █████      FDR ratio=0.09x
+    Head 23:   1 dims █          FDR ratio=0.09x
+    Head 24:   4 dims ████       FDR ratio=0.09x
+    Head 25:   3 dims ███        FDR ratio=0.10x
+    Head 26:   3 dims ███        FDR ratio=0.10x
+    Head 27:   3 dims ███        FDR ratio=0.09x
+
+############################################################
+  llava-video-7b / shape_place
+############################################################
+
+============================================================
+  Exp1: Layer-wise Probe — shape_place
+============================================================
+  Layer  0: direction= 21.7%  place_class=  0.0%
+  Layer  1: direction=  3.3%  place_class= 93.3%
+  Layer  2: direction=  3.3%  place_class= 93.3%
+  Layer  3: direction=  6.7%  place_class= 93.3%
+  Layer  4: direction=  8.3%  place_class= 93.3%
+  Layer  5: direction=  6.7%  place_class= 93.3%
+  Layer  6: direction=  8.3%  place_class= 93.3%
+  Layer  7: direction= 11.7%  place_class= 93.3%
+  Layer  8: direction=  6.7%  place_class= 93.3%
+  Layer  9: direction=  8.3%  place_class= 93.3%
+  Layer 10: direction=  6.7%  place_class= 93.3%
+  Layer 11: direction=  6.7%  place_class= 93.3%
+  Layer 12: direction= 13.3%  place_class= 93.3%
+  Layer 13: direction=  8.3%  place_class= 93.3%
+  Layer 14: direction= 10.0%  place_class= 93.3%
+  Layer 15: direction=  6.7%  place_class= 93.3%
+  Layer 16: direction=  6.7%  place_class= 93.3%
+  Layer 17: direction= 13.3%  place_class= 93.3%
+  Layer 18: direction= 13.3%  place_class= 90.0%
+  Layer 19: direction= 16.7%  place_class= 85.0%
+  Layer 20: direction= 23.3%  place_class= 65.0%
+  Layer 21: direction= 30.0%  place_class= 60.0%
+  Layer 22: direction= 28.3%  place_class= 63.3%
+  Layer 23: direction= 30.0%  place_class= 61.7%
+  Layer 24: direction= 30.0%  place_class= 63.3%
+  Layer 25: direction= 28.3%  place_class= 50.0%
+  Layer 26: direction= 30.0%  place_class= 46.7%
+  Layer 27: direction= 28.3%  place_class= 48.3%
+  Layer 28: direction= 28.3%  place_class= 46.7%
+
+============================================================
+  Exp2: Layer-wise FDR — shape_place
+============================================================
+  Layer  0: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  1: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  2: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  3: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  4: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  5: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  6: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  7: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  8: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  9: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 10: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 11: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 12: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 13: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 14: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 15: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 16: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 17: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 18: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 19: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer 20: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 21: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 22: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 23: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 24: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 25: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 26: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 27: dir-selective=  0.0%  FDR ratio=0.01x
+  Layer 28: dir-selective=  0.0%  FDR ratio=0.01x
+
+============================================================
+  Exp3: Dimension Tracking — shape_place (top-100)
+============================================================
+  Direction top-100 dims: mean FDR ratio = 0.07
+  Identity top-100 dims: mean FDR ratio = 3484.92
+  Layer  0: dir-dims→dir= 21.7% | id-dims→dir= 21.7% | dir-FDR=0.000 | id-FDR=0.000
+  Layer  1: dir-dims→dir=  6.7% | id-dims→dir=  5.0% | dir-FDR=0.001 | id-FDR=43.211
+  Layer  2: dir-dims→dir=  5.0% | id-dims→dir=  8.3% | dir-FDR=0.001 | id-FDR=25.129
+  Layer  3: dir-dims→dir=  5.0% | id-dims→dir= 11.7% | dir-FDR=0.002 | id-FDR=17.011
+  Layer  4: dir-dims→dir=  5.0% | id-dims→dir= 13.3% | dir-FDR=0.002 | id-FDR=15.177
+  Layer  5: dir-dims→dir=  8.3% | id-dims→dir= 11.7% | dir-FDR=0.003 | id-FDR=13.621
+  Layer  6: dir-dims→dir=  5.0% | id-dims→dir= 15.0% | dir-FDR=0.003 | id-FDR=12.949
+  Layer  7: dir-dims→dir= 10.0% | id-dims→dir=  5.0% | dir-FDR=0.002 | id-FDR=13.563
+  Layer  8: dir-dims→dir=  8.3% | id-dims→dir=  5.0% | dir-FDR=0.003 | id-FDR=8.889
+  Layer  9: dir-dims→dir=  6.7% | id-dims→dir= 10.0% | dir-FDR=0.003 | id-FDR=9.624
+  Layer 10: dir-dims→dir=  8.3% | id-dims→dir=  6.7% | dir-FDR=0.003 | id-FDR=8.044
+  Layer 11: dir-dims→dir= 10.0% | id-dims→dir= 10.0% | dir-FDR=0.003 | id-FDR=9.967
+  Layer 12: dir-dims→dir= 11.7% | id-dims→dir=  8.3% | dir-FDR=0.003 | id-FDR=8.544
+  Layer 13: dir-dims→dir= 13.3% | id-dims→dir=  8.3% | dir-FDR=0.003 | id-FDR=7.510
+  Layer 14: dir-dims→dir= 10.0% | id-dims→dir=  8.3% | dir-FDR=0.003 | id-FDR=8.289
+  Layer 15: dir-dims→dir=  6.7% | id-dims→dir=  6.7% | dir-FDR=0.003 | id-FDR=8.221
+  Layer 16: dir-dims→dir=  8.3% | id-dims→dir= 11.7% | dir-FDR=0.003 | id-FDR=6.220
+  Layer 17: dir-dims→dir= 16.7% | id-dims→dir= 15.0% | dir-FDR=0.004 | id-FDR=4.771
+  Layer 18: dir-dims→dir= 10.0% | id-dims→dir=  6.7% | dir-FDR=0.005 | id-FDR=3.202
+  Layer 19: dir-dims→dir= 13.3% | id-dims→dir= 10.0% | dir-FDR=0.007 | id-FDR=1.987
+  Layer 20: dir-dims→dir= 28.3% | id-dims→dir= 20.0% | dir-FDR=0.013 | id-FDR=1.464
+  Layer 21: dir-dims→dir= 35.0% | id-dims→dir= 25.0% | dir-FDR=0.018 | id-FDR=1.273
+  Layer 22: dir-dims→dir= 33.3% | id-dims→dir= 26.7% | dir-FDR=0.022 | id-FDR=1.151
+  Layer 23: dir-dims→dir= 30.0% | id-dims→dir= 20.0% | dir-FDR=0.023 | id-FDR=1.211
+  Layer 24: dir-dims→dir= 26.7% | id-dims→dir= 25.0% | dir-FDR=0.026 | id-FDR=1.204
+  Layer 25: dir-dims→dir= 26.7% | id-dims→dir= 15.0% | dir-FDR=0.017 | id-FDR=0.604
+  Layer 26: dir-dims→dir= 35.0% | id-dims→dir= 15.0% | dir-FDR=0.021 | id-FDR=0.612
+  Layer 27: dir-dims→dir= 33.3% | id-dims→dir= 15.0% | dir-FDR=0.026 | id-FDR=0.579
+  Layer 28: dir-dims→dir= 35.0% | id-dims→dir=  8.3% | dir-FDR=0.037 | id-FDR=0.576
+
+============================================================
+  Exp5: Head-Dimension Correspondence — shape_place
+============================================================
+  Direction top-100 dims distribution across heads:
+    Head  0:   2 dims ██         FDR ratio=0.01x
+    Head  1:   4 dims ████       FDR ratio=0.01x
+    Head  2:   3 dims ███        FDR ratio=0.01x
+    Head  3:   7 dims ███████    FDR ratio=0.01x
+    Head  4:   5 dims █████      FDR ratio=0.01x
+    Head  5:   3 dims ███        FDR ratio=0.01x
+    Head  6:   2 dims ██         FDR ratio=0.01x
+    Head  7:   3 dims ███        FDR ratio=0.01x
+    Head  8:   4 dims ████       FDR ratio=0.01x
+    Head  9:   4 dims ████       FDR ratio=0.01x
+    Head 10:   2 dims ██         FDR ratio=0.01x
+    Head 11:   4 dims ████       FDR ratio=0.01x
+    Head 12:   6 dims ██████     FDR ratio=0.01x
+    Head 13:   2 dims ██         FDR ratio=0.01x
+    Head 14:   5 dims █████      FDR ratio=0.01x
+    Head 15:   5 dims █████      FDR ratio=0.01x
+    Head 16:   0 dims            FDR ratio=0.01x
+    Head 17:   4 dims ████       FDR ratio=0.01x
+    Head 18:   4 dims ████       FDR ratio=0.01x
+    Head 19:   0 dims            FDR ratio=0.01x
+    Head 20:   3 dims ███        FDR ratio=0.01x
+    Head 21:   4 dims ████       FDR ratio=0.01x
+    Head 22:   6 dims ██████     FDR ratio=0.01x
+    Head 23:   3 dims ███        FDR ratio=0.01x
+    Head 24:   5 dims █████      FDR ratio=0.01x
+    Head 25:   2 dims ██         FDR ratio=0.01x
+    Head 26:   4 dims ████       FDR ratio=0.01x
+    Head 27:   4 dims ████       FDR ratio=0.01x
+
+############################################################
+  llava-video-7b / obj_place
+############################################################
+
+============================================================
+  Exp1: Layer-wise Probe — obj_place
+============================================================
+  Layer  0: direction= 21.7%  obj_class=  0.0%
+  Layer  1: direction= 18.3%  obj_class= 20.0%
+  Layer  2: direction= 18.3%  obj_class= 20.0%
+  Layer  3: direction= 23.3%  obj_class= 16.7%
+  Layer  4: direction= 28.3%  obj_class= 21.7%
+  Layer  5: direction= 33.3%  obj_class= 28.3%
+  Layer  6: direction= 26.7%  obj_class= 23.3%
+  Layer  7: direction= 26.7%  obj_class= 26.7%
+  Layer  8: direction= 26.7%  obj_class= 26.7%
+  Layer  9: direction= 25.0%  obj_class= 20.0%
+  Layer 10: direction= 25.0%  obj_class= 18.3%
+  Layer 11: direction= 21.7%  obj_class= 15.0%
+  Layer 12: direction= 18.3%  obj_class= 13.3%
+  Layer 13: direction= 25.0%  obj_class= 21.7%
+  Layer 14: direction= 33.3%  obj_class= 25.0%
+  Layer 15: direction= 36.7%  obj_class= 26.7%
+  Layer 16: direction= 35.0%  obj_class= 15.0%
+  Layer 17: direction= 26.7%  obj_class= 11.7%
+  Layer 18: direction= 26.7%  obj_class= 10.0%
+  Layer 19: direction= 30.0%  obj_class=  8.3%
+  Layer 20: direction= 33.3%  obj_class=  8.3%
+  Layer 21: direction= 31.7%  obj_class=  6.7%
+  Layer 22: direction= 33.3%  obj_class= 10.0%
+  Layer 23: direction= 28.3%  obj_class= 10.0%
+  Layer 24: direction= 25.0%  obj_class=  8.3%
+  Layer 25: direction= 31.7%  obj_class= 10.0%
+  Layer 26: direction= 31.7%  obj_class= 10.0%
+  Layer 27: direction= 33.3%  obj_class= 10.0%
+  Layer 28: direction= 33.3%  obj_class=  6.7%
+
+============================================================
+  Exp2: Layer-wise FDR — obj_place
+============================================================
+  Layer  0: dir-selective=  0.0%  FDR ratio=0.00x
+  Layer  1: dir-selective=  0.0%  FDR ratio=0.05x
+  Layer  2: dir-selective=  0.0%  FDR ratio=0.05x
+  Layer  3: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer  4: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer  5: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer  6: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer  7: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer  8: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer  9: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 10: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 11: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 12: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 13: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 14: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 15: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 16: dir-selective=  0.0%  FDR ratio=0.06x
+  Layer 17: dir-selective=  0.0%  FDR ratio=0.07x
+  Layer 18: dir-selective=  0.1%  FDR ratio=0.08x
+  Layer 19: dir-selective=  0.2%  FDR ratio=0.10x
+  Layer 20: dir-selective=  0.2%  FDR ratio=0.10x
+  Layer 21: dir-selective=  0.3%  FDR ratio=0.11x
+  Layer 22: dir-selective=  0.2%  FDR ratio=0.11x
+  Layer 23: dir-selective=  0.3%  FDR ratio=0.11x
+  Layer 24: dir-selective=  0.4%  FDR ratio=0.11x
+  Layer 25: dir-selective=  0.0%  FDR ratio=0.09x
+  Layer 26: dir-selective=  0.0%  FDR ratio=0.09x
+  Layer 27: dir-selective=  0.0%  FDR ratio=0.09x
+  Layer 28: dir-selective=  0.1%  FDR ratio=0.10x
+
+============================================================
+  Exp3: Dimension Tracking — obj_place (top-100)
+============================================================
+  Direction top-100 dims: mean FDR ratio = 0.54
+  Identity top-100 dims: mean FDR ratio = 581.82
+  Layer  0: dir-dims→dir= 21.7% | id-dims→dir= 21.7% | dir-FDR=0.000 | id-FDR=0.000
+  Layer  1: dir-dims→dir= 28.3% | id-dims→dir= 30.0% | dir-FDR=0.009 | id-FDR=0.178
+  Layer  2: dir-dims→dir= 16.7% | id-dims→dir= 25.0% | dir-FDR=0.008 | id-FDR=0.178
+  Layer  3: dir-dims→dir= 20.0% | id-dims→dir= 31.7% | dir-FDR=0.010 | id-FDR=0.179
+  Layer  4: dir-dims→dir= 20.0% | id-dims→dir= 25.0% | dir-FDR=0.010 | id-FDR=0.196
+  Layer  5: dir-dims→dir= 23.3% | id-dims→dir= 18.3% | dir-FDR=0.012 | id-FDR=0.201
+  Layer  6: dir-dims→dir= 16.7% | id-dims→dir= 20.0% | dir-FDR=0.013 | id-FDR=0.188
+  Layer  7: dir-dims→dir= 21.7% | id-dims→dir= 26.7% | dir-FDR=0.012 | id-FDR=0.209
+  Layer  8: dir-dims→dir= 15.0% | id-dims→dir= 23.3% | dir-FDR=0.011 | id-FDR=0.202
+  Layer  9: dir-dims→dir= 16.7% | id-dims→dir= 23.3% | dir-FDR=0.012 | id-FDR=0.202
+  Layer 10: dir-dims→dir= 10.0% | id-dims→dir= 20.0% | dir-FDR=0.012 | id-FDR=0.193
+  Layer 11: dir-dims→dir= 21.7% | id-dims→dir= 10.0% | dir-FDR=0.013 | id-FDR=0.199
+  Layer 12: dir-dims→dir= 21.7% | id-dims→dir= 20.0% | dir-FDR=0.012 | id-FDR=0.197
+  Layer 13: dir-dims→dir= 18.3% | id-dims→dir= 21.7% | dir-FDR=0.013 | id-FDR=0.198
+  Layer 14: dir-dims→dir= 16.7% | id-dims→dir= 23.3% | dir-FDR=0.012 | id-FDR=0.222
+  Layer 15: dir-dims→dir= 21.7% | id-dims→dir= 21.7% | dir-FDR=0.013 | id-FDR=0.212
+  Layer 16: dir-dims→dir= 20.0% | id-dims→dir= 26.7% | dir-FDR=0.012 | id-FDR=0.204
+  Layer 17: dir-dims→dir= 25.0% | id-dims→dir= 20.0% | dir-FDR=0.013 | id-FDR=0.204
+  Layer 18: dir-dims→dir= 23.3% | id-dims→dir= 21.7% | dir-FDR=0.017 | id-FDR=0.208
+  Layer 19: dir-dims→dir= 21.7% | id-dims→dir= 26.7% | dir-FDR=0.020 | id-FDR=0.177
+  Layer 20: dir-dims→dir= 30.0% | id-dims→dir= 28.3% | dir-FDR=0.024 | id-FDR=0.177
+  Layer 21: dir-dims→dir= 35.0% | id-dims→dir= 33.3% | dir-FDR=0.028 | id-FDR=0.167
+  Layer 22: dir-dims→dir= 40.0% | id-dims→dir= 23.3% | dir-FDR=0.032 | id-FDR=0.174
+  Layer 23: dir-dims→dir= 36.7% | id-dims→dir= 26.7% | dir-FDR=0.034 | id-FDR=0.175
+  Layer 24: dir-dims→dir= 40.0% | id-dims→dir= 28.3% | dir-FDR=0.038 | id-FDR=0.170
+  Layer 25: dir-dims→dir= 35.0% | id-dims→dir= 21.7% | dir-FDR=0.028 | id-FDR=0.138
+  Layer 26: dir-dims→dir= 30.0% | id-dims→dir= 20.0% | dir-FDR=0.032 | id-FDR=0.137
+  Layer 27: dir-dims→dir= 36.7% | id-dims→dir= 21.7% | dir-FDR=0.042 | id-FDR=0.123
+  Layer 28: dir-dims→dir= 36.7% | id-dims→dir=  3.3% | dir-FDR=0.058 | id-FDR=0.111
+
+============================================================
+  Exp5: Head-Dimension Correspondence — obj_place
+============================================================
+  Direction top-100 dims distribution across heads:
+    Head  0:   4 dims ████       FDR ratio=0.10x
+    Head  1:   6 dims ██████     FDR ratio=0.11x
+    Head  2:   2 dims ██         FDR ratio=0.09x
+    Head  3:   4 dims ████       FDR ratio=0.09x
+    Head  4:   2 dims ██         FDR ratio=0.10x
+    Head  5:   3 dims ███        FDR ratio=0.09x
+    Head  6:   4 dims ████       FDR ratio=0.11x
+    Head  7:   2 dims ██         FDR ratio=0.09x
+    Head  8:   6 dims ██████     FDR ratio=0.11x
+    Head  9:   2 dims ██         FDR ratio=0.09x
+    Head 10:   4 dims ████       FDR ratio=0.11x
+    Head 11:   6 dims ██████     FDR ratio=0.10x
+    Head 12:   2 dims ██         FDR ratio=0.10x
+    Head 13:   4 dims ████       FDR ratio=0.10x
+    Head 14:   4 dims ████       FDR ratio=0.10x
+    Head 15:   2 dims ██         FDR ratio=0.09x
+    Head 16:   5 dims █████      FDR ratio=0.10x
+    Head 17:   4 dims ████       FDR ratio=0.10x
+    Head 18:   8 dims ████████   FDR ratio=0.11x
+    Head 19:   2 dims ██         FDR ratio=0.09x
+    Head 20:   1 dims █          FDR ratio=0.10x
+    Head 21:   4 dims ████       FDR ratio=0.11x
+    Head 22:   4 dims ████       FDR ratio=0.09x
+    Head 23:   3 dims ███        FDR ratio=0.10x
+    Head 24:   2 dims ██         FDR ratio=0.10x
+    Head 25:   3 dims ███        FDR ratio=0.10x
+    Head 26:   2 dims ██         FDR ratio=0.10x
+    Head 27:   5 dims █████      FDR ratio=0.10x
+
+[SAVED] analysis/filtering_results/filtering_llava-video-7b.json

@@ -301,10 +301,53 @@ def _compute_stats(q, k, img_start, img_end, seq_len, head_dim,
 # LLaVA analysis (Qwen2 RoPE)
 # ============================================================
 
+def _update_rollout(q, k, rollout_state, head_dim, alpha=None):
+    """Rollout 행렬을 GPU에서 head-by-head로 업데이트. 메모리: O(S^2), not O(H*S^2).
+
+    Args:
+        alpha: attention 기여 비율 (0~1). None이면 0.5 고정.
+               adaptive rollout은 실측 norm 비율 사용.
+    """
+    S = q.shape[1]
+    n_heads = q.shape[0]
+    scale = head_dim ** 0.5
+    device = q.device
+
+    if rollout_state['R'] is None:
+        rollout_state['R'] = torch.eye(S, device=device)
+        rollout_state['R_adaptive'] = torch.eye(S, device=device)
+        rollout_state['eye'] = torch.eye(S, device=device)
+        rollout_state['causal'] = torch.triu(torch.ones(S, S, device=device, dtype=torch.bool), diagonal=1)
+
+    # Head-by-head attention: 메모리 O(S^2) per step (not H*S^2)
+    A_avg = torch.zeros(S, S, device=device)
+    for h in range(n_heads):
+        scores = torch.matmul(q[h], k[h].T) / scale  # (S, S)
+        scores.masked_fill_(rollout_state['causal'], float('-inf'))
+        A_avg += torch.softmax(scores, dim=-1)
+    A_avg /= n_heads
+
+    # Fixed rollout (0.5)
+    A_hat = 0.5 * A_avg + 0.5 * rollout_state['eye']
+    rollout_state['R'] = torch.matmul(A_hat, rollout_state['R'])
+    rollout_state['R'] = rollout_state['R'] / rollout_state['R'].sum(dim=-1, keepdim=True).clamp(min=1e-8)
+
+    # Adaptive rollout (실측 alpha)
+    if alpha is not None:
+        a = min(max(alpha, 0.001), 0.999)  # clamp
+        A_hat_adp = a * A_avg + (1.0 - a) * rollout_state['eye']
+        rollout_state['R_adaptive'] = torch.matmul(A_hat_adp, rollout_state['R_adaptive'])
+        rollout_state['R_adaptive'] = rollout_state['R_adaptive'] / rollout_state['R_adaptive'].sum(dim=-1, keepdim=True).clamp(min=1e-8)
+        del A_hat_adp
+
+    del A_avg, A_hat
+
+
 @torch.no_grad()
 def analyze_sample_llava(model, tokenizer, inputs_embeds, attention_mask, position_ids,
-                         img_start, img_end, layer_stride=1, frame_ranges=None):
-    """Run LLaVA forward with hooks to get post-RoPE Q, K per layer."""
+                         img_start, img_end, layer_stride=1, frame_ranges=None,
+                         compute_rollout=True):
+    """Run LLaVA forward with hooks to get post-RoPE Q, K per layer + attention rollout."""
     from transformers.models.qwen2.modeling_qwen2 import apply_rotary_pos_emb
 
     decoder_layers = model.model.layers
@@ -326,6 +369,9 @@ def analyze_sample_llava(model, tokenizer, inputs_embeds, attention_mask, positi
     _rope_uses_position_ids = 'position_ids' in _inspect.signature(_first_attn.rotary_emb.forward).parameters
     _pos_default = position_ids if position_ids is not None else torch.arange(seq_len, device=inputs_embeds.device).unsqueeze(0)
 
+    # Rollout state (GPU, 업데이트는 모든 layer에서, stats는 selected layer에서만)
+    rollout_state = {'R': None, 'eye': None, 'causal': None} if compute_rollout else None
+
     layer_stats = []
     hooks = []
 
@@ -340,22 +386,41 @@ def analyze_sample_llava(model, tokenizer, inputs_embeds, attention_mask, positi
             def h(mod, inp, out): cap['k'] = out.detach(); return out
             return h
 
-        def _lh(layer_idx, cap, attn_mod, compute):
+        # self_attn output hook: attention output norm 캡처 (adaptive rollout용)
+        def _attn_out_hook(cap):
             def h(module, input, output):
-                if not compute or 'q' not in cap or 'k' not in cap:
+                # self_attn output: (attn_output, attn_weights, past_kv) or tuple
+                attn_out = output[0] if isinstance(output, tuple) else output
+                cap['attn_out_norm'] = attn_out[0, -1, :].detach().norm().item()  # answer token norm
+            return h
+
+        def _lh(layer_idx, cap, attn_mod, compute_stats, do_rollout, r_state):
+            def h(module, input, output):
+                need_qk = compute_stats or do_rollout
+                if not need_qk or 'q' not in cap or 'k' not in cap:
                     cap.clear()
                     return output
 
+                # Adaptive alpha: residual norm vs attn output norm (answer token, GPU)
+                alpha = None
+                if do_rollout:
+                    residual = input[0] if isinstance(input, tuple) else input
+                    residual_norm = residual[0, -1, :].detach().float().norm().item()
+                    attn_out_norm = cap.get('attn_out_norm', 0.0)
+                    total = residual_norm + attn_out_norm
+                    alpha = attn_out_norm / total if total > 1e-8 else 0.5
+
                 q_raw = cap.pop('q')[0].float()
                 k_raw = cap.pop('k')[0].float()
+                cap.pop('attn_out_norm', None)
 
                 q = q_raw.view(seq_len, n_heads, head_dim).transpose(0, 1).unsqueeze(0)
                 k = k_raw.view(seq_len, n_kv_heads, head_dim).transpose(0, 1).unsqueeze(0)
 
-                # Pre-RoPE Q,K for comparison (GQA-expanded)
-                q_pre = q[0].clone()
-                k_pre = k[0].clone()
-                if n_groups > 1:
+                # Pre-RoPE Q,K (only needed for QK stats, skip for rollout-only layers)
+                q_pre = q[0].clone() if compute_stats else None
+                k_pre = k[0].clone() if compute_stats else None
+                if compute_stats and n_groups > 1:
                     k_pre = k_pre.repeat_interleave(n_groups, dim=0)
 
                 # Apply RoPE
@@ -369,19 +434,47 @@ def analyze_sample_llava(model, tokenizer, inputs_embeds, attention_mask, positi
                 if n_groups > 1:
                     k = k.repeat_interleave(n_groups, dim=1)
 
-                stats = _compute_stats(q[0], k[0], img_start, img_end, seq_len, head_dim,
-                                      frame_ranges=frame_ranges,
-                                      q_pre_rope=q_pre, k_pre_rope=k_pre)
-                stats['layer_idx'] = layer_idx
-                layer_stats.append(stats)
+                # Rollout: 모든 layer에서 업데이트 (GPU, head-by-head)
+                if do_rollout and r_state is not None:
+                    _update_rollout(q[0], k[0], r_state, head_dim, alpha=alpha)
 
-                del q, k, q_raw, k_raw, q_pre, k_pre
+                # QK stats: selected layer만
+                if compute_stats:
+                    stats = _compute_stats(q[0], k[0], img_start, img_end, seq_len, head_dim,
+                                          frame_ranges=frame_ranges,
+                                          q_pre_rope=q_pre, k_pre_rope=k_pre)
+
+                    # Fixed rollout stats
+                    if do_rollout and r_state is not None and r_state['R'] is not None:
+                        eff = r_state['R'][-1, :]
+                        stats['rollout_to_vision'] = eff[img_start:img_end].sum().item()
+                        stats['rollout_to_question'] = eff[img_end:seq_len-1].sum().item()
+                        stats['rollout_to_system'] = eff[:img_start].sum().item()
+
+                    # Adaptive rollout stats
+                    if do_rollout and r_state is not None and r_state.get('R_adaptive') is not None:
+                        eff_adp = r_state['R_adaptive'][-1, :]
+                        stats['adaptive_rollout_to_vision'] = eff_adp[img_start:img_end].sum().item()
+                        stats['adaptive_rollout_to_question'] = eff_adp[img_end:seq_len-1].sum().item()
+                        stats['adaptive_rollout_to_system'] = eff_adp[:img_start].sum().item()
+
+                    if alpha is not None:
+                        stats['attn_alpha'] = alpha
+
+                    stats['layer_idx'] = layer_idx
+                    layer_stats.append(stats)
+
+                del q, k, q_raw, k_raw
+                if q_pre is not None:
+                    del q_pre, k_pre
                 return output
             return h
 
         hooks.append(attn_mod.q_proj.register_forward_hook(_qh(captured)))
         hooks.append(attn_mod.k_proj.register_forward_hook(_kh(captured)))
-        hooks.append(decoder_layers[i].register_forward_hook(_lh(i, captured, attn_mod, i in selected_set)))
+        hooks.append(attn_mod.register_forward_hook(_attn_out_hook(captured)))
+        hooks.append(decoder_layers[i].register_forward_hook(
+            _lh(i, captured, attn_mod, i in selected_set, compute_rollout, rollout_state)))
 
     predicted_token = ""
     try:
@@ -393,6 +486,9 @@ def analyze_sample_llava(model, tokenizer, inputs_embeds, attention_mask, positi
     finally:
         for h in hooks:
             h.remove()
+        # Rollout state GPU 메모리 해제
+        if rollout_state is not None:
+            rollout_state.clear()
 
     return layer_stats, predicted_token
 

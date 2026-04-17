@@ -1,0 +1,110 @@
+
+================================================================================
+  Vanilla
+================================================================================
+
+  [shape_color]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 23.8% (chance 25.0) | gap= +0.4
+    L 7: dir= 96.1% (chance 25.0) | letter= 23.9% (chance 25.0) | gap=+72.1
+    L14: dir= 95.2% (chance 25.0) | letter= 24.4% (chance 25.0) | gap=+70.8
+    L21: dir= 94.5% (chance 25.0) | letter= 24.0% (chance 25.0) | gap=+70.5
+    L27: dir= 88.7% (chance 25.0) | letter= 24.7% (chance 25.0) | gap=+64.0
+
+  [obj_color]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 24.9% (chance 25.0) | gap= -0.7
+    L 7: dir= 89.6% (chance 25.0) | letter= 23.9% (chance 25.0) | gap=+65.7
+    L14: dir= 86.4% (chance 25.0) | letter= 23.7% (chance 25.0) | gap=+62.7
+    L21: dir= 80.4% (chance 25.0) | letter= 27.9% (chance 25.0) | gap=+52.6
+    L27: dir= 72.2% (chance 25.0) | letter= 25.1% (chance 25.0) | gap=+47.1
+
+  [shape_place]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 25.8% (chance 25.0) | gap= -1.5
+    L 7: dir= 82.3% (chance 25.0) | letter= 24.9% (chance 25.0) | gap=+57.4
+    L14: dir= 80.1% (chance 25.0) | letter= 23.6% (chance 25.0) | gap=+56.5
+    L21: dir= 71.8% (chance 25.0) | letter= 24.8% (chance 25.0) | gap=+46.9
+    L27: dir= 64.1% (chance 25.0) | letter= 22.6% (chance 25.0) | gap=+41.4
+
+  [obj_place]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 25.5% (chance 25.0) | gap= -1.2
+    L 7: dir= 76.6% (chance 25.0) | letter= 24.6% (chance 25.0) | gap=+52.0
+    L14: dir= 75.3% (chance 25.0) | letter= 23.3% (chance 25.0) | gap=+52.0
+    L21: dir= 67.5% (chance 25.0) | letter= 24.7% (chance 25.0) | gap=+42.8
+    L27: dir= 56.8% (chance 25.0) | letter= 24.4% (chance 25.0) | gap=+32.3
+
+================================================================================
+  Baseline
+================================================================================
+
+  [shape_color]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 23.8% (chance 25.0) | gap= +0.4
+    L 7: dir= 95.7% (chance 25.0) | letter= 25.2% (chance 25.0) | gap=+70.4
+    L14: dir= 99.6% (chance 25.0) | letter= 23.3% (chance 25.0) | gap=+76.2
+    L21: dir= 99.4% (chance 25.0) | letter= 27.0% (chance 25.0) | gap=+72.4
+    L27: dir= 99.5% (chance 25.0) | letter= 25.6% (chance 25.0) | gap=+73.9
+
+  [obj_color]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 24.9% (chance 25.0) | gap= -0.7
+    L 7: dir= 87.8% (chance 25.0) | letter= 25.4% (chance 25.0) | gap=+62.4
+    L14: dir= 93.8% (chance 25.0) | letter= 26.3% (chance 25.0) | gap=+67.6
+    L21: dir= 97.2% (chance 25.0) | letter= 25.2% (chance 25.0) | gap=+71.9
+    L27: dir= 97.2% (chance 25.0) | letter= 24.4% (chance 25.0) | gap=+72.8
+
+  [shape_place]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 25.8% (chance 25.0) | gap= -1.5
+    L 7: dir= 73.4% (chance 25.0) | letter= 25.6% (chance 25.0) | gap=+47.8
+    L14: dir= 93.4% (chance 25.0) | letter= 24.3% (chance 25.0) | gap=+69.1
+    L21: dir= 95.9% (chance 25.0) | letter= 24.2% (chance 25.0) | gap=+71.8
+    L27: dir= 95.1% (chance 25.0) | letter= 24.9% (chance 25.0) | gap=+70.2
+
+  [obj_place]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 25.5% (chance 25.0) | gap= -1.2
+    L 7: dir= 69.3% (chance 25.0) | letter= 23.6% (chance 25.0) | gap=+45.7
+    L14: dir= 88.7% (chance 25.0) | letter= 22.4% (chance 25.0) | gap=+66.3
+    L21: dir= 92.7% (chance 25.0) | letter= 22.7% (chance 25.0) | gap=+70.0
+    L27: dir= 91.1% (chance 25.0) | letter= 24.0% (chance 25.0) | gap=+67.1
+
+================================================================================
+  Delta
+================================================================================
+
+  [shape_color]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 23.8% (chance 25.0) | gap= +0.4
+    L 7: dir= 98.9% (chance 25.0) | letter= 24.4% (chance 25.0) | gap=+74.5
+    L14: dir= 99.4% (chance 25.0) | letter= 25.0% (chance 25.0) | gap=+74.4
+    L21: dir= 99.7% (chance 25.0) | letter= 25.6% (chance 25.0) | gap=+74.1
+    L27: dir= 99.8% (chance 25.0) | letter= 24.9% (chance 25.0) | gap=+74.9
+
+  [obj_color]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 24.9% (chance 25.0) | gap= -0.7
+    L 7: dir= 92.7% (chance 25.0) | letter= 25.4% (chance 25.0) | gap=+67.3
+    L14: dir= 96.3% (chance 25.0) | letter= 27.2% (chance 25.0) | gap=+69.1
+    L21: dir= 97.9% (chance 25.0) | letter= 24.3% (chance 25.0) | gap=+73.6
+    L27: dir= 97.2% (chance 25.0) | letter= 24.1% (chance 25.0) | gap=+73.1
+
+  [shape_place]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 25.8% (chance 25.0) | gap= -1.5
+    L 7: dir= 80.8% (chance 25.0) | letter= 24.4% (chance 25.0) | gap=+56.4
+    L14: dir= 95.1% (chance 25.0) | letter= 25.4% (chance 25.0) | gap=+69.7
+    L21: dir= 97.4% (chance 25.0) | letter= 23.3% (chance 25.0) | gap=+74.1
+    L27: dir= 96.6% (chance 25.0) | letter= 23.9% (chance 25.0) | gap=+72.7
+
+  [obj_place]
+    6000 samples, 4 unique letters: ['A', 'B', 'C', 'D']
+    L 0: dir= 24.3% (chance 25.0) | letter= 25.5% (chance 25.0) | gap= -1.2
+    L 7: dir= 77.8% (chance 25.0) | letter= 23.3% (chance 25.0) | gap=+54.6
+    L14: dir= 90.9% (chance 25.0) | letter= 24.8% (chance 25.0) | gap=+66.2
+    L21: dir= 95.1% (chance 25.0) | letter= 24.8% (chance 25.0) | gap=+70.2
+    L27: dir= 93.8% (chance 25.0) | letter= 25.1% (chance 25.0) | gap=+68.7
+
+[SAVED] analysis/letter_vs_direction_probing.json

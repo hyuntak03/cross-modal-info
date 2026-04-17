@@ -1,0 +1,209 @@
+
+  Exp2: Projector Weight Comparison
+    base_model.model.model.mm_projector.0.weight: diff=2.6745 norm=57.0751 rel=4.69%
+    base_model.model.model.mm_projector.0.bias: diff=0.0840 norm=1.3184 rel=6.37%
+    base_model.model.model.mm_projector.2.weight: diff=4.6256 norm=79.7811 rel=5.80%
+    base_model.model.model.mm_projector.2.bias: diff=0.0124 norm=1.2027 rel=1.03%
+    base_model.model.model.delta_direction_head.head.weight: DELTA ONLY, norm=0.9464
+    base_model.model.model.delta_direction_head.head.bias: DELTA ONLY, norm=0.0152
+
+  Exp5: LoRA Weight Comparison (per layer)
+  Layer   Baseline   Delta    Diff
+     0      0.808     0.747   -0.062
+     1      0.815     0.767   -0.048
+     2      0.891     0.865   -0.026
+     3      0.904     0.860   -0.044
+     4      1.103     0.984   -0.119
+     5      1.162     1.015   -0.146
+     6      1.257     1.020   -0.237
+     7      0.988     0.951   -0.037
+     8      1.016     0.966   -0.050
+     9      1.080     1.050   -0.030
+    10      1.257     1.155   -0.102
+    11      1.114     1.139   +0.026
+    12      1.170     1.238   +0.068
+    13      1.228     1.209   -0.019
+    14      1.257     1.292   +0.036
+    15      1.216     1.195   -0.021
+    16      1.143     1.142   -0.001
+    17      1.162     1.154   -0.008
+    18      1.135     1.195   +0.060
+    19      1.142     1.188   +0.045
+    20      1.063     1.062   -0.001
+    21      1.076     1.088   +0.013
+    22      1.139     1.138   -0.001
+    23      1.103     1.112   +0.009
+    24      1.103     1.119   +0.016
+    25      1.075     1.083   +0.009
+    26      1.016     1.021   +0.005
+    27      0.864     0.866   +0.001
+
+############################################################
+  shape_color
+############################################################
+
+  Exp1: Projector Temporal Delta — shape_color
+    [baseline] dir=95.0% id=40.0% FDR=2.15x
+    [delta] dir=100.0% id=41.7% FDR=15.84x
+
+  Exp3: Layer-wise Filtering — shape_color
+    L 0 B: dir= 21.7 id= 16.7 FDR= 0.00x | D: dir= 21.7 id= 16.7 FDR= 0.00x
+    L 1 B: dir= 30.0 id=100.0 FDR= 0.01x | D: dir= 35.0 id=100.0 FDR= 0.02x
+    L 2 B: dir= 48.3 id=100.0 FDR= 0.01x | D: dir= 53.3 id=100.0 FDR= 0.02x
+    L 3 B: dir= 51.7 id=100.0 FDR= 0.01x | D: dir= 60.0 id=100.0 FDR= 0.02x
+    L 4 B: dir= 50.0 id=100.0 FDR= 0.01x | D: dir= 56.7 id=100.0 FDR= 0.02x
+    L 5 B: dir= 41.7 id=100.0 FDR= 0.01x | D: dir= 56.7 id=100.0 FDR= 0.03x
+    L 6 B: dir= 50.0 id=100.0 FDR= 0.01x | D: dir= 60.0 id=100.0 FDR= 0.03x
+    L 7 B: dir= 45.0 id=100.0 FDR= 0.01x | D: dir= 65.0 id=100.0 FDR= 0.03x
+    L 8 B: dir= 55.0 id=100.0 FDR= 0.02x | D: dir= 61.7 id=100.0 FDR= 0.03x
+    L 9 B: dir= 58.3 id=100.0 FDR= 0.02x | D: dir= 71.7 id=100.0 FDR= 0.03x
+    L10 B: dir= 63.3 id=100.0 FDR= 0.03x | D: dir= 76.7 id=100.0 FDR= 0.05x
+    L11 B: dir= 56.7 id=100.0 FDR= 0.04x | D: dir= 73.3 id=100.0 FDR= 0.06x
+    L12 B: dir= 71.7 id=100.0 FDR= 0.06x | D: dir= 85.0 id=100.0 FDR= 0.07x
+    L13 B: dir= 80.0 id=100.0 FDR= 0.08x | D: dir= 80.0 id=100.0 FDR= 0.16x
+    L14 B: dir= 85.0 id=100.0 FDR= 0.20x | D: dir= 86.7 id=100.0 FDR= 0.30x
+    L15 B: dir= 93.3 id= 96.7 FDR= 1.76x | D: dir= 96.7 id= 96.7 FDR= 2.16x
+    L16 B: dir= 96.7 id= 88.3 FDR= 1.96x | D: dir= 95.0 id= 83.3 FDR= 2.74x
+    L17 B: dir= 95.0 id= 81.7 FDR= 2.48x | D: dir= 96.7 id= 70.0 FDR= 3.32x
+    L18 B: dir= 96.7 id= 63.3 FDR= 4.40x | D: dir= 95.0 id= 50.0 FDR= 4.84x
+    L19 B: dir= 96.7 id= 48.3 FDR= 3.94x | D: dir= 98.3 id= 40.0 FDR= 4.27x
+    L20 B: dir=100.0 id= 25.0 FDR=57.52x | D: dir=100.0 id= 23.3 FDR=90.22x
+    L21 B: dir= 98.3 id= 18.3 FDR=49.76x | D: dir=100.0 id= 23.3 FDR=69.32x
+    L22 B: dir=100.0 id= 21.7 FDR=41.87x | D: dir=100.0 id= 25.0 FDR=61.46x
+    L23 B: dir= 98.3 id= 18.3 FDR=41.73x | D: dir=100.0 id= 23.3 FDR=74.83x
+    L24 B: dir= 98.3 id= 13.3 FDR=41.27x | D: dir=100.0 id= 23.3 FDR=68.70x
+    L25 B: dir= 98.3 id= 18.3 FDR=17.88x | D: dir=100.0 id= 15.0 FDR=32.53x
+    L26 B: dir= 98.3 id= 15.0 FDR=17.82x | D: dir=100.0 id= 13.3 FDR=30.25x
+    L27 B: dir= 98.3 id= 15.0 FDR=15.86x | D: dir=100.0 id= 16.7 FDR=25.91x
+    L28 B: dir= 98.3 id= 15.0 FDR=14.60x | D: dir=100.0 id= 11.7 FDR=23.27x
+
+  Exp4: Auxiliary Head — shape_color
+    Accuracy: 48.7% (682/1400)
+
+############################################################
+  obj_color
+############################################################
+
+  Exp1: Projector Temporal Delta — obj_color
+    [baseline] dir=90.0% id=10.0% FDR=0.51x
+    [delta] dir=98.3% id=8.3% FDR=2.13x
+
+  Exp3: Layer-wise Filtering — obj_color
+    L 0 B: dir= 21.7 id=  0.0 FDR= 0.00x | D: dir= 21.7 id=  0.0 FDR= 0.00x
+    L 1 B: dir= 28.3 id= 75.0 FDR= 0.02x | D: dir= 36.7 id= 75.0 FDR= 0.02x
+    L 2 B: dir= 31.7 id= 76.7 FDR= 0.02x | D: dir= 43.3 id= 76.7 FDR= 0.02x
+    L 3 B: dir= 31.7 id= 75.0 FDR= 0.02x | D: dir= 53.3 id= 70.0 FDR= 0.02x
+    L 4 B: dir= 38.3 id= 78.3 FDR= 0.02x | D: dir= 43.3 id= 78.3 FDR= 0.02x
+    L 5 B: dir= 33.3 id= 70.0 FDR= 0.02x | D: dir= 46.7 id= 70.0 FDR= 0.03x
+    L 6 B: dir= 30.0 id= 70.0 FDR= 0.02x | D: dir= 45.0 id= 71.7 FDR= 0.03x
+    L 7 B: dir= 30.0 id= 70.0 FDR= 0.02x | D: dir= 46.7 id= 70.0 FDR= 0.03x
+    L 8 B: dir= 38.3 id= 71.7 FDR= 0.03x | D: dir= 50.0 id= 75.0 FDR= 0.03x
+    L 9 B: dir= 41.7 id= 65.0 FDR= 0.02x | D: dir= 38.3 id= 70.0 FDR= 0.03x
+    L10 B: dir= 38.3 id= 66.7 FDR= 0.03x | D: dir= 43.3 id= 58.3 FDR= 0.04x
+    L11 B: dir= 33.3 id= 65.0 FDR= 0.03x | D: dir= 41.7 id= 56.7 FDR= 0.04x
+    L12 B: dir= 53.3 id= 61.7 FDR= 0.03x | D: dir= 56.7 id= 56.7 FDR= 0.04x
+    L13 B: dir= 60.0 id= 58.3 FDR= 0.04x | D: dir= 56.7 id= 45.0 FDR= 0.05x
+    L14 B: dir= 63.3 id= 61.7 FDR= 0.04x | D: dir= 70.0 id= 43.3 FDR= 0.05x
+    L15 B: dir= 73.3 id= 46.7 FDR= 0.24x | D: dir= 86.7 id= 35.0 FDR= 0.29x
+    L16 B: dir= 86.7 id= 40.0 FDR= 0.23x | D: dir= 96.7 id= 23.3 FDR= 0.36x
+    L17 B: dir= 91.7 id= 25.0 FDR= 0.34x | D: dir= 86.7 id= 20.0 FDR= 0.44x
+    L18 B: dir= 98.3 id= 21.7 FDR= 0.65x | D: dir= 96.7 id= 13.3 FDR= 0.82x
+    L19 B: dir= 98.3 id= 18.3 FDR= 0.74x | D: dir= 96.7 id= 10.0 FDR= 0.70x
+    L20 B: dir= 96.7 id=  6.7 FDR= 8.12x | D: dir= 95.0 id=  8.3 FDR=10.96x
+    L21 B: dir= 96.7 id= 10.0 FDR= 7.50x | D: dir= 96.7 id=  6.7 FDR= 9.37x
+    L22 B: dir= 96.7 id=  8.3 FDR= 6.22x | D: dir= 98.3 id= 16.7 FDR= 8.31x
+    L23 B: dir= 95.0 id=  8.3 FDR= 6.01x | D: dir= 98.3 id= 10.0 FDR= 9.63x
+    L24 B: dir= 95.0 id=  8.3 FDR= 6.15x | D: dir= 96.7 id= 10.0 FDR= 9.49x
+    L25 B: dir= 93.3 id=  6.7 FDR= 3.74x | D: dir= 98.3 id=  3.3 FDR= 5.38x
+    L26 B: dir= 93.3 id=  5.0 FDR= 3.71x | D: dir= 98.3 id=  3.3 FDR= 5.05x
+    L27 B: dir= 93.3 id=  5.0 FDR= 3.49x | D: dir= 98.3 id=  1.7 FDR= 4.37x
+    L28 B: dir= 91.7 id=  5.0 FDR= 3.42x | D: dir= 98.3 id=  5.0 FDR= 3.82x
+
+  Exp4: Auxiliary Head — obj_color
+    Accuracy: 40.5% (567/1400)
+
+############################################################
+  shape_place
+############################################################
+
+  Exp1: Projector Temporal Delta — shape_place
+    [baseline] dir=71.7% id=18.3% FDR=0.22x
+    [delta] dir=86.7% id=15.0% FDR=0.40x
+
+  Exp3: Layer-wise Filtering — shape_place
+    L 0 B: dir= 21.7 id=  0.0 FDR= 0.00x | D: dir= 21.7 id=  0.0 FDR= 0.00x
+    L 1 B: dir=  1.7 id= 93.3 FDR= 0.00x | D: dir=  3.3 id= 93.3 FDR= 0.00x
+    L 2 B: dir=  1.7 id= 93.3 FDR= 0.00x | D: dir=  3.3 id= 93.3 FDR= 0.00x
+    L 3 B: dir=  3.3 id= 93.3 FDR= 0.00x | D: dir=  3.3 id= 93.3 FDR= 0.00x
+    L 4 B: dir=  1.7 id= 93.3 FDR= 0.00x | D: dir=  1.7 id= 93.3 FDR= 0.00x
+    L 5 B: dir=  3.3 id= 93.3 FDR= 0.00x | D: dir=  5.0 id= 93.3 FDR= 0.00x
+    L 6 B: dir=  3.3 id= 93.3 FDR= 0.00x | D: dir=  5.0 id= 93.3 FDR= 0.00x
+    L 7 B: dir=  8.3 id= 93.3 FDR= 0.00x | D: dir=  6.7 id= 93.3 FDR= 0.00x
+    L 8 B: dir=  5.0 id= 93.3 FDR= 0.00x | D: dir= 10.0 id= 93.3 FDR= 0.00x
+    L 9 B: dir=  6.7 id= 93.3 FDR= 0.00x | D: dir=  6.7 id= 93.3 FDR= 0.00x
+    L10 B: dir= 15.0 id= 93.3 FDR= 0.00x | D: dir= 13.3 id= 93.3 FDR= 0.00x
+    L11 B: dir= 18.3 id= 93.3 FDR= 0.00x | D: dir= 20.0 id= 93.3 FDR= 0.00x
+    L12 B: dir= 30.0 id= 93.3 FDR= 0.00x | D: dir= 36.7 id= 93.3 FDR= 0.00x
+    L13 B: dir= 35.0 id= 93.3 FDR= 0.00x | D: dir= 46.7 id= 93.3 FDR= 0.00x
+    L14 B: dir= 36.7 id= 93.3 FDR= 0.00x | D: dir= 48.3 id= 93.3 FDR= 0.00x
+    L15 B: dir= 53.3 id= 91.7 FDR= 0.01x | D: dir= 63.3 id= 91.7 FDR= 0.01x
+    L16 B: dir= 61.7 id= 90.0 FDR= 0.02x | D: dir= 75.0 id= 86.7 FDR= 0.03x
+    L17 B: dir= 81.7 id= 75.0 FDR= 0.06x | D: dir= 80.0 id= 75.0 FDR= 0.07x
+    L18 B: dir= 80.0 id= 75.0 FDR= 0.13x | D: dir= 80.0 id= 61.7 FDR= 0.16x
+    L19 B: dir= 86.7 id= 40.0 FDR= 0.14x | D: dir= 91.7 id= 33.3 FDR= 0.16x
+    L20 B: dir= 83.3 id=  8.3 FDR= 1.63x | D: dir= 90.0 id=  5.0 FDR= 3.10x
+    L21 B: dir= 90.0 id=  5.0 FDR= 1.84x | D: dir= 91.7 id=  0.0 FDR= 3.05x
+    L22 B: dir= 90.0 id=  8.3 FDR= 1.57x | D: dir= 91.7 id=  3.3 FDR= 2.75x
+    L23 B: dir= 88.3 id=  6.7 FDR= 1.87x | D: dir= 91.7 id=  3.3 FDR= 3.50x
+    L24 B: dir= 88.3 id=  5.0 FDR= 1.92x | D: dir= 91.7 id=  3.3 FDR= 3.51x
+    L25 B: dir= 86.7 id=  5.0 FDR= 1.17x | D: dir= 86.7 id=  0.0 FDR= 2.07x
+    L26 B: dir= 85.0 id=  3.3 FDR= 1.15x | D: dir= 88.3 id=  0.0 FDR= 2.01x
+    L27 B: dir= 85.0 id=  3.3 FDR= 1.08x | D: dir= 88.3 id=  0.0 FDR= 1.80x
+    L28 B: dir= 83.3 id=  3.3 FDR= 1.13x | D: dir= 86.7 id=  0.0 FDR= 1.73x
+
+  Exp4: Auxiliary Head — shape_place
+    Accuracy: 37.6% (526/1400)
+
+############################################################
+  obj_place
+############################################################
+
+  Exp1: Projector Temporal Delta — obj_place
+    [baseline] dir=75.0% id=3.3% FDR=0.44x
+    [delta] dir=88.3% id=3.3% FDR=0.69x
+
+  Exp3: Layer-wise Filtering — obj_place
+    L 0 B: dir= 21.7 id=  0.0 FDR= 0.00x | D: dir= 21.7 id=  0.0 FDR= 0.00x
+    L 1 B: dir= 20.0 id= 25.0 FDR= 0.05x | D: dir= 21.7 id= 23.3 FDR= 0.05x
+    L 2 B: dir= 20.0 id= 30.0 FDR= 0.05x | D: dir= 21.7 id= 28.3 FDR= 0.05x
+    L 3 B: dir= 20.0 id= 28.3 FDR= 0.05x | D: dir= 18.3 id= 21.7 FDR= 0.05x
+    L 4 B: dir= 15.0 id= 28.3 FDR= 0.05x | D: dir= 18.3 id= 31.7 FDR= 0.05x
+    L 5 B: dir= 18.3 id= 30.0 FDR= 0.05x | D: dir= 18.3 id= 33.3 FDR= 0.05x
+    L 6 B: dir= 21.7 id= 26.7 FDR= 0.05x | D: dir= 20.0 id= 23.3 FDR= 0.05x
+    L 7 B: dir= 21.7 id= 26.7 FDR= 0.05x | D: dir= 28.3 id= 21.7 FDR= 0.05x
+    L 8 B: dir= 20.0 id= 28.3 FDR= 0.05x | D: dir= 28.3 id= 21.7 FDR= 0.05x
+    L 9 B: dir= 21.7 id= 30.0 FDR= 0.05x | D: dir= 26.7 id= 25.0 FDR= 0.06x
+    L10 B: dir= 28.3 id= 21.7 FDR= 0.06x | D: dir= 26.7 id= 20.0 FDR= 0.06x
+    L11 B: dir= 25.0 id= 23.3 FDR= 0.06x | D: dir= 28.3 id= 18.3 FDR= 0.06x
+    L12 B: dir= 30.0 id= 21.7 FDR= 0.06x | D: dir= 35.0 id= 21.7 FDR= 0.06x
+    L13 B: dir= 31.7 id= 18.3 FDR= 0.07x | D: dir= 41.7 id= 20.0 FDR= 0.07x
+    L14 B: dir= 35.0 id= 25.0 FDR= 0.07x | D: dir= 43.3 id= 23.3 FDR= 0.07x
+    L15 B: dir= 53.3 id= 21.7 FDR= 0.13x | D: dir= 61.7 id= 15.0 FDR= 0.12x
+    L16 B: dir= 53.3 id= 20.0 FDR= 0.15x | D: dir= 60.0 id= 10.0 FDR= 0.17x
+    L17 B: dir= 75.0 id=  6.7 FDR= 0.29x | D: dir= 81.7 id=  8.3 FDR= 0.32x
+    L18 B: dir= 73.3 id=  6.7 FDR= 0.48x | D: dir= 88.3 id=  5.0 FDR= 0.56x
+    L19 B: dir= 70.0 id=  6.7 FDR= 0.48x | D: dir= 85.0 id=  6.7 FDR= 0.54x
+    L20 B: dir= 80.0 id=  5.0 FDR= 3.09x | D: dir= 88.3 id=  6.7 FDR= 4.90x
+    L21 B: dir= 80.0 id=  8.3 FDR= 3.68x | D: dir= 91.7 id=  5.0 FDR= 5.69x
+    L22 B: dir= 83.3 id=  8.3 FDR= 3.32x | D: dir= 93.3 id=  8.3 FDR= 5.27x
+    L23 B: dir= 81.7 id=  6.7 FDR= 3.47x | D: dir= 91.7 id=  6.7 FDR= 5.71x
+    L24 B: dir= 78.3 id=  6.7 FDR= 3.64x | D: dir= 91.7 id=  8.3 FDR= 5.76x
+    L25 B: dir= 78.3 id=  6.7 FDR= 1.91x | D: dir= 93.3 id=  5.0 FDR= 3.21x
+    L26 B: dir= 78.3 id=  5.0 FDR= 1.81x | D: dir= 90.0 id=  3.3 FDR= 3.00x
+    L27 B: dir= 80.0 id=  6.7 FDR= 1.67x | D: dir= 90.0 id=  6.7 FDR= 2.69x
+    L28 B: dir= 78.3 id=  8.3 FDR= 1.55x | D: dir= 91.7 id=  6.7 FDR= 2.36x
+
+  Exp4: Auxiliary Head — obj_place
+    Accuracy: 37.5% (525/1400)
+
+[SAVED] analysis/dimension_selection_results/delta_analysis.json

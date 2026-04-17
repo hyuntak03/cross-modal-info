@@ -1,0 +1,286 @@
+
+############################################################
+  MODEL: llava-video-7b_lora_syn_v4_baseline / TASK: shape_color
+############################################################
+
+============================================================
+  Exp1: Direction vs Identity Probe — shape_color
+============================================================
+
+  [vision_encoder] dim=6718464
+    Direction (4-class): 61.7%
+    shape (10-class): 98.3%
+    color (10-class): 78.3%
+
+  [after_projector] dim=5619712
+    Direction (4-class): 76.7%
+    shape (10-class): 75.0%
+    color (10-class): 56.7%
+
+  [vision_token_meanpool] dim=3584
+    Direction (4-class): 95.0%
+    shape (10-class): 100.0%
+    color (10-class): 98.3%
+
+  [answer_token] dim=3584
+    Direction (4-class): 100.0%
+    shape (10-class): 23.3%
+    color (10-class): 18.3%
+
+============================================================
+  Exp2: Fisher Discriminant Ratio — shape_color
+============================================================
+  [vision_encoder]
+    Direction-selective dims: 328687/6718464 (4.9%)
+    Identity-selective dims:  6389777/6718464 (95.1%)
+    Mean FDR direction: 0.0208
+    Mean FDR shape: 0.1675
+    Ratio (dir/id): 0.12x
+  [after_projector]
+    Direction-selective dims: 687089/5619712 (12.2%)
+    Identity-selective dims:  4932623/5619712 (87.8%)
+    Mean FDR direction: 0.0311
+    Mean FDR shape: 0.1129
+    Ratio (dir/id): 0.27x
+  [vision_token_meanpool]
+    Direction-selective dims: 452/3584 (12.6%)
+    Identity-selective dims:  3132/3584 (87.4%)
+    Mean FDR direction: 0.1457
+    Mean FDR shape: 0.5188
+    Ratio (dir/id): 0.28x
+  [answer_token]
+    Direction-selective dims: 2822/3584 (78.7%)
+    Identity-selective dims:  762/3584 (21.3%)
+    Mean FDR direction: 0.2125
+    Mean FDR shape: 0.0541
+    Ratio (dir/id): 3.93x
+
+============================================================
+  Exp3: PCA Variance Analysis — shape_color
+============================================================
+  [vision_token_meanpool]
+    PC0 (var=15.0%): direction=25.0%, shape=25.0%
+    PC1 (var=11.7%): direction=23.3%, shape=13.3%
+    PC2 (var=11.1%): direction=30.0%, shape=6.7%
+    PC3 (var=10.1%): direction=20.0%, shape=13.3%
+    PC4 (var=6.6%): direction=28.3%, shape=15.0%
+  [answer_token]
+    PC0 (var=24.2%): direction=26.7%, shape=8.3%
+    PC1 (var=20.9%): direction=20.0%, shape=11.7%
+    PC2 (var=18.6%): direction=31.7%, shape=11.7%
+    PC3 (var=17.1%): direction=18.3%, shape=5.0%
+    PC4 (var=6.0%): direction=36.7%, shape=13.3%
+
+############################################################
+  MODEL: llava-video-7b_lora_syn_v4_baseline / TASK: obj_color
+############################################################
+
+============================================================
+  Exp1: Direction vs Identity Probe — obj_color
+============================================================
+
+  [vision_encoder] dim=6718464
+    Direction (4-class): 53.3%
+    obj_class (top-10 of 26): 79.2%
+
+  [after_projector] dim=5619712
+    Direction (4-class): 66.7%
+    obj_class (top-10 of 26): 45.8%
+
+  [vision_token_meanpool] dim=3584
+    Direction (4-class): 48.3%
+    obj_class (top-10 of 26): 91.7%
+
+  [answer_token] dim=3584
+    Direction (4-class): 80.0%
+    obj_class (top-10 of 26): 16.7%
+
+============================================================
+  Exp2: Fisher Discriminant Ratio — obj_color
+============================================================
+  [vision_encoder]
+    Direction-selective dims: 14621/6718464 (0.2%)
+    Identity-selective dims:  6703843/6718464 (99.8%)
+    Mean FDR direction: 0.0187
+    Mean FDR obj_class: 0.1997
+    Ratio (dir/id): 0.09x
+  [after_projector]
+    Direction-selective dims: 75801/5619712 (1.3%)
+    Identity-selective dims:  5543911/5619712 (98.7%)
+    Mean FDR direction: 0.0269
+    Mean FDR obj_class: 0.1903
+    Ratio (dir/id): 0.14x
+  [vision_token_meanpool]
+    Direction-selective dims: 1/3584 (0.0%)
+    Identity-selective dims:  3583/3584 (100.0%)
+    Mean FDR direction: 0.0226
+    Mean FDR obj_class: 0.6181
+    Ratio (dir/id): 0.04x
+  [answer_token]
+    Direction-selective dims: 968/3584 (27.0%)
+    Identity-selective dims:  2616/3584 (73.0%)
+    Mean FDR direction: 0.1034
+    Mean FDR obj_class: 0.1446
+    Ratio (dir/id): 0.72x
+
+============================================================
+  Exp3: PCA Variance Analysis — obj_color
+============================================================
+  [vision_token_meanpool]
+    PC0 (var=31.9%): direction=25.0%, obj_class=1.7%
+    PC1 (var=12.6%): direction=18.3%, obj_class=1.7%
+    PC2 (var=7.2%): direction=23.3%, obj_class=3.3%
+    PC3 (var=6.0%): direction=21.7%, obj_class=8.3%
+    PC4 (var=5.5%): direction=18.3%, obj_class=0.0%
+  [answer_token]
+    PC0 (var=26.9%): direction=26.7%, obj_class=0.0%
+    PC1 (var=19.1%): direction=21.7%, obj_class=0.0%
+    PC2 (var=18.4%): direction=23.3%, obj_class=3.3%
+    PC3 (var=13.5%): direction=20.0%, obj_class=1.7%
+    PC4 (var=5.9%): direction=40.0%, obj_class=0.0%
+
+############################################################
+  MODEL: llava-video-7b_lora_syn_v4_baseline / TASK: shape_place
+############################################################
+
+============================================================
+  Exp1: Direction vs Identity Probe — shape_place
+============================================================
+
+  [vision_encoder] dim=6718464
+    Direction (4-class): 10.0%
+    shape (10-class): 93.3%
+    place_class (top-10 of 50): 100.0%
+
+  [after_projector] dim=5619712
+    Direction (4-class): 23.3%
+    shape (10-class): 93.3%
+    place_class (top-10 of 50): 100.0%
+
+  [vision_token_meanpool] dim=3584
+    Direction (4-class): 16.7%
+    shape (10-class): 93.3%
+    place_class (top-10 of 50): 100.0%
+
+  [answer_token] dim=3584
+    Direction (4-class): 81.7%
+    shape (10-class): 31.7%
+    place_class (top-10 of 50): 25.0%
+
+============================================================
+  Exp2: Fisher Discriminant Ratio — shape_place
+============================================================
+  [vision_encoder]
+    Direction-selective dims: 560/6718464 (0.0%)
+    Identity-selective dims:  6717904/6718464 (100.0%)
+    Mean FDR direction: 0.0034
+    Mean FDR shape: 0.1972
+    Ratio (dir/id): 0.02x
+  [after_projector]
+    Direction-selective dims: 11703/5619712 (0.2%)
+    Identity-selective dims:  5608009/5619712 (99.8%)
+    Mean FDR direction: 0.0063
+    Mean FDR shape: 0.1853
+    Ratio (dir/id): 0.03x
+  [vision_token_meanpool]
+    Direction-selective dims: 0/3584 (0.0%)
+    Identity-selective dims:  3584/3584 (100.0%)
+    Mean FDR direction: 0.0035
+    Mean FDR shape: 0.2355
+    Ratio (dir/id): 0.01x
+  [answer_token]
+    Direction-selective dims: 2517/3584 (70.2%)
+    Identity-selective dims:  1067/3584 (29.8%)
+    Mean FDR direction: 0.1397
+    Mean FDR shape: 0.0503
+    Ratio (dir/id): 2.78x
+
+============================================================
+  Exp3: PCA Variance Analysis — shape_place
+============================================================
+  [vision_token_meanpool]
+    PC0 (var=17.1%): direction=20.0%, shape=10.0%
+    PC1 (var=12.1%): direction=23.3%, shape=8.3%
+    PC2 (var=9.1%): direction=26.7%, shape=10.0%
+    PC3 (var=7.4%): direction=23.3%, shape=10.0%
+    PC4 (var=6.7%): direction=20.0%, shape=3.3%
+  [answer_token]
+    PC0 (var=21.9%): direction=26.7%, shape=10.0%
+    PC1 (var=20.1%): direction=30.0%, shape=15.0%
+    PC2 (var=15.8%): direction=20.0%, shape=8.3%
+    PC3 (var=12.4%): direction=21.7%, shape=10.0%
+    PC4 (var=7.9%): direction=36.7%, shape=5.0%
+
+############################################################
+  MODEL: llava-video-7b_lora_syn_v4_baseline / TASK: obj_place
+############################################################
+
+============================================================
+  Exp1: Direction vs Identity Probe — obj_place
+============================================================
+
+  [vision_encoder] dim=6718464
+    Direction (4-class): 15.0%
+    obj_class (top-10 of 26): 12.5%
+    place_class (top-10 of 49): 100.0%
+
+  [after_projector] dim=5619712
+    Direction (4-class): 38.3%
+    obj_class (top-10 of 26): 12.5%
+    place_class (top-10 of 49): 100.0%
+
+  [vision_token_meanpool] dim=3584
+    Direction (4-class): 21.7%
+    obj_class (top-10 of 26): 41.7%
+    place_class (top-10 of 49): 100.0%
+
+  [answer_token] dim=3584
+    Direction (4-class): 76.7%
+    obj_class (top-10 of 26): 4.2%
+    place_class (top-10 of 49): 34.8%
+
+============================================================
+  Exp2: Fisher Discriminant Ratio — obj_place
+============================================================
+  [vision_encoder]
+    Direction-selective dims: 1065/6718464 (0.0%)
+    Identity-selective dims:  6717399/6718464 (100.0%)
+    Mean FDR direction: 0.0123
+    Mean FDR obj_class: 0.1471
+    Ratio (dir/id): 0.08x
+  [after_projector]
+    Direction-selective dims: 4923/5619712 (0.1%)
+    Identity-selective dims:  5614789/5619712 (99.9%)
+    Mean FDR direction: 0.0139
+    Mean FDR obj_class: 0.1459
+    Ratio (dir/id): 0.10x
+  [vision_token_meanpool]
+    Direction-selective dims: 0/3584 (0.0%)
+    Identity-selective dims:  3584/3584 (100.0%)
+    Mean FDR direction: 0.0109
+    Mean FDR obj_class: 0.1959
+    Ratio (dir/id): 0.06x
+  [answer_token]
+    Direction-selective dims: 659/3584 (18.4%)
+    Identity-selective dims:  2925/3584 (81.6%)
+    Mean FDR direction: 0.0843
+    Mean FDR obj_class: 0.1598
+    Ratio (dir/id): 0.53x
+
+============================================================
+  Exp3: PCA Variance Analysis — obj_place
+============================================================
+  [vision_token_meanpool]
+    PC0 (var=17.7%): direction=18.3%, obj_class=3.3%
+    PC1 (var=13.3%): direction=23.3%, obj_class=0.0%
+    PC2 (var=8.6%): direction=21.7%, obj_class=0.0%
+    PC3 (var=7.8%): direction=20.0%, obj_class=1.7%
+    PC4 (var=6.7%): direction=18.3%, obj_class=1.7%
+  [answer_token]
+    PC0 (var=23.9%): direction=16.7%, obj_class=0.0%
+    PC1 (var=17.5%): direction=21.7%, obj_class=3.3%
+    PC2 (var=15.4%): direction=25.0%, obj_class=1.7%
+    PC3 (var=12.2%): direction=21.7%, obj_class=1.7%
+    PC4 (var=8.3%): direction=28.3%, obj_class=1.7%
+
+[SAVED] analysis/identity_results/identity_analysis_llava-video-7b_lora_syn_v4_baseline.json

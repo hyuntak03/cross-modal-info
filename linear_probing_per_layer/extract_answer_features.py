@@ -20,14 +20,14 @@ Usage (LLaVA):
     python linear_probing_per_layer/extract_answer_features.py \
         --model_args "pretrained=...,conv_template=qwen_1_5,device_map=auto" \
         --task direction_testbed_ablation_8way \
-        --output_dir output/answer_probe_features
+        --output_dir output/MODEL_NAME/answer_probe_features
 
 Usage (Qwen3-VL):
     python linear_probing_per_layer/extract_answer_features.py \
         --model_type qwen3_vl \
         --model_args "pretrained=/path/to/Qwen3-VL-4B-Instruct" \
         --task direction_testbed_ablation_8way \
-        --output_dir output/answer_probe_features_qwen3vl
+        --output_dir output/MODEL_NAME/answer_probe_features
 """
 
 import sys, os
@@ -39,6 +39,7 @@ import argparse
 import ast
 import importlib.util
 import json
+from concurrent.futures import ThreadPoolExecutor
 import math
 import string
 
@@ -48,6 +49,11 @@ from PIL import Image
 from tqdm import tqdm
 
 torch.set_grad_enabled(False)
+
+# TF32 활성화 (A100/H100 bf16 유사 속도)
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+torch.backends.cudnn.benchmark = True
 
 # core/__init__.py의 무거운 import chain을 피하기 위해 dataset_loader를 직접 로드
 def _import_module_direct(module_name, file_path):
@@ -212,32 +218,32 @@ def extract_features_llava(args):
         else:
             effective_modality = modality
 
-        inps = {
-            "inputs": input_ids,
-            "images": image_tensor,
-            "image_sizes": original_image_sizes,
-            "modalities": [effective_modality],
-            "do_sample": False,
-            "temperature": 0,
-            "max_new_tokens": 1,
-            "use_cache": True,
-            "return_dict_in_generate": True,
-            "output_hidden_states": True,
-            "pad_token_id": tokenizer.eos_token_id,
-        }
-
+        # === prefill만 필요: prepare_multimodal + forward (generate 오버헤드 제거) ===
         with torch.inference_mode():
-            output = model.generate(**inps)
+            (
+                _, position_ids, attention_mask, _, inputs_embeds, _
+            ) = model.prepare_inputs_labels_for_multimodal(
+                input_ids, None, None, None, None, image_tensor,
+                modalities=[effective_modality], image_sizes=original_image_sizes,
+            )
+            output = model(
+                inputs_embeds=inputs_embeds,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                output_hidden_states=True,
+                return_dict=True,
+            )
 
-        # prefill hidden states: output['hidden_states'][0] = tuple of (1, seq_len, hidden_dim) per layer
-        prefill_hidden = output['hidden_states'][0]
-
+        # 전체 layer의 last token → GPU stack → single CPU transfer
+        hidden_states = output.hidden_states  # tuple of (1, seq_len, hidden_dim) × (num_layers+1)
+        # stack: (L, D) on GPU
+        layer_stack = torch.stack(
+            [hidden_states[l][0, -1, :] for l in range(num_layers)], dim=0
+        )
+        layer_stack_cpu = layer_stack.cpu().to(torch.float16)  # (L, D) 1회 전송
         for layer_idx in range(num_layers):
-            layer_hs = prefill_hidden[layer_idx]  # (1, seq_len, hidden_dim)
-            # answer token = prefill의 마지막 토큰 (다음 토큰 생성 위치)
-            answer_hs = layer_hs[0, -1, :]  # (hidden_dim,)
-            answer_feature = answer_hs.cpu().to(torch.float16)
-            all_features[layer_idx].append(answer_feature)
+            all_features[layer_idx].append(layer_stack_cpu[layer_idx])
+        del layer_stack, layer_stack_cpu, output
 
         all_labels.append(label_idx)
         all_qids.append(question_id)
@@ -436,9 +442,12 @@ def save_results(output_dir, all_features, all_labels, all_qids, num_layers, num
     np.save(os.path.join(output_dir, "labels.npy"), labels_array)
     np.save(os.path.join(output_dir, "qids.npy"), np.array(all_qids))
 
-    for layer_idx in range(num_layers):
+    def _save_layer(layer_idx):
         features = torch.stack(all_features[layer_idx], dim=0).numpy()
         np.save(os.path.join(output_dir, f"features_layer_{layer_idx}.npy"), features)
+
+    with ThreadPoolExecutor(max_workers=min(8, num_layers)) as executor:
+        list(executor.map(_save_layer, range(num_layers)))
 
     meta = {
         "num_layers": num_layers,
@@ -468,7 +477,7 @@ if __name__ == "__main__":
                         choices=["auto", "llava", "qwen3_vl"],
                         help="모델 타입 (auto: config.json에서 자동 감지)")
     parser.add_argument("--task", type=str, required=True)
-    parser.add_argument("--output_dir", type=str, default="output/answer_probe_features")
+    parser.add_argument("--output_dir", type=str, required=True, help="e.g., output/MODEL_NAME/answer_probe_features/TASK")
     parser.add_argument("--limit", type=int, default=-1)
 
     parser.add_argument("--image-folder", type=str, default="")

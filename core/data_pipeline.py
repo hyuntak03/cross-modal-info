@@ -183,7 +183,12 @@ def create_data_loader(questions, image_folder, batch_size, num_workers, tokeniz
     dataset = CustomDataset(questions, image_folder, tokenizer, image_processor, model_config, task_name, conv_mode,
                             video_folder=video_folder, video_fps=video_fps,
                             frames_upbound=frames_upbound, force_sample=force_sample)
-    data_loader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn=collate_fn)
+    data_loader = DataLoader(
+        dataset, batch_size=batch_size, num_workers=num_workers,
+        shuffle=False, collate_fn=collate_fn,
+        pin_memory=True, prefetch_factor=4 if num_workers > 0 else None,
+        persistent_workers=num_workers > 0,
+    )
     return data_loader
 
 

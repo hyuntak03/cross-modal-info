@@ -6,8 +6,8 @@ extract_vision_features.py로 저장한 features를 로드하여
 
 Usage:
     python linear_probing_per_layer/linear_probe.py \
-        --feature_dir output/linear_probe_features \
-        --output_dir output/linear_probe_results \
+        --feature_dir linear_probe_features/MODEL_NAME/TASK \
+        --output_dir output/MODEL_NAME/linear_probe_results/TASK \
         --test_ratio 0.2
 """
 
@@ -149,6 +149,7 @@ def plot_results(df, output_dir, num_layers, num_classes, model_name, task):
     ax.set_ylabel("Accuracy (%)")
     ax.set_title(f"Linear Probing per Layer\n{model_name} / {task}")
     ax.set_xlim(0, num_layers - 1)
+    ax.set_ylim(0, 100)
     ax.legend(fontsize=8)
     plt.tight_layout()
 
@@ -162,7 +163,7 @@ def plot_results(df, output_dir, num_layers, num_classes, model_name, task):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Linear probing per layer (PyTorch GPU)")
     parser.add_argument("--feature_dir", type=str, required=True)
-    parser.add_argument("--output_dir", type=str, default="output/linear_probe_results")
+    parser.add_argument("--output_dir", type=str, required=True, help="e.g., output/MODEL_NAME/linear_probe_results/TASK")
     parser.add_argument("--test_ratio", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--epochs", type=int, default=100)

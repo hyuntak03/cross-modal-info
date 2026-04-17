@@ -1,0 +1,12 @@
+task: vlm_direction_testbed_R2R_4way_obj_color
+dataset_name: R2R_4way_obj_color
+include: default.yaml
+test_split: val
+doc_to_visual: !function utils.doc_to_visual
+doc_to_text: !function utils.close_ended_doc_to_text
+doc_to_target: "answer"
+process_results: !function utils.process_results
+metric_list:
+  - metric: accuracy
+    aggregation: !function utils.R2R_4way_obj_color_aggregate
+    higher_is_better: true

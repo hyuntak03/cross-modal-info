@@ -1,0 +1,332 @@
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.459596756438259e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.459596756438259e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.221043484330949e-09.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.221043484330949e-09.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3901657602843898e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3901657602843898e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2531729431941585e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2531729431941585e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2471815580283874e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2471815580283874e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.459596756438259e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.459596756438259e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.494768526963071e-09.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.494768526963071e-09.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3927851760797694e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3927851760797694e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.244297820335305e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.244297820335305e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2912217073335341e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2912217073335341e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.459596756438259e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.459596756438259e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.897023645066838e-09.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.897023645066838e-09.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5252933138754088e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5252933138754088e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+
+==========================================================================================
+  Vanilla
+==========================================================================================
+
+  [Stage: vision_encoder, D=1152]
+            Task |  Pos R² | Dir acc | Obj acc (cls) |  P∩D  P∩O  D∩O  (rand=2.17)
+     shape_color |  0.992 |  100.0% |  96.3% (30) |    6    8    0
+       obj_color |  0.851 |   99.2% |  88.6% (26) |    7    8    3
+     shape_place |  0.917 |   97.2% |  87.7% (30) |    6    2    4
+       obj_place |  0.806 |   95.1% |  80.8% (26) |    8    4    3
+
+  [Cross-task top-50 overlap, vision_encoder] (random = 2.17)
+    position:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          4          2          2
+           obj_color          4         50          6         10
+         shape_place          2          6         50          8
+           obj_place          2         10          8         50
+    direction:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50         16          7          6
+           obj_color         16         50          5         10
+         shape_place          7          5         50         23
+           obj_place          6         10         23         50
+    object:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          2         17          3
+           obj_color          2         50          1         22
+         shape_place         17          1         50          3
+           obj_place          3         22          3         50
+
+  [Stage: after_projector, D=3584]
+            Task |  Pos R² | Dir acc | Obj acc (cls) |  P∩D  P∩O  D∩O  (rand=0.70)
+     shape_color |  0.989 |   99.9% |  93.9% (30) |    1    0    0
+       obj_color |  0.875 |   97.8% |  86.2% (26) |    0    0    1
+     shape_place |  0.929 |   96.3% |  84.7% (30) |    0    0    0
+       obj_place |  0.836 |   93.0% |  77.1% (26) |    2    1    1
+
+  [Cross-task top-50 overlap, after_projector] (random = 0.70)
+    position:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          0          0          2
+           obj_color          0         50          0          2
+         shape_place          0          0         50          0
+           obj_place          2          2          0         50
+    direction:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50         11          0          1
+           obj_color         11         50          0          0
+         shape_place          0          0         50         17
+           obj_place          1          0         17         50
+    object:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          1          6          0
+           obj_color          1         50          1          5
+         shape_place          6          1         50          2
+           obj_place          0          5          2         50
+
+==========================================================================================
+  Baseline
+==========================================================================================
+
+  [Stage: vision_encoder, D=1152]
+            Task |  Pos R² | Dir acc | Obj acc (cls) |  P∩D  P∩O  D∩O  (rand=2.17)
+     shape_color |  0.992 |  100.0% |  96.3% (30) |    6    8    0
+       obj_color |  0.851 |   99.2% |  88.6% (26) |    7    8    3
+     shape_place |  0.917 |   97.2% |  87.7% (30) |    6    2    4
+       obj_place |  0.806 |   95.1% |  80.8% (26) |    8    4    3
+
+  [Cross-task top-50 overlap, vision_encoder] (random = 2.17)
+    position:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          4          2          2
+           obj_color          4         50          6         10
+         shape_place          2          6         50          8
+           obj_place          2         10          8         50
+    direction:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50         16          7          6
+           obj_color         16         50          5         10
+         shape_place          7          5         50         23
+           obj_place          6         10         23         50
+    object:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          2         17          3
+           obj_color          2         50          1         22
+         shape_place         17          1         50          3
+           obj_place          3         22          3         50
+
+  [Stage: after_projector, D=3584]
+            Task |  Pos R² | Dir acc | Obj acc (cls) |  P∩D  P∩O  D∩O  (rand=0.70)
+     shape_color |  0.990 |   99.9% |  94.2% (30) |    0    2    0
+       obj_color |  0.878 |   98.0% |  86.2% (26) |    0    1    1
+     shape_place |  0.931 |   96.2% |  85.1% (30) |    0    0    0
+       obj_place |  0.837 |   93.2% |  77.1% (26) |    2    1    0
+
+  [Cross-task top-50 overlap, after_projector] (random = 0.70)
+    position:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          1          0          1
+           obj_color          1         50          0          3
+         shape_place          0          0         50          1
+           obj_place          1          3          1         50
+    direction:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          9          0          1
+           obj_color          9         50          0          0
+         shape_place          0          0         50         17
+           obj_place          1          0         17         50
+    object:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          2          9          0
+           obj_color          2         50          1          5
+         shape_place          9          1         50          2
+           obj_place          0          5          2         50
+
+==========================================================================================
+  Delta
+==========================================================================================
+
+  [Stage: vision_encoder, D=1152]
+            Task |  Pos R² | Dir acc | Obj acc (cls) |  P∩D  P∩O  D∩O  (rand=2.17)
+     shape_color |  0.992 |  100.0% |  96.3% (30) |    6    8    0
+       obj_color |  0.851 |   99.2% |  88.6% (26) |    7    8    3
+     shape_place |  0.917 |   97.2% |  87.7% (30) |    6    2    4
+       obj_place |  0.806 |   95.1% |  80.8% (26) |    8    4    3
+
+  [Cross-task top-50 overlap, vision_encoder] (random = 2.17)
+    position:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          4          2          2
+           obj_color          4         50          6         10
+         shape_place          2          6         50          8
+           obj_place          2         10          8         50
+    direction:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50         16          7          6
+           obj_color         16         50          5         10
+         shape_place          7          5         50         23
+           obj_place          6         10         23         50
+    object:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          2         17          3
+           obj_color          2         50          1         22
+         shape_place         17          1         50          3
+           obj_place          3         22          3         50
+
+  [Stage: after_projector, D=3584]
+            Task |  Pos R² | Dir acc | Obj acc (cls) |  P∩D  P∩O  D∩O  (rand=0.70)
+     shape_color |  0.993 |  100.0% |  94.2% (30) |    1    0    0
+       obj_color |  0.925 |   99.9% |  85.7% (26) |    0    1    0/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2980149399766105e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2980149399766105e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3159163536613505e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_ridge.py:228: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3159163536613505e-08.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+/data/takhyun03/anaconda3/envs/lmms_llavavideo/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=-1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+
+     shape_place |  0.940 |   96.5% |  84.6% (30) |    1    0    0
+       obj_place |  0.860 |   95.6% |  76.9% (26) |    1    1    0
+
+  [Cross-task top-50 overlap, after_projector] (random = 0.70)
+    position:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          1          0          0
+           obj_color          1         50          2          1
+         shape_place          0          2         50          0
+           obj_place          0          1          0         50
+    direction:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50         18          7          1
+           obj_color         18         50          8          5
+         shape_place          7          8         50         17
+           obj_place          1          5         17         50
+    object:
+                     shape_colo  obj_color shape_plac  obj_place
+         shape_color         50          3          6          1
+           obj_color          3         50          0          7
+         shape_place          6          0         50          2
+           obj_place          1          7          2         50
+
+[SAVED] analysis/position_direction_object_dims.json

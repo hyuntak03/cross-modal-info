@@ -35,6 +35,9 @@ DIRECTION_LABELS = [
     "Down-Right",
 ]
 
+DIRECTION_CLASSES_4WAY = ["up", "down", "left", "right"]
+DIRECTION_LABELS_4WAY = ["Up", "Down", "Left", "Right"]
+
 
 # ============================================================
 # output_dir 추출
@@ -59,7 +62,7 @@ def _get_output_dir():
 # ============================================================
 def doc_to_visual(doc):
     video_rel = doc["video"]
-    video_path = HF_DATASETS_CACHE
+    video_path = os.path.join(HF_DATASETS_CACHE, video_rel)
     if not os.path.exists(video_path):
         eval_logger.error(f"Video path: {video_path} does not exist")
     return [video_path]
@@ -135,11 +138,11 @@ def process_results(doc: dict, results: list) -> dict:
 # Confusion Matrix 저장 (방향 기반)
 # ============================================================
 def _save_direction_confusion_matrix(
-    results_list: list[dict], task_name: str
+    results_list: list[dict], task_name: str, is_4way: bool = False
 ) -> float:
-    """pred_direction vs gold_direction 기반 8×8 confusion matrix."""
-    classes = DIRECTION_CLASSES
-    labels = DIRECTION_LABELS
+    """pred_direction vs gold_direction 기반 confusion matrix."""
+    classes = DIRECTION_CLASSES_4WAY if is_4way else DIRECTION_CLASSES
+    labels = DIRECTION_LABELS_4WAY if is_4way else DIRECTION_LABELS
     n = len(classes)
     cm = np.zeros((n, n), dtype=int)
     class_to_idx = {c: i for i, c in enumerate(classes)}
@@ -211,8 +214,9 @@ def _save_direction_confusion_matrix(
 # Per-direction accuracy 로깅
 # ============================================================
 def _log_per_direction_accuracy(
-    results_list: list[dict], task_name: str
+    results_list: list[dict], task_name: str, is_4way: bool = False
 ) -> float:
+    classes = DIRECTION_CLASSES_4WAY if is_4way else DIRECTION_CLASSES
     dir_correct: dict[str, float] = {}
     dir_total: dict[str, int] = {}
     for r in results_list:
@@ -228,7 +232,7 @@ def _log_per_direction_accuracy(
     eval_logger.info(
         f"{task_name} | Overall: {acc:.4f} ({int(correct)}/{total})"
     )
-    for d in DIRECTION_CLASSES:
+    for d in classes:
         if d in dir_total:
             d_acc = dir_correct[d] / dir_total[d]
             eval_logger.info(
@@ -268,4 +272,35 @@ def synobj_synbg_aggregate(results: list[dict]) -> float:
     _log_per_direction_accuracy(results, "identity_testbed_synobj_synbg")
     return _save_direction_confusion_matrix(
         results, "identity_testbed_synobj_synbg"
+    )
+
+
+# ============================================================
+# Aggregation functions (4-way)
+# ============================================================
+def realobj_realbg_4way_aggregate(results: list[dict]) -> float:
+    _log_per_direction_accuracy(results, "identity_testbed_realobj_realbg_4way", is_4way=True)
+    return _save_direction_confusion_matrix(
+        results, "identity_testbed_realobj_realbg_4way", is_4way=True
+    )
+
+
+def realobj_synbg_4way_aggregate(results: list[dict]) -> float:
+    _log_per_direction_accuracy(results, "identity_testbed_realobj_synbg_4way", is_4way=True)
+    return _save_direction_confusion_matrix(
+        results, "identity_testbed_realobj_synbg_4way", is_4way=True
+    )
+
+
+def synobj_realbg_4way_aggregate(results: list[dict]) -> float:
+    _log_per_direction_accuracy(results, "identity_testbed_synobj_realbg_4way", is_4way=True)
+    return _save_direction_confusion_matrix(
+        results, "identity_testbed_synobj_realbg_4way", is_4way=True
+    )
+
+
+def synobj_synbg_4way_aggregate(results: list[dict]) -> float:
+    _log_per_direction_accuracy(results, "identity_testbed_synobj_synbg_4way", is_4way=True)
+    return _save_direction_confusion_matrix(
+        results, "identity_testbed_synobj_synbg_4way", is_4way=True
     )

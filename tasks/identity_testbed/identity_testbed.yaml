@@ -4,3 +4,8 @@ task:
   - identity_testbed_realobj_synbg
   - identity_testbed_synobj_realbg
   - identity_testbed_synobj_synbg
+
+  - identity_testbed_realobj_realbg_4way
+  - identity_testbed_realobj_synbg_4way
+  - identity_testbed_synobj_realbg_4way
+  - identity_testbed_synobj_synbg_4way

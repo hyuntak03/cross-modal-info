@@ -1,0 +1,10 @@
+group: vlm_direction_testbed_E2E
+task:
+  - vlm_direction_testbed_E2E_shape_color
+  - vlm_direction_testbed_E2E_shape_place
+  - vlm_direction_testbed_E2E_obj_color
+  - vlm_direction_testbed_E2E_obj_place
+  - vlm_direction_testbed_E2E_4way_shape_color
+  - vlm_direction_testbed_E2E_4way_shape_place
+  - vlm_direction_testbed_E2E_4way_obj_color
+  - vlm_direction_testbed_E2E_4way_obj_place
